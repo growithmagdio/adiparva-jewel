@@ -1,0 +1,40 @@
+import { HeroSlide } from '../types';
+
+export const seedHeroSlides: HeroSlide[] = [
+  {
+    id: 'hero-1',
+    eyebrow: 'EST. IN THE TRADITION OF THE SOUTH',
+    headingItalic: 'Adi',
+    headingRoman: 'Parva',
+    body: 'Custodians of South Indian temple gold, Kundan, and royal Polki heirlooms crafted by hereditary artisan guilds.',
+    ctaLabel: 'See the collection',
+    ctaHref: '/collections',
+    image: '/images/hero/hero-temple-necklace.jpg',
+    order: 1,
+    active: true,
+  },
+  {
+    id: 'hero-2',
+    eyebrow: 'SACRED ARCHITECTURAL REPOUSSÉ',
+    headingItalic: 'Temple',
+    headingRoman: 'Heirlooms',
+    body: 'Hand-raised 22K gold nakashi relief panels depicting Lakshmi and sacred motifs from ancient Chola shrines.',
+    ctaLabel: 'Explore Temple Jewellery',
+    ctaHref: '/collections/temple-jewellery',
+    image: '/images/hero/hero-kasu-haaram.jpg',
+    order: 2,
+    active: true,
+  },
+  {
+    id: 'hero-3',
+    eyebrow: 'ROYAL COURTLY SPLENDOR',
+    headingItalic: 'Kundan',
+    headingRoman: 'Masterpieces',
+    body: 'Refined gold foil burnished around natural gemstones, featuring traditional Banaras meenakari on the reverse.',
+    ctaLabel: 'Discover Kundan & Polki',
+    ctaHref: '/collections/kundan',
+    image: '/images/hero/hero-kundan-set.jpg',
+    order: 3,
+    active: true,
+  },
+];
