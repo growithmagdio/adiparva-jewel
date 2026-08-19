@@ -1,62 +1,105 @@
 @import "tailwindcss";
 
 @theme {
-  /* Dark Brown — sidebar, headings, foot, dark sections */
-  --color-ink-900: #321509;
-  --color-ink-800: #241008;
-  --color-ink-700: #4A210F;
-  --color-ink-600: #5A3A26;
+  /* Vault & Vitrine Surfaces */
+  --color-vault:    #1C0F07;  /* near-black espresso */
+  --color-ink:      #1C0F07;  /* primary text on light, secondary dark surface */
+  --color-ink-900:  #1C0F07;  /* deepest */
+  --color-ink-800:  #2C1810;  /* sidebar surface */
+  --color-ink-700:  #3D2418;  /* sidebar hover */
 
-  /* Gold — antique gold accent, active elements */
+  /* Cream — page ground & surface (Replacing pure white) */
+  --color-cream-50:  #FDF7EF;  /* warm cream background */
+  --color-cream-100: #FAF0E4;  /* card & section ground */
+  --color-cream-200: #F2E6D6;  /* hairlines, dividers */
+  --color-cream-300: #E6D5BF;  /* borders */
+  
+  --color-ivory:    #FDF7EF;  /* main page background */
+  --color-bone:     #FAF0E4;  /* input fills & cards */
+  --color-hairline: #F2E6D6;  /* dividers */
+  --color-surface:  #FDF7EF;  /* surface replacing pure white */
+
+  /* Metals & Signals */
+  --color-gold:     #A67A2E;  /* primary accent */
   --color-gold-700: #96601A;
-  --color-gold-600: #C47A20;  /* Antique Gold */
-  --color-gold-500: #D99A38;  /* Bright Gold */
-  --color-gold-400: #E2B258;
+  --color-gold-600: #B8761F;
+  --color-gold-500: #C8891F;
+  --color-gold-400: #D9A441;
   --color-gold-100: #F6EDE1;
+  --color-gold-lit: #D6AC5E;
+  --color-kumkum:   #8C2F26;
+  --color-leaf:     #2E5E45;
 
-  /* Cream — page ground & cards */
-  --color-cream-50:  #FBF8F2;  /* Warm Ivory */
-  --color-cream-100: #F7EFE4;  /* Cream App Ground */
-  --color-cream-200: #E8DED2;  /* Dividers & Borders */
-  --color-cream-300: #D8C8B5;
-
-  --color-surface: #FFFFFF;
-
-  /* Type */
-  --color-text-900: #281913;   /* Primary Text */
-  --color-text-700: #4A210F;   /* Body Text */
-  --color-text-500: #756861;   /* Secondary Text */
-  --color-text-400: #9A8C82;   /* Micro Labels */
-
-  /* Status */
-  --color-ok-fg:   #16855B;  --color-ok-bg:   #E4F2EA;
-  --color-info-fg: #2B5FD9;  --color-info-bg: #E4EBFB;
-  --color-warn-fg: #9A6A05;  --color-warn-bg: #FBEFD6;
-  --color-risk-fg: #B3261E;  --color-risk-bg: #FBE9E7;
-
-  --radius-card: 4px;
-  --radius-tile: 12px;
-  --radius-pill: 999px;
+  /* Typography Font Families */
+  --font-bodoni:    var(--font-bodoni-moda), Georgia, serif;
+  --font-marcellus: var(--font-marcellus), Georgia, serif;
+  --font-karla:     var(--font-karla), system-ui, sans-serif;
+  --font-tamil:     var(--font-anek-tamil), sans-serif;
 }
 
 @layer base {
   html {
     color-scheme: light;
-    background-color: var(--color-cream-100);
-    color: var(--color-text-700);
-    font-family: var(--font-poppins), system-ui, sans-serif;
+    background-color: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-karla), system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  /* Universal Strict Rules: No box shadows, 1px hairlines */
+  *, ::before, ::after {
+    border-color: var(--color-hairline);
   }
 
   /* Keyboard Focus Ring */
   :focus-visible {
-    outline: 2px solid var(--color-gold-500);
-    outline-offset: 2px;
+    outline: 1px solid var(--color-gold) !important;
+    outline-offset: 3px !important;
   }
 
-  /* Typography Defaults */
+  /* Headings Default */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-playfair), Georgia, serif;
-    color: var(--color-text-900);
+    font-family: var(--font-bodoni), Georgia, serif;
+    color: var(--color-ink);
+    letter-spacing: -0.02em;
+    line-height: 1.04;
+  }
+}
+
+/* Foil Gradient Utility */
+.bg-foil-gold {
+  background: linear-gradient(100deg, #8A6224 0%, #D6AC5E 38%, #F0DCA8 50%, #D6AC5E 62%, #8A6224 100%);
+}
+
+.text-foil-gold {
+  background: linear-gradient(100deg, #8A6224 0%, #D6AC5E 38%, #F0DCA8 50%, #D6AC5E 62%, #8A6224 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FFF0C9 0%, #D4AF37 45%, #B8761F 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.shadow-royal-gold {
+  box-shadow: 0 12px 35px -8px rgba(166, 122, 46, 0.28);
+}
+
+.border-gold-glow {
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1), 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

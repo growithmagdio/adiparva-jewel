@@ -15,7 +15,7 @@ export interface Category {
 export interface ProductVariant {
   id: string;
   label: string; // "Gold-tone, 18 inch"
-  metal: 'Gold-plated silver' | '22K gold' | 'Silver' | 'Antique gold finish';
+  metal: 'Gold-plated silver' | '22K gold' | 'Silver' | 'Antique gold finish' | '22kt gold plating over brass';
   sizeLabel?: string;
   priceDelta: Currency;
   stock: number;
@@ -32,16 +32,17 @@ export interface Product {
   slug: string;
   name: string;
   categoryId: string;
-  collectionTag?: 'Masterpiece' | 'New arrival' | 'Bridal' | 'Archive';
-  shortDescription: string; // 1 line, 90 chars max
-  story: string; // 3 paragraphs of provenance
+  collectionTag?: 'Masterpiece' | 'New arrival' | 'Bridal' | 'Archive' | 'Bestseller';
+  collection?: string;
+  shortDescription: string; // 1 line, max 90 chars
+  story: string; // Provenance story
   price: Currency;
   compareAtPrice?: Currency;
-  images: string[]; // min 3 per product
+  images: string[]; // min 3-5 per product
   variants: ProductVariant[];
-  specs: ProductSpec[]; // Weight, Metal, Stones, Finish, Origin, Era
+  specs: ProductSpec[]; // Weight, Plating, Base metal, Stones, Closure, Length, Care, Origin
   craftTime: string; // "6 weeks"
-  artisanCluster: string; // "Nagercoil, Tamil Nadu"
+  artisanCluster: string; // "Madurai, Tamil Nadu"
   certification: string[]; // ["BIS Hallmarked", "Certificate of authenticity"]
   careNotes: string[];
   status: 'live' | 'draft' | 'archived';
@@ -49,6 +50,15 @@ export interface Product {
   rating: number;
   reviewCount: number;
   createdAt: string;
+
+  // Additional Redesign Fine Jewellery Specifications
+  weightGrams?: number;
+  plating?: string;
+  baseMetal?: string;
+  stones?: string[];
+  closure?: string;
+  lengthInches?: string;
+  occasion?: string[];
 }
 
 export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'returned';
@@ -183,7 +193,8 @@ export interface JournalArticle {
 export interface SiteContent {
   announcementBar: {
     enabled: boolean;
-    message: string;
+    messages?: string[];
+    message?: string;
     linkHref?: string;
     linkLabel?: string;
   };

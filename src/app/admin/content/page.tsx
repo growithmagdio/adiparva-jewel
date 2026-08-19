@@ -17,7 +17,7 @@ export default function AdminContentPage() {
     async function loadContent() {
       const data = await getSiteContent();
       setContent(data);
-      setAnnouncementMsg(data.announcementBar.message);
+      setAnnouncementMsg(data.announcementBar.message || (data.announcementBar.messages ? data.announcementBar.messages[0] : ''));
       setHouseStoryHeading(data.houseStory.heading);
     }
     loadContent();
@@ -33,6 +33,7 @@ export default function AdminContentPage() {
       announcementBar: {
         ...content.announcementBar,
         message: announcementMsg,
+        messages: [announcementMsg],
       },
       houseStory: {
         ...content.houseStory,

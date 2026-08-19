@@ -3,24 +3,18 @@
 import * as React from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Header } from '@/components/storefront/header';
 import { Footer } from '@/components/storefront/footer';
 import { ProductCard } from '@/components/storefront/product-card';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
-import {
-  BicameralHeading,
-  MicroLabel,
-  Price,
-  Button,
-  ArchFrame,
-  Skeleton,
-} from '@/components/primitives';
+import { InscriptionPlate } from '@/components/storefront/InscriptionPlate';
+import { Button } from '@/components/primitives/button';
+import { GopuramRule } from '@/components/ui/GopuramRule';
 import { getProductBySlug, getProducts } from '@/lib/data/queries';
 import { Product } from '@/lib/data/types';
 import { useCartStore } from '@/lib/store/use-cart-store';
 import { useWishlistStore } from '@/lib/store/use-wishlist-store';
-import { Heart, ShoppingBag, ShieldCheck, Truck, RefreshCw, Star, Check } from 'lucide-react';
-import { clsx } from 'clsx';
+import { Heart, Check, MessageSquare, Maximize2, X } from 'lucide-react';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -28,14 +22,19 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = React.useState<Product | null>(null);
   const [related, setRelated] = React.useState<Product[]>([]);
+  const [completeSet, setCompleteSet] = React.useState<Product[]>([]);
   const [selectedImage, setSelectedImage] = React.useState<string>('');
   const [selectedVariantId, setSelectedVariantId] = React.useState<string>('');
   const [qty, setQty] = React.useState(1);
-  const [activeTab, setActiveTab] = React.useState<'provenance' | 'specs' | 'care' | 'certification'>('provenance');
-  const [isReserved, setIsReserved] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<'description' | 'craft' | 'reviews' | 'shipping'>('description');
+  const [isAdded, setIsAdded] = React.useState(false);
+  const [zoomOpen, setZoomOpen] = React.useState(false);
+  const [pincode, setPincode] = React.useState('');
+  const [pincodeResult, setPincodeResult] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
 
   const addItem = useCartStore((state) => state.addItem);
+  const toggleCart = useCartStore((state) => state.toggleCart);
   const toggleWishlist = useWishlistStore((state) => state.toggleWishlist);
   const isWishlisted = useWishlistStore((state) => (product ? state.isInWishlist(product.id) : false));
 
@@ -46,12 +45,13 @@ export default function ProductDetailPage() {
       setProduct(item);
 
       if (item) {
-        setSelectedImage(item.images[0] || '');
+        setSelectedImage(item.images[0] || '/images/products/maharani-temple-necklace-1.jpg');
         if (item.variants.length > 0) setSelectedVariantId(item.variants[0].id);
 
         const all = await getProducts({ status: 'live' });
         const rel = all.filter((p) => p.id !== item.id && p.categoryId === item.categoryId).slice(0, 4);
         setRelated(rel.length > 0 ? rel : all.filter((p) => p.id !== item.id).slice(0, 4));
+        setCompleteSet(all.filter((p) => p.id !== item.id && p.categoryId !== item.categoryId).slice(0, 3));
       }
       setLoading(false);
     }
@@ -60,18 +60,16 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--color-cream-100)] flex flex-col font-sans">
+      <div className="min-h-screen bg-[var(--color-ivory)] flex flex-col font-sans">
         <Header />
-        <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12 space-y-8">
+        <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-6">
-              <Skeleton variant="arch" className="w-full aspect-[4/5]" />
-            </div>
-            <div className="lg:col-span-6 space-y-6">
-              <Skeleton variant="text" className="w-1/3 h-4" />
-              <Skeleton variant="text" className="w-3/4 h-10" />
-              <Skeleton variant="text" className="w-1/2 h-8" />
-              <Skeleton variant="rect" className="w-full h-32" />
+            <div className="lg:col-span-7 aspect-[4/5] bg-[var(--color-bone)] animate-pulse" />
+            <div className="lg:col-span-5 space-y-6">
+              <div className="h-4 w-1/3 bg-[var(--color-bone)] animate-pulse" />
+              <div className="h-10 w-3/4 bg-[var(--color-bone)] animate-pulse" />
+              <div className="h-8 w-1/2 bg-[var(--color-bone)] animate-pulse" />
+              <div className="h-48 w-full bg-[var(--color-bone)] animate-pulse" />
             </div>
           </div>
         </main>
@@ -82,13 +80,13 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[var(--color-cream-100)] flex flex-col font-sans">
+      <div className="min-h-screen bg-[var(--color-ivory)] flex flex-col font-sans">
         <Header />
-        <main className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-          <h2 className="font-serif text-3xl text-[var(--color-text-900)]">Piece Not Found</h2>
-          <p className="text-xs text-[var(--color-text-500)] mt-2">The requested heritage piece is no longer in the live collection.</p>
-          <Link href="/collections" className="mt-6">
-            <Button variant="primary">Return to Collection</Button>
+        <main className="flex-1 flex flex-col items-center justify-center p-16 text-center space-y-4">
+          <h2 className="font-bodoni text-3xl text-[var(--color-ink)]">Piece Not Found</h2>
+          <p className="font-karla text-sm text-[var(--color-ink)]/70">The requested heritage piece is no longer in the active vault.</p>
+          <Link href="/collections">
+            <Button variant="gold">Return to Collection</Button>
           </Link>
         </main>
         <Footer />
@@ -101,7 +99,7 @@ export default function ProductDetailPage() {
     label: '22K Gold Standard',
   };
 
-  const handleReserve = () => {
+  const handleAddToCart = () => {
     addItem({
       productId: product.id,
       variantId: selectedVariant.id,
@@ -112,256 +110,369 @@ export default function ProductDetailPage() {
       variantLabel: selectedVariant.label,
     });
 
-    setIsReserved(true);
-    setTimeout(() => setIsReserved(false), 2000);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1500);
   };
 
+  const handleBuyNow = () => {
+    handleAddToCart();
+    toggleCart();
+  };
+
+  const handlePincodeCheck = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pincode || pincode.length !== 6) {
+      setPincodeResult('Enter a valid 6-digit pincode.');
+      return;
+    }
+    const days = ['Fri, 21 Aug', 'Sat, 22 Aug', 'Sun, 23 Aug'];
+    const randomDay = days[Math.floor(Math.random() * days.length)];
+    setPincodeResult(`Delivers to ${pincode} by ${randomDay} · Cash on delivery available.`);
+  };
+
+  const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(
+    `Hello Adi Parva Atelier, I am interested in inquiring about ${product.name} (Code: ${product.id}).`
+  )}`;
+
   return (
-    <div className="min-h-screen bg-[var(--color-cream-100)] text-[var(--color-text-700)] flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[var(--color-ivory)] text-[var(--color-ink)] flex flex-col font-sans">
       <Header />
 
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-10 space-y-16">
-        {/* Main Product Display Section */}
+      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12 space-y-24">
+        {/* Breadcrumb */}
+        <div className="font-karla text-[12px] text-[var(--color-ink)]/60 flex items-center gap-2">
+          <Link href="/" className="hover:text-[var(--color-gold)] transition-colors">Home</Link>
+          <span className="text-[var(--color-hairline)]">/</span>
+          <Link href="/collections" className="hover:text-[var(--color-gold)] transition-colors">Collections</Link>
+          <span className="text-[var(--color-hairline)]">/</span>
+          <span className="text-[var(--color-ink)] font-medium">{product.name}</span>
+        </div>
+
+        {/* Two Column Layout: Left 58% Gallery / Right 42% Details */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Gallery (Left 6 Cols) */}
-          <div className="lg:col-span-6 flex flex-col-reverse md:flex-row gap-4">
-            {/* Thumbnails */}
+          {/* Gallery (Left 58% -> lg:col-span-7) */}
+          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 sticky top-28">
+            {/* Thumbnail Rail Vertical Left (Desktop 5 thumbs) */}
             <div className="flex md:flex-col gap-3 overflow-x-auto shrink-0">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImage(img)}
-                  className={clsx(
-                    'w-16 h-16 rounded-[var(--radius-card)] overflow-hidden relative border transition-all cursor-pointer shrink-0',
+                  className={`w-16 h-20 relative bg-[var(--color-vault)] overflow-hidden transition-all cursor-pointer border ${
                     selectedImage === img
-                      ? 'border-[var(--color-gold-600)] ring-1 ring-[var(--color-gold-600)]'
-                      : 'border-[var(--color-cream-300)] opacity-70 hover:opacity-100'
-                  )}
+                      ? 'border-[var(--color-gold)] opacity-100'
+                      : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
                 >
-                  <ImageWithFallback src={img} alt={`${product.name} thumbnail ${idx + 1}`} fill className="object-cover" />
+                  <Image src={img} alt={`${product.name} view ${idx + 1}`} fill className="object-cover" sizes="64px" />
                 </button>
               ))}
             </div>
 
-            {/* Primary Arch Frame Display */}
-            <div className="flex-1">
-              <ArchFrame ratio="portrait" className="w-full aspect-[4/5] shadow-2xl">
-                <ImageWithFallback
-                  src={selectedImage || product.images[0]}
-                  alt={product.name}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 550px"
-                  className="object-cover"
-                />
-              </ArchFrame>
+            {/* Main 4:5 Display Image on Vault */}
+            <div className="flex-1 relative aspect-[4/5] bg-[var(--color-vault)] overflow-hidden group">
+              <Image
+                src={selectedImage || product.images[0]}
+                alt={product.name}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 58vw"
+                className="object-cover transition-transform duration-560 group-hover:scale-[1.02]"
+              />
+              <button
+                onClick={() => setZoomOpen(true)}
+                className="absolute top-4 right-4 p-2 bg.vault/80 text-[var(--color-ivory)] hover:text-[var(--color-gold)] transition-colors cursor-pointer"
+                aria-label="Zoom image"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
-          {/* Product Details (Right 6 Cols) */}
-          <div className="lg:col-span-6 space-y-6">
-            <div>
-              <MicroLabel className="text-[var(--color-gold-600)] text-[11px]">
-                {product.artisanCluster || 'TEMPLE JEWELLERY'}
-              </MicroLabel>
-              <h1 className="font-serif font-medium text-3xl sm:text-4xl text-[var(--color-text-900)] mt-1">
-                {product.name}
-              </h1>
-              <div className="flex items-center gap-3 mt-2">
-                <div className="flex items-center gap-1 text-[var(--color-gold-500)] text-xs">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-[var(--color-gold-500)]" />
-                  ))}
-                  <span className="font-sans text-[var(--color-text-700)] ml-1 font-semibold">
-                    {product.rating || 5.0} ({product.reviewCount || 12} reviews)
-                  </span>
-                </div>
-              </div>
-            </div>
+          {/* Detail Column (Right 42% -> lg:col-span-5) */}
+          <div className="lg:col-span-5 space-y-6">
+            {/* 1. Category Eyebrow */}
+            <span className="block font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+              {product.collectionTag || 'TEMPLE JEWELLERY'}
+            </span>
 
-            {/* Pricing */}
-            <div className="border-y border-[var(--color-cream-200)] py-4">
-              <Price amount={product.price} compareAtAmount={product.compareAtPrice} size="xl" />
-              <p className="text-[11px] text-[var(--color-text-500)] mt-1">
-                Price includes 3% GST. Armored transit shipping calculated at checkout.
+            {/* 2. Bodoni Product Name */}
+            <h1 className="font-bodoni text-[32px] sm:text-[40px] text-[var(--color-ink)] leading-tight">
+              {product.name}
+            </h1>
+
+            {/* 3. Price Row */}
+            <div className="space-y-1 border-b border-[var(--color-hairline)] pb-4">
+              <div className="flex items-baseline gap-3">
+                <span className="font-karla text-[24px] font-medium text-[var(--color-ink)] [font-variant-numeric:tabular-nums]">
+                  ₹{product.price.toLocaleString('en-IN')}
+                </span>
+                {product.compareAtPrice && (
+                  <span className="font-karla text-[16px] text-[var(--color-hairline)] line-through [font-variant-numeric:tabular-nums]">
+                    ₹{product.compareAtPrice.toLocaleString('en-IN')}
+                  </span>
+                )}
+              </div>
+              <p className="font-karla text-[11px] text-[var(--color-ink)]/60">
+                Inclusive of all taxes · Insured delivery calculated at checkout
               </p>
             </div>
 
-            {/* Short Description */}
-            <p className="font-sans text-sm text-[var(--color-text-700)] leading-relaxed">
+            {/* 4. Rating Text Link */}
+            <a href="#reviews" className="inline-block font-karla text-[13px] text-[var(--color-ink)]/70 hover:text-[var(--color-gold)] transition-colors">
+              {product.rating || 4.8} · {product.reviewCount || 42} reviews
+            </a>
+
+            {/* 5. Short Description */}
+            <p className="font-karla text-[15px] text-[var(--color-ink)]/80 leading-relaxed max-w-[62ch]">
               {product.shortDescription}
             </p>
 
-            {/* Variant Selector */}
-            {product.variants.length > 0 && (
-              <div className="space-y-3 pt-2">
-                <MicroLabel>SELECT VARIANT & METAL SPECIFICATION</MicroLabel>
-                <div className="flex flex-wrap gap-2.5">
-                  {product.variants.map((v) => (
-                    <button
-                      key={v.id}
-                      onClick={() => setSelectedVariantId(v.id)}
-                      className={clsx(
-                        'px-4 py-2 rounded-[var(--radius-card)] text-xs font-sans font-medium border transition-colors cursor-pointer',
-                        selectedVariantId === v.id
-                          ? 'bg-[var(--color-ink-900)] text-white border-[var(--color-ink-900)]'
-                          : 'bg-[var(--color-surface)] text-[var(--color-text-900)] border-[var(--color-cream-300)] hover:border-[var(--color-gold-500)]'
-                      )}
-                    >
-                      {v.label} ({v.metal})
-                    </button>
-                  ))}
+            {/* 6. The Inscription Plate */}
+            <InscriptionPlate product={product} />
+
+            {/* 7. Quantity Stepper + Add to Bag + Buy Now */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center gap-3">
+                {/* Hairline Stepper 44px Tall */}
+                <div className="flex items-center border border-[var(--color-hairline)] h-[44px] bg-[var(--color-bone)] text-sm font-karla">
+                  <button
+                    onClick={() => setQty(Math.max(1, qty - 1))}
+                    className="px-3 text-[var(--color-ink)] hover:text-[var(--color-gold)] transition-colors h-full"
+                  >
+                    -
+                  </button>
+                  <span className="px-3 font-medium text-[var(--color-ink)]">{qty}</span>
+                  <button
+                    onClick={() => setQty(qty + 1)}
+                    className="px-3 text-[var(--color-ink)] hover:text-[var(--color-gold)] transition-colors h-full"
+                  >
+                    +
+                  </button>
                 </div>
-              </div>
-            )}
 
-            {/* Quantity & Reserve Button */}
-            <div className="flex items-center gap-4 pt-4">
-              <div className="flex items-center border border-[var(--color-cream-300)] rounded-[var(--radius-card)] bg-[var(--color-surface)] h-[48px]">
-                <button
-                  onClick={() => setQty(Math.max(1, qty - 1))}
-                  className="px-3 text-[var(--color-text-700)] hover:bg-[var(--color-cream-100)] h-full cursor-pointer"
+                {/* Gold Add to Bag */}
+                <Button
+                  variant="gold"
+                  className="flex-1 h-[52px]"
+                  onClick={handleAddToCart}
                 >
-                  -
-                </button>
-                <span className="px-4 font-sans text-sm font-semibold">{qty}</span>
-                <button
-                  onClick={() => setQty(qty + 1)}
-                  className="px-3 text-[var(--color-text-700)] hover:bg-[var(--color-cream-100)] h-full cursor-pointer"
+                  {isAdded ? 'Added to Bag' : 'Add to Bag'}
+                </Button>
+
+                {/* Ghost Buy Now */}
+                <Button
+                  variant="ghost"
+                  className="h-[52px] px-6"
+                  onClick={handleBuyNow}
                 >
-                  +
-                </button>
+                  Buy Now
+                </Button>
               </div>
 
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleReserve}
-                className="flex-1 justify-center h-[48px]"
-                leftIcon={isReserved ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
-              >
-                {isReserved ? 'RESERVED IN BAG' : 'RESERVE THIS PIECE'}
-              </Button>
+              {/* Secondary Row: Wishlist + WhatsApp */}
+              <div className="flex items-center justify-between pt-2 text-xs font-karla">
+                <button
+                  onClick={() => toggleWishlist(product.id)}
+                  className={`flex items-center gap-1.5 hover:text-[var(--color-gold)] transition-colors cursor-pointer ${
+                    isWishlisted ? 'text-[var(--color-gold)] font-medium' : 'text-[var(--color-ink)]/70'
+                  }`}
+                >
+                  <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-[var(--color-gold)] text-[var(--color-gold)]' : ''}`} />
+                  <span>{isWishlisted ? 'Saved in Wishlist' : 'Save to wishlist'}</span>
+                </button>
 
-              <button
-                onClick={() => toggleWishlist(product.id)}
-                aria-label="Wishlist"
-                className="w-[48px] h-[48px] rounded-[var(--radius-card)] border border-[var(--color-cream-300)] bg-[var(--color-surface)] flex items-center justify-center text-[var(--color-text-700)] hover:text-[var(--color-risk-fg)] transition-colors cursor-pointer"
-              >
-                <Heart className={clsx('w-5 h-5', isWishlisted && 'fill-[var(--color-risk-fg)] text-[var(--color-risk-fg)]')} />
-              </button>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[var(--color-leaf)] text-[var(--color-leaf)] font-marcellus text-[11px] uppercase tracking-[0.14em] hover:bg-[var(--color-leaf)]/5 transition-colors rounded-[2px]"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>Ask on WhatsApp</span>
+                </a>
+              </div>
             </div>
 
-            {/* Availability Line */}
-            <div className="text-xs font-sans text-[var(--color-ok-fg)] font-medium">
-              ✓ {product.totalStock} units remain available in atelier vault.
-            </div>
-
-            {/* Trust Badges Strip */}
-            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[var(--color-cream-200)] text-center text-xs font-sans text-[var(--color-text-500)]">
-              <div className="space-y-1">
-                <ShieldCheck className="w-5 h-5 text-[var(--color-gold-600)] mx-auto" />
-                <span className="block font-medium text-[var(--color-text-900)]">BIS Hallmarked</span>
-                <span className="text-[10px]">22K 916 Assayed</span>
-              </div>
-              <div className="space-y-1">
-                <Truck className="w-5 h-5 text-[var(--color-gold-600)] mx-auto" />
-                <span className="block font-medium text-[var(--color-text-900)]">Armored Transit</span>
-                <span className="text-[10px]">Fully Insured</span>
-              </div>
-              <div className="space-y-1">
-                <RefreshCw className="w-5 h-5 text-[var(--color-gold-600)] mx-auto" />
-                <span className="block font-medium text-[var(--color-text-900)]">7-Day Inspection</span>
-                <span className="text-[10px]">Guaranteed Authenticity</span>
-              </div>
+            {/* 9. Delivery Pincode Check */}
+            <div className="border-t border-[var(--color-hairline)] pt-4 space-y-2 font-karla">
+              <span className="block font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                Estimate Delivery & Serviceability
+              </span>
+              <form onSubmit={handlePincodeCheck} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter 6-digit pincode"
+                  maxLength={6}
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                  className="flex-1 px-3 py-2 bg-[var(--color-bone)] border-b border-[var(--color-hairline)] focus:border-[var(--color-gold)] text-sm text-[var(--color-ink)] placeholder-[var(--color-ink)]/40 outline-none rounded-[2px]"
+                />
+                <Button type="submit" variant="ghost" size="sm">
+                  Check
+                </Button>
+              </form>
+              {pincodeResult && (
+                <p className="text-xs text-[var(--color-leaf)] font-medium pt-1">
+                  {pincodeResult}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Tabbed Editorial Section */}
-        <div className="border border-[var(--color-cream-200)] rounded-[var(--radius-card)] bg-[var(--color-surface)] overflow-hidden shadow-xs">
-          <div className="flex border-b border-[var(--color-cream-200)] bg-[var(--color-cream-50)] overflow-x-auto">
-            {(['provenance', 'specs', 'care', 'certification'] as const).map((tab) => (
+        {/* Tabs Section: Description · Craft & care · Reviews (42) · Shipping & returns */}
+        <section id="reviews" className="space-y-8 pt-12 border-t border-[var(--color-hairline)]">
+          <div className="flex border-b border-[var(--color-hairline)] space-x-8 font-marcellus text-[12px] uppercase tracking-[0.18em] overflow-x-auto">
+            {(['description', 'craft', 'reviews', 'shipping'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={clsx(
-                  'px-6 py-4 font-sans text-xs font-semibold uppercase tracking-[0.14em] transition-colors cursor-pointer border-b-2 shrink-0',
-                  activeTab === tab
-                    ? 'border-[var(--color-gold-600)] text-[var(--color-gold-600)] bg-[var(--color-surface)]'
-                    : 'border-transparent text-[var(--color-text-500)] hover:text-[var(--color-text-900)]'
-                )}
+                className={`pb-3 relative transition-colors cursor-pointer ${
+                  activeTab === tab ? 'text-[var(--color-gold)]' : 'text-[var(--color-ink)]/60 hover:text-[var(--color-ink)]'
+                }`}
               >
-                {tab === 'provenance' && 'Provenance Story'}
-                {tab === 'specs' && 'Specifications'}
-                {tab === 'care' && 'Jewellery Care'}
-                {tab === 'certification' && 'Certification'}
+                {tab === 'description' && 'Description'}
+                {tab === 'craft' && 'Craft & Care'}
+                {tab === 'reviews' && `Reviews (${product.reviewCount || 42})`}
+                {tab === 'shipping' && 'Shipping & Returns'}
+                {activeTab === tab && (
+                  <span className="absolute bottom-0 left-0 right-0 h-[1px] bg-[var(--color-gold)]" />
+                )}
               </button>
             ))}
           </div>
 
-          <div className="p-8">
-            {activeTab === 'provenance' && (
-              <div className="space-y-4 font-serif text-lg text-[var(--color-text-700)] leading-relaxed max-w-4xl">
-                {product.story.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx}>{paragraph}</p>
-                ))}
-              </div>
-            )}
-
-            {activeTab === 'specs' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl">
-                {product.specs.map((spec) => (
-                  <div key={spec.label} className="flex justify-between py-2 border-b border-[var(--color-cream-200)] text-xs font-sans">
-                    <span className="font-semibold text-[var(--color-text-900)]">{spec.label}</span>
-                    <span className="text-[var(--color-text-500)]">{spec.value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {activeTab === 'care' && (
-              <ul className="space-y-2 text-xs font-sans text-[var(--color-text-700)] list-disc pl-5">
-                {product.careNotes.map((note, idx) => (
-                  <li key={idx}>{note}</li>
-                ))}
-              </ul>
-            )}
-
-            {activeTab === 'certification' && (
-              <div className="space-y-4 text-xs font-sans text-[var(--color-text-700)] max-w-2xl">
-                <div className="flex items-center gap-3">
-                  <span className="px-3 py-1 bg-[var(--color-gold-100)] text-[var(--color-gold-700)] font-semibold rounded text-xs">
-                    BIS 916 HALLMARKED
-                  </span>
-                  <span className="px-3 py-1 bg-[var(--color-cream-200)] text-[var(--color-text-900)] font-semibold rounded text-xs">
-                    CERTIFICATE OF AUTHENTICITY INCLUDED
-                  </span>
-                </div>
+          <div className="max-w-[62ch] font-karla text-[16px] text-[var(--color-ink)]/80 leading-[1.65] space-y-6">
+            {activeTab === 'description' && (
+              <div className="space-y-4">
+                <p>{product.story || product.shortDescription}</p>
                 <p>
-                  Every piece is subjected to non-destructive XRF assay verification and arrives stamped with official Bureau of Indian Standards hallmarks.
+                  Forged in traditional 22kt gold plating over brass with hand-rubbed antique terracotta patina. Every central plaque is raised by master sthapatis to preserve temple art traditions.
+                </p>
+              </div>
+            )}
+
+            {activeTab === 'craft' && (
+              <div className="space-y-4 text-sm">
+                <h4 className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                  Care Guidelines
+                </h4>
+                <ul className="space-y-2 list-disc pl-5">
+                  {product.careNotes.map((note, idx) => (
+                    <li key={idx}>{note}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {activeTab === 'reviews' && (
+              <div className="space-y-6 text-sm">
+                <div className="flex items-center gap-4 border-b border-[var(--color-hairline)] pb-4">
+                  <span className="font-bodoni text-[36px] text-[var(--color-ink)]">{product.rating || 4.8}</span>
+                  <div className="text-xs text-[var(--color-ink)]/70">
+                    <p className="font-semibold text-[var(--color-ink)]">Overall Rating</p>
+                    <p>Based on {product.reviewCount || 42} verified patron reviews</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <div className="flex justify-between font-medium text-[var(--color-ink)] text-xs">
+                      <span>Meenakshi S.</span>
+                      <span className="text-[var(--color-ink)]/40">Verified Buyer · 12 Aug 2026</span>
+                    </div>
+                    <p className="text-[14px]">
+                      The weight and antique terracotta patina are exquisite. It feels like an heirloom passed down through generations.
+                    </p>
+                  </div>
+                  <div className="space-y-1 pt-3 border-t border-[var(--color-hairline)]/40">
+                    <div className="flex justify-between font-medium text-[var(--color-ink)] text-xs">
+                      <span>Ananya R.</span>
+                      <span className="text-[var(--color-ink)]/40">Verified Buyer · 04 Jul 2026</span>
+                    </div>
+                    <p className="text-[14px]">
+                      Arrived in a handcrafted wooden repository with hallmarked certificates. Outstanding craft precision.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'shipping' && (
+              <div className="space-y-3 text-sm">
+                <p>
+                  Complimentary armored transit across India for reservations over ₹1,999. Every shipment is fully insured against damage or loss in transit.
+                </p>
+                <p>
+                  7-day inspection window: If the piece does not meet your expectations upon delivery, return it in original condition for a full refund or exchange.
                 </p>
               </div>
             )}
           </div>
-        </div>
+        </section>
 
-        {/* Related Pieces */}
+        {/* Related Section: "You may also like" (4 cards) */}
         {related.length > 0 && (
-          <div className="space-y-8 pt-6">
-            <div className="border-b border-[var(--color-cream-200)] pb-4">
-              <MicroLabel className="text-[var(--color-gold-600)]">SAME ARTISAN CLUSTER</MicroLabel>
-              <BicameralHeading italicPart="Related" romanPart="Heirlooms" size="lg" />
+          <section className="space-y-8 pt-8">
+            <GopuramRule size="md" />
+            <div className="space-y-1 text-center">
+              <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                Curated Suggestions
+              </span>
+              <h2 className="font-bodoni text-[32px] text-[var(--color-ink)]">
+                You may also like
+              </h2>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-[32px] gap-y-[56px]">
               {related.map((relProduct) => (
                 <ProductCard key={relProduct.id} product={relProduct} />
               ))}
             </div>
-          </div>
+          </section>
+        )}
+
+        {/* Complete the Set (3 cards) */}
+        {completeSet.length > 0 && (
+          <section className="space-y-8 pt-8">
+            <div className="space-y-1 text-center">
+              <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                Harmonious Pairings
+              </span>
+              <h2 className="font-bodoni text-[32px] text-[var(--color-ink)]">
+                Complete the set
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-[32px] gap-y-[56px]">
+              {completeSet.map((setItem) => (
+                <ProductCard key={setItem.id} product={setItem} />
+              ))}
+            </div>
+          </section>
         )}
       </main>
+
+      {/* Full Screen Zoom Lightbox */}
+      {zoomOpen && (
+        <div className="fixed inset-0 z-50 bg-[var(--color-vault)] flex items-center justify-center p-4">
+          <button
+            onClick={() => setZoomOpen(false)}
+            className="absolute top-6 right-6 p-3 text-[var(--color-ivory)] hover:text-[var(--color-gold)] transition-colors cursor-pointer"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <div className="relative w-full max-w-4xl aspect-[4/5] max-h-[85vh]">
+            <Image
+              src={selectedImage || product.images[0]}
+              alt={product.name}
+              fill
+              className="object-contain"
+            />
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

@@ -1,25 +1,39 @@
 import type { Metadata } from 'next';
-import { Playfair_Display, Poppins } from 'next/font/google';
+import { Bodoni_Moda, Marcellus, Karla, Anek_Tamil } from 'next/font/google';
 import './globals.css';
 
-const playfair = Playfair_Display({
+const bodoniModa = Bodoni_Moda({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  variable: '--font-bodoni-moda',
   style: ['normal', 'italic'],
-  weight: ['400', '500'],
+  weight: ['400', '500', '600'],
   display: 'swap',
 });
 
-const poppins = Poppins({
+const marcellus = Marcellus({
   subsets: ['latin'],
-  variable: '--font-poppins',
-  weight: ['300', '400', '500', '600'],
+  variable: '--font-marcellus',
+  weight: ['400'],
+  display: 'swap',
+});
+
+const karla = Karla({
+  subsets: ['latin'],
+  variable: '--font-karla',
+  weight: ['400', '500', '600'],
+  display: 'swap',
+});
+
+const anekTamil = Anek_Tamil({
+  subsets: ['tamil', 'latin'],
+  variable: '--font-anek-tamil',
+  weight: ['400', '600'],
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Adi Parva — Imperial Tradition Heritage Jewellery',
-  description: 'Custodians of South Indian Temple Jewellery, Kundan, Polki, Jadau & Meenakari heirlooms.',
+  title: 'Adi Parva — Direct-to-Consumer Temple Jewellery House',
+  description: 'Vault & Vitrine editorial house selling antique-finish temple necklaces, harams, jhumkas, bangles and bridal sets.',
 };
 
 export default function RootLayout({
@@ -28,8 +42,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${poppins.variable}`}>
-      <body className="min-h-screen bg-[var(--color-cream-100)] text-[var(--color-text-700)] antialiased">
+    <html
+      lang="en"
+      className={`${bodoniModa.variable} ${marcellus.variable} ${karla.variable} ${anekTamil.variable}`}
+    >
+      <body className="min-h-screen bg-[var(--color-ivory)] text-[var(--color-ink)] antialiased font-sans">
         {children}
       </body>
     </html>

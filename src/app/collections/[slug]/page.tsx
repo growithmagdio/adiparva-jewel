@@ -6,16 +6,14 @@ import Link from 'next/link';
 import { Header } from '@/components/storefront/header';
 import { Footer } from '@/components/storefront/footer';
 import { ProductCard } from '@/components/storefront/product-card';
-import { BicameralHeading, MicroLabel, ProductCardSkeleton, EmptyState } from '@/components/primitives';
 import { getProducts, getCategories } from '@/lib/data/queries';
 import { Product, Category } from '@/lib/data/types';
-import { SlidersHorizontal } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 export default function CategoryPage() {
   const params = useParams();
   const rawSlug = (params?.slug as string) || 'all';
 
-  // Category slug aliases
   const slugMap: Record<string, string> = {
     temple: 'temple-jewellery',
     'temple-jewellery': 'temple-jewellery',
@@ -31,7 +29,7 @@ export default function CategoryPage() {
   const [category, setCategory] = React.useState<Category | null>(null);
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [sortBy, setSortBy] = React.useState<'curated' | 'price-asc' | 'price-desc'>('curated');
+  const [sortBy, setSortBy] = React.useState<string>('latest');
 
   React.useEffect(() => {
     async function loadCategoryData() {
@@ -58,64 +56,68 @@ export default function CategoryPage() {
   const sortedProducts = [...products].sort((a, b) => {
     if (sortBy === 'price-asc') return a.price - b.price;
     if (sortBy === 'price-desc') return b.price - a.price;
-    return 0;
+    if (sortBy === 'best-selling') return b.reviewCount - a.reviewCount;
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream-100)] text-[var(--color-text-700)] flex flex-col font-sans">
+    <div className="min-h-screen bg-[var(--color-ivory)] text-[var(--color-ink)] flex flex-col font-sans">
       <Header />
 
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-10 space-y-12">
+      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12 space-y-12">
+        {/* Breadcrumb */}
+        <div className="font-karla text-[12px] text-[var(--color-ink)]/60 flex items-center gap-2">
+          <Link href="/" className="hover:text-[var(--color-gold)] transition-colors">Home</Link>
+          <span className="text-[var(--color-hairline)]">/</span>
+          <Link href="/collections" className="hover:text-[var(--color-gold)] transition-colors">Collections</Link>
+          <span className="text-[var(--color-hairline)]">/</span>
+          <span className="text-[var(--color-ink)] font-medium">{category?.name || activeSlug}</span>
+        </div>
+
         {/* Category Header */}
-        <div className="border-b border-[var(--color-cream-200)] pb-8 space-y-3">
-          <MicroLabel className="text-[var(--color-gold-600)]">HERITAGE COLLECTION</MicroLabel>
-          <BicameralHeading
-            italicPart={category ? category.name.split(' ')[0] : 'The'}
-            romanPart={category ? category.name.split(' ').slice(1).join(' ') || 'Collection' : 'Collection'}
-            size="xl"
-          />
-          <p className="font-sans text-sm text-[var(--color-text-500)] max-w-2xl leading-relaxed">
-            {category?.description || 'Browse our complete repository of 22K temple gold, Kundan, and Polki pieces.'}
+        <div className="space-y-2 border-b border-[var(--color-hairline)] pb-8">
+          <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+            {products.length} pieces available
+          </span>
+          <h1 className="font-bodoni text-[36px] sm:text-[44px] text-[var(--color-ink)]">
+            {category?.name || 'Collection'}
+          </h1>
+          <p className="font-karla text-[16px] text-[var(--color-ink)]/70 max-w-[62ch]">
+            {category?.description || 'Browse our complete repository of temple gold and antique heirlooms.'}
           </p>
         </div>
 
-        {/* Controls Bar: Sort & Filter indicator */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-4 rounded-[var(--radius-card)]">
-          <div className="flex items-center gap-2 text-xs font-sans text-[var(--color-text-500)]">
-            <SlidersHorizontal className="w-4 h-4 text-[var(--color-gold-600)]" />
-            <span>Showing {sortedProducts.length} pieces</span>
-          </div>
+        {/* Controls Bar */}
+        <div className="flex items-center justify-between font-karla text-sm">
+          <span className="text-[var(--color-ink)]/60">Showing {sortedProducts.length} pieces</span>
 
-          <div className="flex items-center gap-3 text-xs font-sans">
-            <span className="text-[var(--color-text-500)]">Sort by:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-[var(--color-cream-100)] border border-[var(--color-cream-300)] rounded px-3 py-1.5 text-xs text-[var(--color-text-900)] outline-none"
-            >
-              <option value="curated">Curated (Default)</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-            </select>
+          <div className="flex items-center gap-2">
+            <span className="text-[var(--color-ink)]/60">Sort:</span>
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-transparent border-none text-[var(--color-ink)] font-medium outline-none cursor-pointer pr-6 appearance-none"
+              >
+                <option value="latest">Latest</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="best-selling">Best Selling</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-[var(--color-gold)] absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
         </div>
 
         {/* Product Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-[32px] gap-y-[56px]">
             {Array.from({ length: 8 }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
+              <div key={i} className="aspect-[4/5] bg-[var(--color-bone)] animate-pulse" />
             ))}
           </div>
-        ) : sortedProducts.length === 0 ? (
-          <EmptyState
-            title="No pieces match this collection"
-            description="Explore our other heritage categories or reset filters."
-            actionLabel="View all collections"
-            onAction={() => (window.location.href = '/collections')}
-          />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-[32px] gap-y-[56px]">
             {sortedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

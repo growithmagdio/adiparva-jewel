@@ -2,64 +2,73 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Header } from '@/components/storefront/header';
 import { Footer } from '@/components/storefront/footer';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
-import { BicameralHeading, MicroLabel, ArchFrame, Button } from '@/components/primitives';
-import { ArrowRight, ShieldCheck, Heart, Award } from 'lucide-react';
+import { GopuramRule } from '@/components/ui/GopuramRule';
+import { KolamLattice } from '@/components/ui/KolamLattice';
+import { Button } from '@/components/primitives/button';
 
 export default function HeritagePage() {
   return (
-    <div className="min-h-screen bg-[var(--color-cream-100)] text-[var(--color-text-700)] flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[var(--color-ivory)] text-[var(--color-ink)] flex flex-col font-sans">
       <Header />
 
-      <main className="flex-1 space-y-24 sm:space-y-32 pb-24">
+      <main className="flex-1 space-y-24 pb-24">
         {/* Section 1: Hero */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 pt-12">
+        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 pt-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6 space-y-6">
-              <MicroLabel className="text-[var(--color-gold-600)]">THE HOUSE STORY</MicroLabel>
-              <BicameralHeading italicPart="Custodians of" romanPart="Temple Gold" size="xl" />
-              <p className="font-sans text-base sm:text-lg text-[var(--color-text-700)] leading-relaxed max-w-xl">
-                Founded to preserve South India&apos;s sacred gopuram jewelry traditions, Adi Parva exists to keep and honor heirloom gold for future generations.
+              <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                The House Story
+              </span>
+              <h1 className="font-bodoni text-[44px] sm:text-[64px] text-[var(--color-ink)] leading-none">
+                Custodians of Temple Gold
+              </h1>
+              <p className="font-karla text-[16px] sm:text-[18px] text-[var(--color-ink)]/75 max-w-xl leading-[1.65]">
+                Founded to preserve South India&apos;s sacred gopuram jewellery traditions, Adi Parva exists to keep and honor heirloom gold for generations to come.
               </p>
               <div className="pt-2">
                 <Link href="/collections">
-                  <Button variant="primary" size="lg" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                    EXPLORE THE REPOSITORY
+                  <Button variant="gold">
+                    Explore the collection
                   </Button>
                 </Link>
               </div>
             </div>
 
-            <div className="lg:col-span-6 flex justify-center lg:justify-end">
-              <ArchFrame ratio="portrait" className="w-full max-w-[460px] aspect-[4/5] shadow-2xl">
-                <ImageWithFallback
-                  src="/images/hero/hero-temple-necklace.jpg"
-                  alt="House of Adi Parva"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 100vw, 460px"
-                  className="object-cover"
-                />
-              </ArchFrame>
+            <div className="lg:col-span-6 relative aspect-[4/5] bg-[var(--color-vault)] overflow-hidden">
+              <Image
+                src="/images/categories/temple-jewellery.jpg"
+                alt="House of Adi Parva Temple Gold"
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover opacity-90"
+              />
             </div>
           </div>
         </section>
 
-        {/* Section 2: Gopuram Origins */}
+        <GopuramRule size="md" />
+
+        {/* Section 2: Sacred Origins */}
         <section className="max-w-[1440px] mx-auto px-6 sm:px-8">
-          <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] rounded-[var(--radius-card)] p-8 sm:p-16 space-y-12">
+          <div className="space-y-12">
             <div className="max-w-3xl mx-auto text-center space-y-4">
-              <MicroLabel className="text-[var(--color-gold-600)]">SACRED ORIGINS</MicroLabel>
-              <BicameralHeading italicPart="Born in the" romanPart="Sthapati Guilds" size="lg" align="center" />
-              <p className="font-serif italic text-lg sm:text-xl text-[var(--color-text-900)] leading-relaxed">
-                &ldquo;Before jewellery was personal adornment, it was sacred temple geometry created exclusively for deity idols in Thanjavur and Nagercoil.&rdquo;
+              <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                Sacred Origins
+              </span>
+              <h2 className="font-bodoni text-[36px] sm:text-[44px] text-[var(--color-ink)]">
+                Born in the Sthapati Guilds
+              </h2>
+              <p className="font-bodoni italic text-xl text-[var(--color-ink)]/90 leading-relaxed">
+                "Before jewellery was personal ornamentation, it was sacred temple geometry created exclusively for deity idols in Thanjavur and Nagercoil."
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center pt-6">
-              <div className="space-y-4 text-sm font-sans text-[var(--color-text-700)] leading-relaxed">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center pt-6 font-karla text-[16px] text-[var(--color-ink)]/80 leading-[1.65]">
+              <div className="space-y-4">
                 <p>
                   For centuries, hereditary sthapati artisans dedicated their bench craft to temple treasuries. Every kasu coin, peacock motif, and lotus petal was hand-engraved with mathematical precision using repoussé techniques passed down through secret family deeds.
                 </p>
@@ -68,10 +77,10 @@ export default function HeritagePage() {
                 </p>
               </div>
 
-              <div className="relative aspect-[4/3] rounded-[var(--radius-card)] overflow-hidden border border-[var(--color-cream-300)]">
-                <ImageWithFallback
-                  src="/images/categories/temple-jewellery.jpg"
-                  alt="Temple Gold Craft"
+              <div className="relative aspect-[4/3] bg-[var(--color-vault)] overflow-hidden">
+                <Image
+                  src="/images/craft/stage-1.jpg"
+                  alt="Sthapati Guild Workshop"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
@@ -81,51 +90,51 @@ export default function HeritagePage() {
           </div>
         </section>
 
-        {/* Section 3: Custodial Philosophy Band */}
-        <section className="w-full bg-[var(--color-ink-900)] text-[var(--color-cream-100)] py-20 px-6 text-center select-none border-y border-[var(--color-gold-700)]/30">
-          <div className="max-w-4xl mx-auto space-y-6">
-            <MicroLabel className="text-[var(--color-gold-500)]">THE PARVA DEED</MicroLabel>
-            <p className="font-serif italic font-normal text-2xl sm:text-3xl lg:text-4xl text-white leading-relaxed">
-              &ldquo;We do not manufacture seasonal fashion. We keep and record heirloom pieces meant to be passed down through centuries.&rdquo;
+        {/* Section 3: Dark Editorial Band */}
+        <section className="relative w-full bg-[var(--color-vault)] text-[var(--color-ivory)] py-24 px-6 text-center overflow-hidden">
+          <KolamLattice />
+          <div className="relative z-10 max-w-4xl mx-auto space-y-6">
+            <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+              The Parva Deed
+            </span>
+            <p className="font-bodoni italic font-normal text-2xl sm:text-4xl text-[var(--color-ivory)] leading-relaxed">
+              "We do not manufacture seasonal fashion. We keep and record heirloom pieces meant to be passed down through centuries."
             </p>
-            <div className="pt-2 flex justify-center gap-8 text-xs font-sans text-[var(--color-cream-300)]/80">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[var(--color-gold-400)]" />
-                <span>BIS 916 Hallmarked</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-[var(--color-gold-400)]" />
-                <span>Atelier Provenance Deed</span>
-              </div>
+            <div className="pt-4 flex justify-center gap-8 font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold-lit)]">
+              <span>BIS 916 Hallmarked</span>
+              <span>•</span>
+              <span>Atelier Provenance Deed</span>
             </div>
           </div>
         </section>
 
-        {/* Section 4: Preservation & Future */}
+        {/* Section 4: Preservation Mission */}
         <section className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-6">
-              <div className="relative aspect-[4/3] rounded-[var(--radius-card)] overflow-hidden border border-[var(--color-cream-300)] shadow-xl">
-                <ImageWithFallback
-                  src="/images/craft/stage-3-jadau.jpg"
-                  alt="Jadau Stone Setting"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover"
-                />
-              </div>
+            <div className="lg:col-span-6 relative aspect-[4/3] bg-[var(--color-vault)] overflow-hidden">
+              <Image
+                src="/images/categories/kundan.jpg"
+                alt="Endangered Jewellery Arts"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
 
             <div className="lg:col-span-6 space-y-6">
-              <MicroLabel className="text-[var(--color-gold-600)]">PRESERVATION MISSION</MicroLabel>
-              <BicameralHeading italicPart="Preserving" romanPart="Endangered Arts" size="lg" />
-              <p className="font-sans text-sm sm:text-base text-[var(--color-text-700)] leading-relaxed">
+              <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                Preservation Mission
+              </span>
+              <h2 className="font-bodoni text-[36px] sm:text-[44px] text-[var(--color-ink)]">
+                Preserving Endangered Arts
+              </h2>
+              <p className="font-karla text-[16px] text-[var(--color-ink)]/80 leading-[1.65]">
                 Modern mass production has threatened traditional bench setting, nakashi repoussé, and organic meenakari enamelling. Adi Parva supports over seventy artisan families across Nagercoil, Madurai, and Jaipur, providing fair custodial wages and preserving traditional bench tools.
               </p>
               <div className="pt-2">
                 <Link href="/craft">
-                  <Button variant="secondary" size="md" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                    EXPLORE CRAFTSMANSHIP STAGES
+                  <Button variant="ghost">
+                    Explore craftsmanship stages
                   </Button>
                 </Link>
               </div>

@@ -3,13 +3,14 @@
 import * as React from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Header } from '@/components/storefront/header';
 import { Footer } from '@/components/storefront/footer';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
-import { BicameralHeading, MicroLabel, Price, Button, ArchFrame, StatusPill } from '@/components/primitives';
+import { GopuramRule } from '@/components/ui/GopuramRule';
+import { Button } from '@/components/primitives/button';
 import { getOrderById } from '@/lib/data/queries';
 import { Order } from '@/lib/data/types';
-import { CheckCircle2, ShieldCheck, ArrowRight, PackageCheck, Truck, Clock } from 'lucide-react';
+import { MessageSquare, Check, ArrowRight } from 'lucide-react';
 
 export default function OrderConfirmedPage() {
   const params = useParams();
@@ -17,6 +18,7 @@ export default function OrderConfirmedPage() {
 
   const [order, setOrder] = React.useState<Order | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [whatsappOpted, setWhatsappOpted] = React.useState(false);
 
   React.useEffect(() => {
     async function loadOrder() {
@@ -35,89 +37,110 @@ export default function OrderConfirmedPage() {
   const firstItem = order?.items[0];
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream-100)] text-[var(--color-text-700)] flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[var(--color-ivory)] text-[var(--color-ink)] flex flex-col font-sans">
       <Header />
 
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12 space-y-12">
-        {/* Success Banner */}
-        <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-8 sm:p-12 rounded-[var(--radius-card)] text-center max-w-3xl mx-auto space-y-4 shadow-md">
-          <div className="w-16 h-16 rounded-full bg-[var(--color-ok-bg)] text-[var(--color-ok-fg)] flex items-center justify-center mx-auto">
-            <CheckCircle2 className="w-8 h-8" />
-          </div>
+      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-16 space-y-16">
+        {/* Order Placed Heading Block */}
+        <div className="max-w-2xl mx-auto text-center space-y-4">
+          <GopuramRule size="sm" />
 
-          <MicroLabel className="text-[var(--color-gold-600)]">RESERVATION CONFIRMED</MicroLabel>
-          <BicameralHeading italicPart="Order" romanPart="Confirmed" size="xl" align="center" />
+          <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+            Reservation Record: #{order?.id || orderId}
+          </span>
 
-          <p className="font-serif text-lg text-[var(--color-text-900)]">
-            Order Reference: <span className="font-sans font-semibold text-[var(--color-gold-600)]">#{order?.id || orderId}</span>
-          </p>
+          <h1 className="font-bodoni text-[44px] sm:text-[64px] text-[var(--color-ink)] leading-none">
+            Order placed.
+          </h1>
 
-          <p className="font-sans text-xs sm:text-sm text-[var(--color-text-500)] max-w-lg mx-auto leading-relaxed">
-            Your piece has been assigned in our vault. A formal certificate deed and armored transit tracking dispatch have been sent to{' '}
-            <span className="font-semibold text-[var(--color-text-900)]">{order?.customerEmail}</span>.
+          <p className="font-karla text-[16px] text-[var(--color-ink)]/75 leading-relaxed">
+            Your heirlooms have been registered with the atelier vault. A formal certificate deed and dispatch tracking link have been dispatched to{' '}
+            <span className="font-medium text-[var(--color-ink)]">{order?.customerEmail || 'your email'}</span>.
           </p>
         </div>
 
-        {/* Order Breakdown Grid */}
-        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Arch Frame Thumbnail of First Reserved Item (Left 5 Cols) */}
-          <div className="lg:col-span-5 flex justify-center">
+        {/* Order Details & First Item Display */}
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+          {/* First Item Image (Left 5 Cols) */}
+          <div className="md:col-span-5 relative aspect-[4/5] bg-[var(--color-vault)] overflow-hidden">
             {firstItem && (
-              <ArchFrame ratio="portrait" className="w-full max-w-[320px] aspect-[4/5] shadow-xl">
-                <ImageWithFallback src={firstItem.image} alt={firstItem.name} fill className="object-cover" />
-              </ArchFrame>
+              <Image
+                src={firstItem.image}
+                alt={firstItem.name}
+                fill
+                sizes="(max-width: 768px) 100vw, 350px"
+                className="object-cover"
+              />
             )}
           </div>
 
-          {/* Reserved Items & Order Status Timeline (Right 7 Cols) */}
-          <div className="lg:col-span-7 bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-6 sm:p-8 rounded-[var(--radius-card)] shadow-xs space-y-6">
-            <div className="flex items-center justify-between border-b border-[var(--color-cream-200)] pb-4">
-              <MicroLabel className="text-[var(--color-gold-600)]">RESERVED HEIRLOOMS</MicroLabel>
-              <StatusPill variant="ok" dot>
-                {order?.status || 'confirmed'}
-              </StatusPill>
+          {/* Itemized Summary & Actions (Right 7 Cols) */}
+          <div className="md:col-span-7 space-y-6 font-karla">
+            <div className="border-b border-[var(--color-hairline)] pb-4 space-y-1">
+              <h3 className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
+                Expected Delivery
+              </h3>
+              <p className="font-bodoni text-2xl text-[var(--color-ink)]">
+                Fri, 21 Aug 2026
+              </p>
+              <p className="text-xs text-[var(--color-ink)]/60">
+                Insured Armored Transit via BlueDart Apex
+              </p>
             </div>
 
-            {/* Line items list */}
-            <div className="space-y-4">
+            {/* Line Items */}
+            <div className="space-y-3 divide-y divide-[var(--color-hairline)]/40">
               {order?.items.map((item) => (
-                <div key={`${item.productId}-${item.variantId}`} className="flex justify-between items-center text-xs font-sans">
+                <div key={`${item.productId}-${item.variantId}`} className="pt-3 flex justify-between text-sm">
                   <div>
-                    <h5 className="font-semibold text-[var(--color-text-900)]">{item.name}</h5>
-                    <p className="text-[11px] text-[var(--color-gold-600)]">Qty: {item.qty}</p>
+                    <h4 className="font-medium text-[var(--color-ink)]">{item.name}</h4>
+                    <p className="text-xs text-[var(--color-ink)]/60">Qty: {item.qty}</p>
                   </div>
-                  <Price amount={item.unitPrice * item.qty} size="sm" className="font-semibold" />
+                  <span className="font-medium text-[var(--color-ink)] [font-variant-numeric:tabular-nums]">
+                    ₹{(item.unitPrice * item.qty).toLocaleString('en-IN')}
+                  </span>
                 </div>
               ))}
             </div>
 
-            {/* Total */}
-            <div className="border-t border-[var(--color-cream-200)] pt-4 flex justify-between items-center font-serif text-lg font-semibold text-[var(--color-text-900)]">
-              <span>Total Paid</span>
-              <Price amount={order?.total || 45000} size="lg" />
+            {/* Total Paid */}
+            <div className="border-t border-[var(--color-hairline)] pt-4 flex justify-between items-baseline">
+              <span className="font-marcellus text-xs uppercase tracking-[0.18em] text-[var(--color-gold)]">Total Paid</span>
+              <span className="font-bodoni text-[28px] text-[var(--color-ink)] [font-variant-numeric:tabular-nums]">
+                ₹{(order?.total || 45000).toLocaleString('en-IN')}
+              </span>
             </div>
 
-            {/* Expected Delivery */}
-            <div className="p-4 bg-[var(--color-cream-50)] border border-[var(--color-cream-200)] rounded text-xs font-sans text-[var(--color-text-700)] flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Truck className="w-4 h-4 text-[var(--color-gold-600)]" />
-                <span>Expected Armored Delivery:</span>
-              </span>
-              <span className="font-semibold text-[var(--color-text-900)]">30 April 2026</span>
+            {/* WhatsApp Tracking Opt-In */}
+            <div className="p-4 bg-[var(--color-bone)] border border-[var(--color-hairline)] flex items-center justify-between gap-4 rounded-[2px]">
+              <div className="space-y-0.5">
+                <span className="font-marcellus text-[11px] uppercase tracking-[0.14em] text-[var(--color-leaf)] block">
+                  WhatsApp Concierge Updates
+                </span>
+                <p className="text-xs text-[var(--color-ink)]/70">
+                  Receive live transit milestones and delivery dispatch photos directly on WhatsApp.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setWhatsappOpted(true)}
+                className={`px-4 py-2 text-xs font-marcellus uppercase tracking-[0.14em] border transition-colors shrink-0 rounded-[2px] ${
+                  whatsappOpted
+                    ? 'border-[var(--color-leaf)] bg-[var(--color-leaf)] text-white'
+                    : 'border-[var(--color-leaf)] text-[var(--color-leaf)] hover:bg-[var(--color-leaf)]/10'
+                }`}
+              >
+                {whatsappOpted ? 'Opted In ✓' : 'Opt In'}
+              </button>
             </div>
 
             {/* Actions */}
-            <div className="pt-2 flex flex-col sm:flex-row gap-3">
-              <Link href={`/account/orders/${order?.id || orderId}`} className="flex-1">
-                <Button variant="primary" size="md" className="w-full justify-between" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                  <span>Track order in account</span>
-                </Button>
+            <div className="flex flex-wrap gap-4 pt-4">
+              <Link href={`/account/orders/${order?.id || orderId}`}>
+                <Button variant="ghost">Track order</Button>
               </Link>
-
-              <Link href="/collections" className="flex-1">
-                <Button variant="secondary" size="md" className="w-full justify-center">
-                  Continue browsing
-                </Button>
+              <Link href="/collections">
+                <Button variant="gold">Continue browsing</Button>
               </Link>
             </div>
           </div>

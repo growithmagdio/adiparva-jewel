@@ -2,540 +2,395 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import {
-  BicameralHeading,
-  MicroLabel,
-  ArchFrame,
-  Button,
-  ProductCardSkeleton,
-} from '@/components/primitives';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { ArrowRight, ShieldCheck, Truck, Banknote, RotateCcw, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { Header } from '@/components/storefront/header';
 import { Footer } from '@/components/storefront/footer';
 import { ProductCard } from '@/components/storefront/product-card';
-import {
-  getProducts,
-  getCategories,
-  getJournalArticles,
-  getHeroSlides,
-} from '@/lib/data/queries';
-import { Product, Category, JournalArticle, HeroSlide } from '@/lib/data/types';
-import { ArrowRight, ChevronRight, Star, Hammer, Sparkles, ShieldCheck } from 'lucide-react';
+import { getProducts } from '@/lib/data/queries';
+import { Product } from '@/lib/data/types';
 
 export default function HomePage() {
-  const [heroSlide, setHeroSlide] = React.useState<HeroSlide | null>(null);
-  const [masterpieces, setMasterpieces] = React.useState<Product[]>([]);
   const [newArrivals, setNewArrivals] = React.useState<Product[]>([]);
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [articles, setArticles] = React.useState<JournalArticle[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [bestsellers, setBestsellers] = React.useState<Product[]>([]);
+  const [newsletterEmail, setNewsletterEmail] = React.useState('');
+  const [newsletterSubmitted, setNewsletterSubmitted] = React.useState(false);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    async function loadHomeData() {
-      setLoading(true);
-      try {
-        const [slidesData, productsData, catData, journalData] = await Promise.all([
-          getHeroSlides(),
-          getProducts({ status: 'live' }),
-          getCategories(),
-          getJournalArticles(),
-        ]);
-
-        if (slidesData && slidesData.length > 0) {
-          setHeroSlide(slidesData[0]);
-        }
-
-        if (productsData) {
-          setMasterpieces(productsData.filter((p) => p.collectionTag === 'Masterpiece'));
-          setNewArrivals(productsData.slice(0, 8));
-        }
-
-        if (catData) {
-          setCategories(catData.slice(0, 4));
-        }
-
-        if (journalData) {
-          setArticles(journalData.slice(0, 3));
-        }
-      } catch (err) {
-        console.error('Error fetching homepage data:', err);
-      } finally {
-        setLoading(false);
-      }
+    async function loadData() {
+      const all = await getProducts({ status: 'live' });
+      setNewArrivals(all.slice(0, 4));
+      setBestsellers(all.slice(4, 9));
     }
-    loadHomeData();
+    loadData();
   }, []);
 
-  const signatureCategories = [
-    {
-      title: 'TEMPLE',
-      description: 'Hand-hammered 22K gold repoussé inspired by sacred South Indian gopurams.',
-      slug: 'temple-jewellery',
-      image: '/images/categories/temple-jewellery.jpg',
-    },
-    {
-      title: 'KUNDAN',
-      description: 'Pure foil stone setting refined across centuries of royal North Indian workshops.',
-      slug: 'kundan',
-      image: '/images/categories/kundan.jpg',
-    },
-    {
-      title: 'POLKI',
-      description: 'Uncut natural diamond heirlooms set in traditional 22K gold frames.',
-      slug: 'polki',
-      image: '/images/categories/kundan.jpg',
-    },
-    {
-      title: 'HERITAGE',
-      description: 'Historic Kasu coin mala, Oddiyanam waist belts, and rare antique parures.',
-      slug: 'bridal-sets',
-      image: '/images/categories/bridal-sets.jpg',
-    },
+  const scrollBestsellers = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -320 : 320;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const handleNewsletter = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim() || !newsletterEmail.includes('@')) return;
+    setNewsletterSubmitted(true);
+  };
+
+  const categories6 = [
+    { name: 'NECKLACE', slug: 'temple-jewellery', image: '/images/categories/temple-jewellery.jpg' },
+    { name: 'BANGLES', slug: 'bangles-kada', image: '/images/categories/bangles-kada.jpg' },
+    { name: 'EARRINGS', slug: 'jhumkas', image: '/images/categories/jhumkas.jpg' },
+    { name: 'HARAM', slug: 'haarams', image: '/images/categories/haarams.jpg' },
+    { name: 'BROOCHES', slug: 'maang-tikka-nath', image: '/images/categories/maang-tikka-nath.jpg' },
+    { name: 'ANTIQUE SETS', slug: 'kundan', image: '/images/categories/kundan.jpg' },
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--color-cream-100)] text-[var(--color-text-700)] flex flex-col font-sans">
-      {/* 1. Navbar & Top Announcement Bar */}
+    <div className="min-h-screen bg-[var(--color-cream-50)] text-[var(--color-text-900)] flex flex-col font-sans">
       <Header />
 
-      <main className="flex-1 space-y-24 sm:space-y-32 pb-20">
-        {/* 2. Hero Section (48% Left / 52% Right Split Layout, Min Height calc(100vh - 108px)) */}
-        <section className="min-h-[calc(100vh-108px)] flex items-center max-w-[1440px] mx-auto px-6 sm:px-8 py-8 sm:py-12">
-          <div className="w-full grid grid-cols-1 lg:grid-cols-10 gap-12 lg:gap-16 items-center">
-            {/* Left 48% (4.8 cols) Content */}
-            <div className="lg:col-span-5 space-y-6 sm:space-y-8">
-              <MicroLabel className="text-[var(--color-gold-600)] text-[11px] tracking-[0.2em]">
-                {heroSlide?.eyebrow || 'EST. IN THE TRADITION OF THE SOUTH'}
-              </MicroLabel>
+      <main className="flex-1">
+        {/* 1. HERO SECTION — Deep Espresso & Royal Gold Backdrop */}
+        <section className="relative w-full bg-[#120A05] text-[#FDF7EF] py-16 lg:py-24 overflow-hidden border-b border-[#D4AF37]/25">
+          {/* Ambient Glows */}
+          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/3 right-10 w-[400px] h-[400px] bg-[#B8761F]/15 rounded-full blur-3xl pointer-events-none" />
 
-              <div className="space-y-3">
-                <BicameralHeading
-                  italicPart={heroSlide?.headingItalic || 'Adi'}
-                  romanPart={heroSlide?.headingRoman || 'Parva'}
-                  size="xl"
-                />
-                <p className="font-sans text-base sm:text-lg text-[var(--color-text-700)] leading-relaxed max-w-xl">
-                  {heroSlide?.body ||
-                    'Custodians of South Indian temple gold, Kundan, and royal Polki heirlooms crafted by hereditary artisan guilds.'}
-                </p>
+          {/* Background Filigree Pattern */}
+          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#D4AF37_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none" />
+
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center relative z-10">
+            {/* Left Column Text */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-6 space-y-7 text-center lg:text-left"
+            >
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#D4AF37]/40 bg-[#1C0F07]/80 text-[#D4AF37] font-sans text-[10px] uppercase tracking-[0.22em] font-semibold shadow-inner">
+                <Sparkles className="w-3.5 h-3.5 text-[#D4AF37] animate-pulse" />
+                <span>EST. IN THE TEMPLE TOWNS OF TAMIL NADU</span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Link href={heroSlide?.ctaHref || '/collections'}>
-                  <Button variant="primary" size="lg" rightIcon={<ArrowRight className="w-4.5 h-4.5" />}>
-                    {heroSlide?.ctaLabel || 'SEE THE COLLECTION'}
-                  </Button>
-                </Link>
+              <h1 className="font-serif text-[44px] sm:text-[62px] lg:text-[72px] leading-[1.04] tracking-tight text-[#FDF7EF]">
+                <span className="italic font-normal block text-[#E6D5BF]">Temple of</span>
+                <span className="text-gold-gradient font-medium block">Tradition</span>
+              </h1>
 
-                <Link href="/heritage">
-                  <Button variant="ghost" size="lg">
-                    READ OUR STORY
-                  </Button>
+              <p className="font-sans text-[16px] sm:text-[18px] text-[#E6D5BF]/85 max-w-[52ch] mx-auto lg:mx-0 leading-relaxed">
+                Custodians of heirloom South Indian temple gold, Kundan, and royal Polki pieces handcrafted by master sthapati artisans using centuries-old repoussé traditions.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-3">
+                <Link
+                  href="/collections"
+                  className="h-[52px] px-9 bg-foil-gold text-[#120A05] font-sans text-[12px] uppercase tracking-[0.18em] font-bold rounded-xs hover:brightness-110 transition-all flex items-center justify-center shadow-royal-gold"
+                >
+                  SHOP COLLECTION
+                </Link>
+                <Link
+                  href="/heritage"
+                  className="h-[52px] px-8 border border-[#D4AF37]/50 text-[#FDF7EF] font-sans text-[12px] uppercase tracking-[0.18em] font-medium rounded-xs hover:bg-[#D4AF37]/15 hover:border-[#D4AF37] transition-all flex items-center justify-center backdrop-blur-xs"
+                >
+                  EXPLORE STORY
                 </Link>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Right 52% (5.2 cols) Hero Image (Never Empty, Full Coverage) */}
-            <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <ArchFrame ratio="portrait" className="w-full max-w-[480px] aspect-[4/5] shadow-2xl">
-                <ImageWithFallback
-                  src={heroSlide?.image || '/images/hero/hero-temple-necklace.jpg'}
-                  alt="Maharani Temple Gold Necklace"
+            {/* Right Column Image with Frame */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="lg:col-span-6 relative aspect-[4/3] sm:aspect-[16/11] rounded-card overflow-hidden p-2 border-gold-glow bg-[#1C0F07]"
+            >
+              <div className="relative w-full h-full rounded-xs overflow-hidden">
+                <Image
+                  src="/images/hero/hero-temple-necklace.jpg"
+                  alt="Model wearing Adi Parva Temple Gold Jewellery"
                   fill
                   priority
-                  sizes="(max-width: 768px) 100vw, 480px"
-                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover object-top hover:scale-105 transition-transform duration-700"
                 />
-              </ArchFrame>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#120A05]/60 via-transparent to-transparent" />
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* 2. TRUST BADGES STRIP */}
+        <section className="bg-[var(--color-cream-100)] border-b border-[var(--color-cream-200)] py-7">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="flex items-center justify-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[var(--color-gold-100)] border border-[var(--color-gold-500)]/30 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5 text-[var(--color-gold-600)]" />
+              </div>
+              <div className="text-left">
+                <span className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-900)] block">SECURE PAYMENT</span>
+                <span className="font-sans text-[11px] text-[var(--color-text-500)] block">100% Secure & Safe</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[var(--color-gold-100)] border border-[var(--color-gold-500)]/30 flex items-center justify-center shrink-0">
+                <Truck className="w-5 h-5 text-[var(--color-gold-600)]" />
+              </div>
+              <div className="text-left">
+                <span className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-900)] block">FREE SHIPPING</span>
+                <span className="font-sans text-[11px] text-[var(--color-text-500)] block">Above ₹1999</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[var(--color-gold-100)] border border-[var(--color-gold-500)]/30 flex items-center justify-center shrink-0">
+                <Banknote className="w-5 h-5 text-[var(--color-gold-600)]" />
+              </div>
+              <div className="text-left">
+                <span className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-900)] block">COD AVAILABLE</span>
+                <span className="font-sans text-[11px] text-[var(--color-text-500)] block">Cash on Delivery</span>
+              </div>
+            </div>
+            <div className="flex items-center justify-center gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-[var(--color-gold-100)] border border-[var(--color-gold-500)]/30 flex items-center justify-center shrink-0">
+                <RotateCcw className="w-5 h-5 text-[var(--color-gold-600)]" />
+              </div>
+              <div className="text-left">
+                <span className="font-sans text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-900)] block">EASY RETURNS</span>
+                <span className="font-sans text-[11px] text-[var(--color-text-500)] block">7 Days Return Policy</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* 3. Signature Collections (Section 17 - 4 Large Cards) */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-10">
-          <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <MicroLabel className="text-[var(--color-gold-600)]">HERITAGE REPOSITORY</MicroLabel>
-            <BicameralHeading italicPart="The Signature" romanPart="Collections" size="lg" align="center" />
+        {/* 3. SHOP BY CATEGORY — Royal Double Gold Rings */}
+        <section className="py-20 max-w-[1440px] mx-auto px-6 sm:px-8">
+          <div className="text-center my-6 space-y-3">
+            <span className="font-sans text-[11px] uppercase tracking-[0.22em] font-semibold text-[var(--color-gold-700)] block">
+              ✦ ROYAL CLASSIFICATIONS ✦
+            </span>
+            <h2 className="font-serif text-[32px] sm:text-[40px] text-[var(--color-text-900)] font-medium tracking-tight">
+              SHOP BY CATEGORY
+            </h2>
+            <div className="w-28 h-[2px] bg-gradient-to-r from-transparent via-[var(--color-gold-500)] to-transparent mx-auto rounded-full" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {signatureCategories.map((cat) => (
-              <Link key={cat.title} href={`/collections/${cat.slug}`} className="group block">
-                <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] hover:border-[var(--color-gold-500)] rounded-[var(--radius-card)] overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full">
-                  <div className="relative aspect-[4/5] bg-[var(--color-cream-100)] overflow-hidden">
-                    <ImageWithFallback
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-8 pt-8">
+            {categories6.map((cat) => (
+              <Link
+                key={cat.slug}
+                href={`/collections/${cat.slug}`}
+                className="group flex flex-col items-center space-y-4"
+              >
+                {/* Double Gold Filigree Ring Frame */}
+                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full relative p-1 bg-gradient-to-b from-[#D4AF37] via-[#B8761F] to-[#8A6224] shadow-md group-hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all duration-500">
+                  <div className="w-full h-full rounded-full relative overflow-hidden bg-[var(--color-cream-100)] border border-[var(--color-cream-50)]">
+                    <Image
                       src={cat.image}
-                      alt={cat.title}
+                      alt={cat.name}
                       fill
-                      sizes="(max-width: 768px) 100vw, 25vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="150px"
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   </div>
-
-                  <div className="p-5 space-y-2 flex-1 flex flex-col justify-between border-t border-[var(--color-cream-200)]">
-                    <div>
-                      <h4 className="font-serif font-medium text-xl text-[var(--color-text-900)] group-hover:text-[var(--color-gold-600)] transition-colors">
-                        {cat.title}
-                      </h4>
-                      <p className="text-xs font-sans text-[var(--color-text-500)] mt-1 leading-relaxed">
-                        {cat.description}
-                      </p>
-                    </div>
-
-                    <div className="pt-3 flex items-center gap-1 text-xs font-sans font-semibold uppercase tracking-wider text-[var(--color-gold-600)] group-hover:text-[var(--color-gold-700)]">
-                      <span>EXPLORE</span>
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                    </div>
-                  </div>
                 </div>
+                <span className="font-sans text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-900)] group-hover:text-[var(--color-gold-600)] transition-colors">
+                  {cat.name}
+                </span>
               </Link>
             ))}
           </div>
         </section>
 
-        {/* 4. Featured Jewellery (Section 18 - The House Edit) */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-[var(--color-cream-200)] pb-4">
-            <div>
-              <MicroLabel className="text-[var(--color-gold-600)] mb-1">CURATED SELECTION</MicroLabel>
-              <BicameralHeading italicPart="The House" romanPart="Edit" size="lg" />
-              <p className="text-xs font-sans text-[var(--color-text-500)] mt-1">
-                Pieces chosen for their enduring beauty and unmistakable character.
-              </p>
-            </div>
-
-            <Link
-              href="/collections"
-              className="inline-flex items-center gap-1 font-sans text-xs uppercase tracking-widest text-[var(--color-gold-600)] hover:text-[var(--color-gold-700)] font-semibold"
-            >
-              <span>View all pieces</span>
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {masterpieces.slice(0, 4).map((piece) => (
-                <ProductCard key={piece.id} product={piece} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* 5. Temple Gold Editorial Banner (Section 20 - Dark Brown Full Width) */}
-        <section className="w-full bg-[var(--color-ink-900)] text-[var(--color-cream-100)] py-20 px-6 select-none border-y border-[var(--color-gold-700)]/30">
-          <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Banner Left Content */}
-            <div className="lg:col-span-6 space-y-6">
-              <MicroLabel className="text-[var(--color-gold-500)]">TEMPLE GOLD</MicroLabel>
-              <h2 className="font-serif italic font-normal text-3xl sm:text-4xl lg:text-5xl text-white leading-tight">
-                &ldquo;Where devotion becomes adornment.&rdquo;
-              </h2>
-              <p className="font-sans text-sm sm:text-base text-[var(--color-cream-300)]/80 leading-relaxed max-w-xl">
-                Every temple necklace and kasu haaram begins as a solid gold bullion bar, beaten by hand into repoussé sheets before being engraved with sacred motifs.
-              </p>
-              <div>
-                <Link href="/collections/temple-jewellery">
-                  <Button variant="primary" size="lg" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                    EXPLORE TEMPLE COLLECTION
-                  </Button>
-                </Link>
+        {/* 4. NEW ARRIVALS */}
+        <section className="py-20 bg-[var(--color-cream-100)] border-y border-[var(--color-cream-200)]">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-8">
+            <div className="flex items-center justify-between mb-10">
+              <div className="space-y-1">
+                <span className="font-sans text-[11px] uppercase tracking-[0.2em] font-semibold text-[var(--color-gold-700)] block">
+                  ✦ NEWLY VAULTED ✦
+                </span>
+                <h2 className="font-serif text-[30px] sm:text-[40px] text-[var(--color-text-900)] font-medium tracking-tight">
+                  NEW ARRIVALS
+                </h2>
               </div>
+              <Link
+                href="/collections"
+                className="font-sans text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-gold-700)] hover:text-[var(--color-gold-600)] underline underline-offset-4"
+              >
+                VIEW ALL
+              </Link>
             </div>
 
-            {/* Banner Right Image */}
-            <div className="lg:col-span-6 flex justify-center lg:justify-end">
-              <ArchFrame ratio="square" className="w-full max-w-[420px] aspect-square shadow-2xl">
-                <ImageWithFallback
-                  src="/images/categories/temple-jewellery.jpg"
-                  alt="Temple Gold Adornment"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 420px"
-                  className="object-cover"
-                />
-              </ArchFrame>
-            </div>
-          </div>
-        </section>
-
-        {/* 6. Heritage Story (Section 21) */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Story Left Image */}
-            <div className="lg:col-span-6">
-              <ArchFrame ratio="portrait" className="w-full max-w-[460px] aspect-[4/5] mx-auto shadow-xl">
-                <ImageWithFallback
-                  src="/images/craft/stage-2-nakashi.jpg"
-                  alt="Master Artisan Craftsmanship"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 460px"
-                  className="object-cover"
-                />
-              </ArchFrame>
-            </div>
-
-            {/* Story Right Content */}
-            <div className="lg:col-span-6 space-y-6">
-              <MicroLabel className="text-[var(--color-gold-600)]">OUR HERITAGE</MicroLabel>
-              <h2 className="font-serif font-medium text-3xl sm:text-4xl text-[var(--color-text-900)] leading-tight">
-                Crafted by Hands.<br />Carried Through Generations.
-              </h2>
-              <p className="font-sans text-sm sm:text-base text-[var(--color-text-700)] leading-relaxed">
-                Founded to preserve the endangered nakashi and jadau traditions of South India, Adi Parva works directly with hereditary sthapati families in Nagercoil, Madurai, and Vadasery.
-              </p>
-              <div className="pt-2">
-                <Link href="/heritage">
-                  <Button variant="secondary" size="md" rightIcon={<ArrowRight className="w-4 h-4" />}>
-                    DISCOVER OUR STORY
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 7. Kundan + Polki Split Editorial Section (Section 22) */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Kundan Card */}
-            <div className="group relative bg-[var(--color-ink-900)] text-white rounded-[var(--radius-card)] overflow-hidden p-8 sm:p-12 min-h-[380px] flex flex-col justify-end">
-              <ImageWithFallback
-                src="/images/categories/kundan.jpg"
-                alt="Kundan Craft"
-                fill
-                className="object-cover opacity-40 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="relative z-10 space-y-3">
-                <MicroLabel className="text-[var(--color-gold-400)]">ROYAL REPOSITORY</MicroLabel>
-                <h3 className="font-serif text-3xl font-medium text-white">KUNDAN</h3>
-                <p className="font-sans text-xs text-[var(--color-cream-300)] max-w-sm">
-                  Pure gold foil stone settings inlaid with rubies, emeralds, and uncut gems.
-                </p>
-                <Link href="/collections/kundan" className="inline-flex items-center gap-1.5 font-sans text-xs font-semibold uppercase tracking-wider text-[var(--color-gold-400)] group-hover:text-white pt-2">
-                  <span>EXPLORE KUNDAN</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Polki Card */}
-            <div className="group relative bg-[var(--color-ink-900)] text-white rounded-[var(--radius-card)] overflow-hidden p-8 sm:p-12 min-h-[380px] flex flex-col justify-end">
-              <ImageWithFallback
-                src="/images/categories/bridal-sets.jpg"
-                alt="Polki Diamonds"
-                fill
-                className="object-cover opacity-40 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="relative z-10 space-y-3">
-                <MicroLabel className="text-[var(--color-gold-400)]">UNCUT DIAMONDS</MicroLabel>
-                <h3 className="font-serif text-3xl font-medium text-white">POLKI</h3>
-                <p className="font-sans text-xs text-[var(--color-cream-300)] max-w-sm">
-                  Natural uncut diamonds set in traditional 22K yellow gold mountings.
-                </p>
-                <Link href="/collections/polki" className="inline-flex items-center gap-1.5 font-sans text-xs font-semibold uppercase tracking-wider text-[var(--color-gold-400)] group-hover:text-white pt-2">
-                  <span>EXPLORE POLKI</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 8. Craftsmanship Section (Section 23 - 3 Columns with Gold Icons) */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-12">
-          <div className="text-center space-y-2 max-w-xl mx-auto">
-            <MicroLabel className="text-[var(--color-gold-600)]">HERITAGE PILLARS</MicroLabel>
-            <BicameralHeading italicPart="The Art" romanPart="of Craft" size="lg" align="center" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-8 rounded-[var(--radius-card)] space-y-4 text-center">
-              <div className="w-14 h-14 mx-auto rounded-full bg-[var(--color-gold-100)] text-[var(--color-gold-600)] flex items-center justify-center">
-                <Hammer className="w-6 h-6" />
-              </div>
-              <MicroLabel className="text-[var(--color-gold-600)]">GUILD TRADITION</MicroLabel>
-              <h4 className="font-serif text-xl font-medium text-[var(--color-text-900)]">HEREDITARY ARTISANS</h4>
-              <p className="text-xs font-sans text-[var(--color-text-500)] leading-relaxed">
-                Hand-hammered repoussé and engraving executed exclusively by fifth-generation master sthapatis.
-              </p>
-            </div>
-
-            <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-8 rounded-[var(--radius-card)] space-y-4 text-center">
-              <div className="w-14 h-14 mx-auto rounded-full bg-[var(--color-gold-100)] text-[var(--color-gold-600)] flex items-center justify-center">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <MicroLabel className="text-[var(--color-gold-600)]">ANCIENT BENCHWORK</MicroLabel>
-              <h4 className="font-serif text-xl font-medium text-[var(--color-text-900)]">TRADITIONAL TECHNIQUES</h4>
-              <p className="text-xs font-sans text-[var(--color-text-500)] leading-relaxed">
-                Wax carving, pure gold foil jadau setting, and organic meenakari enamelling without modern synthetic substitutes.
-              </p>
-            </div>
-
-            <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-8 rounded-[var(--radius-card)] space-y-4 text-center">
-              <div className="w-14 h-14 mx-auto rounded-full bg-[var(--color-gold-100)] text-[var(--color-gold-600)] flex items-center justify-center">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <MicroLabel className="text-[var(--color-gold-600)]">BIS CERTIFIED</MicroLabel>
-              <h4 className="font-serif text-xl font-medium text-[var(--color-text-900)]">TIMELESS DETAIL</h4>
-              <p className="text-xs font-sans text-[var(--color-text-500)] leading-relaxed">
-                Every piece is 22K 916 BIS hallmarked and arrives accompanied by a permanent provenance deed.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* 9. New Arrivals (Section 24) */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-8">
-          <div className="text-center space-y-2 max-w-xl mx-auto">
-            <MicroLabel className="text-[var(--color-gold-600)]">RECENTLY UNVEILED</MicroLabel>
-            <BicameralHeading italicPart="New" romanPart="From The House" size="lg" align="center" />
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <ProductCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {newArrivals.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} showRating />
               ))}
             </div>
-          )}
-        </section>
-
-        {/* 10. Testimonials (Section 25) */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-10">
-          <div className="text-center space-y-2 max-w-xl mx-auto">
-            <MicroLabel className="text-[var(--color-gold-600)]">PATRON VOICES</MicroLabel>
-            <BicameralHeading italicPart="Worn" romanPart="With Meaning" size="lg" align="center" />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-8 rounded-[var(--radius-card)] space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex gap-1 text-[var(--color-gold-500)]">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-[var(--color-gold-500)]" />
-                  ))}
-                </div>
-                <p className="font-serif italic text-base text-[var(--color-text-900)] leading-relaxed">
-                  &ldquo;The detailing on the Maharani Temple necklace feels like something meant to be passed down for generations.&rdquo;
-                </p>
-              </div>
-              <div className="border-t border-[var(--color-cream-200)] pt-3 text-xs font-sans">
-                <span className="font-semibold text-[var(--color-text-900)] block">Priya Sharma</span>
-                <span className="text-[var(--color-text-500)]">Chennai, Tamil Nadu</span>
-              </div>
-            </div>
-
-            <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-8 rounded-[var(--radius-card)] space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex gap-1 text-[var(--color-gold-500)]">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-[var(--color-gold-500)]" />
-                  ))}
-                </div>
-                <p className="font-serif italic text-base text-[var(--color-text-900)] leading-relaxed">
-                  &ldquo;The uncut Polki stones match royal heirlooms. The armored transit delivery arrived perfectly on schedule.&rdquo;
-                </p>
-              </div>
-              <div className="border-t border-[var(--color-cream-200)] pt-3 text-xs font-sans">
-                <span className="font-semibold text-[var(--color-text-900)] block">Meera Nair</span>
-                <span className="text-[var(--color-text-500)]">Bengaluru, Karnataka</span>
-              </div>
-            </div>
-
-            <div className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] p-8 rounded-[var(--radius-card)] space-y-4 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex gap-1 text-[var(--color-gold-500)]">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-[var(--color-gold-500)]" />
-                  ))}
-                </div>
-                <p className="font-serif italic text-base text-[var(--color-text-900)] leading-relaxed">
-                  &ldquo;Acquired the Lakshmi Kasu Haaram for my daughter&apos;s wedding. The provenance scroll is a cherished document.&rdquo;
-                </p>
-              </div>
-              <div className="border-t border-[var(--color-cream-200)] pt-3 text-xs font-sans">
-                <span className="font-semibold text-[var(--color-text-900)] block">Anil Kapoor</span>
-                <span className="text-[var(--color-text-500)]">Mumbai, Maharashtra</span>
-              </div>
-            </div>
           </div>
         </section>
 
-        {/* 11. Editorial Journal (Section 26) */}
-        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-[var(--color-cream-200)] pb-4">
-            <div>
-              <MicroLabel className="text-[var(--color-gold-600)] mb-1">EDITORIAL JOURNAL</MicroLabel>
-              <BicameralHeading italicPart="Craft" romanPart="Dispatches" size="lg" />
+        {/* 5. OUR HERITAGE BANNER */}
+        <section className="py-24 bg-[var(--color-cream-50)] overflow-hidden">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Left Image in Gold Frame */}
+            <div className="lg:col-span-6 relative aspect-[4/3] rounded-card overflow-hidden p-2 border border-[#D4AF37]/40 bg-[#FAF0E4] shadow-xl">
+              <div className="relative w-full h-full rounded-xs overflow-hidden">
+                <Image
+                  src="/images/journal/anatomy-temple-necklace.jpg"
+                  alt="Crafted from Culture flatlay"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover hover:scale-105 transition-transform duration-700"
+                />
+              </div>
             </div>
 
-            <Link
-              href="/journal"
-              className="inline-flex items-center gap-1 font-sans text-xs uppercase tracking-widest text-[var(--color-gold-600)] hover:text-[var(--color-gold-700)] font-semibold"
-            >
-              <span>Read all articles</span>
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {articles.map((art) => (
-              <article key={art.id} className="bg-[var(--color-surface)] border border-[var(--color-cream-200)] rounded-[var(--radius-card)] overflow-hidden shadow-xs group">
-                <Link href={`/journal/${art.slug}`} className="block relative aspect-[16/9] overflow-hidden bg-[var(--color-cream-100)]">
-                  <ImageWithFallback
-                    src={art.heroImage || '/images/journal/anatomy-temple-necklace.jpg'}
-                    alt={art.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+            {/* Right Copy */}
+            <div className="lg:col-span-6 space-y-7">
+              <span className="font-sans text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--color-gold-700)] block">
+                ✦ OUR ATELIER HERITAGE ✦
+              </span>
+              <h2 className="font-serif text-[36px] sm:text-[48px] text-[var(--color-text-900)] leading-tight font-medium">
+                Crafted from Culture. <br />
+                <span className="font-italic font-normal">Designed for Queens.</span>
+              </h2>
+              <p className="font-sans text-[15px] sm:text-[17px] text-[var(--color-text-700)] leading-relaxed">
+                Adi Parva brings ancient artistry into modern elegance. Every piece tells a story of timeless beauty, tradition and royalty forged by master artisans in historical temple guilds.
+              </p>
+              <div className="pt-2">
+                <Link
+                  href="/heritage"
+                  className="inline-flex h-[48px] px-8 bg-foil-gold text-[#120A05] font-sans text-[11px] font-bold uppercase tracking-[0.18em] rounded-xs hover:brightness-110 transition-all items-center justify-center shadow-md"
+                >
+                  READ OUR JOURNEY
                 </Link>
+              </div>
+            </div>
+          </div>
+        </section>
 
-                <div className="p-6 space-y-3">
-                  <div className="flex items-center justify-between text-[11px] font-sans text-[var(--color-text-500)]">
-                    <MicroLabel className="text-[var(--color-gold-600)]">{art.category}</MicroLabel>
-                    <span>{art.readTime}</span>
-                  </div>
-
-                  <Link href={`/journal/${art.slug}`}>
-                    <h4 className="font-serif text-xl font-medium text-[var(--color-text-900)] group-hover:text-[var(--color-gold-600)] transition-colors line-clamp-2">
-                      {art.title}
-                    </h4>
-                  </Link>
-
-                  <p className="text-xs font-sans text-[var(--color-text-500)] line-clamp-2 leading-relaxed">
-                    {art.excerpt}
-                  </p>
-
-                  <div className="pt-2">
-                    <Link
-                      href={`/journal/${art.slug}`}
-                      className="inline-flex items-center gap-1 text-xs font-sans font-semibold uppercase tracking-wider text-[var(--color-text-900)] group-hover:text-[var(--color-gold-600)] transition-colors"
-                    >
-                      <span>READ ARTICLE</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
+        {/* 6. BESTSELLERS */}
+        <section className="py-20 bg-[var(--color-cream-100)] border-y border-[var(--color-cream-200)]">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-8 space-y-8">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <span className="font-sans text-[11px] uppercase tracking-[0.2em] font-semibold text-[var(--color-gold-700)] block">
+                  ✦ MOST RESERVED ✦
+                </span>
+                <h2 className="font-serif text-[30px] sm:text-[40px] text-[var(--color-text-900)] font-medium tracking-tight">
+                  BESTSELLERS
+                </h2>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => scrollBestsellers('left')}
+                    className="w-10 h-10 rounded-full bg-[var(--color-surface)] border border-[var(--color-cream-300)] flex items-center justify-center text-[var(--color-text-700)] hover:border-[var(--color-gold-600)] hover:text-[var(--color-gold-600)] transition-all cursor-pointer shadow-xs"
+                    aria-label="Scroll left"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => scrollBestsellers('right')}
+                    className="w-10 h-10 rounded-full bg-[var(--color-surface)] border border-[var(--color-cream-300)] flex items-center justify-center text-[var(--color-text-700)] hover:border-[var(--color-gold-600)] hover:text-[var(--color-gold-600)] transition-all cursor-pointer shadow-xs"
+                    aria-label="Scroll right"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
-              </article>
-            ))}
+              </div>
+            </div>
+
+            <div
+              ref={scrollRef}
+              className="flex gap-6 overflow-x-auto scrollbar-none pb-4 snap-x snap-mandatory"
+            >
+              {bestsellers.map((product) => (
+                <div key={product.id} className="snap-start shrink-0 w-[270px] sm:w-[300px]">
+                  <ProductCard product={product} showRating />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 7. BRIDAL COLLECTION BANNER — Deep Espresso & Gold Sheen */}
+        <section className="relative w-full bg-[#120A05] text-[#FDF7EF] py-24 overflow-hidden border-y border-[#D4AF37]/30">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
+            <div className="lg:col-span-7 space-y-5 text-center lg:text-left">
+              <span className="font-sans text-[11px] font-bold uppercase tracking-[0.22em] text-[#D4AF37] block">
+                ✦ FOR WEDDINGS WRITTEN IN GOLD ✦
+              </span>
+              <h2 className="font-serif text-[42px] sm:text-[56px] text-[#FDF7EF] font-medium leading-tight">
+                Bridal Collection
+              </h2>
+              <p className="font-sans text-[16px] sm:text-[18px] text-[#E6D5BF]/85 max-w-[48ch] mx-auto lg:mx-0 leading-relaxed">
+                Exquisite jewellery for your most precious moments. Complete ceremonial ensembles of harams, chokers, matha patti, and waist belts.
+              </p>
+              <div className="pt-4">
+                <Link
+                  href="/collections/bridal-sets"
+                  className="inline-flex h-[52px] px-9 bg-foil-gold text-[#120A05] font-sans text-[12px] font-bold uppercase tracking-[0.18em] rounded-xs hover:brightness-110 transition-all items-center justify-center shadow-royal-gold"
+                >
+                  EXPLORE BRIDAL SETS
+                </Link>
+              </div>
+            </div>
+            <div className="lg:col-span-5 relative aspect-[4/3] rounded-card overflow-hidden p-2 border-gold-glow bg-[#1C0F07]">
+              <div className="relative w-full h-full rounded-xs overflow-hidden">
+                <Image
+                  src="/images/categories/bridal-sets.jpg"
+                  alt="Bridal Jewellery Set"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="object-cover hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 8. NEWSLETTER */}
+        <section className="py-24 bg-[var(--color-cream-50)]">
+          <div className="max-w-[540px] mx-auto px-6 text-center space-y-6">
+            <div className="w-12 h-12 rounded-full bg-[var(--color-gold-100)] border border-[var(--color-gold-500)]/40 flex items-center justify-center mx-auto text-[var(--color-gold-600)]">
+              ✦
+            </div>
+            <h2 className="font-serif text-[32px] sm:text-[40px] text-[var(--color-text-900)] font-medium">
+              JOIN THE ROYAL CIRCLE
+            </h2>
+            <p className="font-sans text-[14px] sm:text-[15px] text-[var(--color-text-500)] leading-relaxed">
+              Receive quiet dispatches on antique stone acquisitions, craft heritage notes, and private collection unveilings.
+            </p>
+
+            {newsletterSubmitted ? (
+              <p className="font-sans text-[12px] font-bold uppercase tracking-[0.18em] text-[var(--color-gold-700)] pt-4">
+                You're subscribed to the Royal Circle.
+              </p>
+            ) : (
+              <form onSubmit={handleNewsletter} className="flex gap-2 max-w-[440px] mx-auto pt-3">
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  className="flex-1 bg-[var(--color-cream-100)] border border-[var(--color-cream-300)] focus:border-[var(--color-gold-600)] text-sm text-[var(--color-text-900)] placeholder-[var(--color-text-400)] px-4 py-3.5 outline-none rounded-xs font-sans"
+                />
+                <button
+                  type="submit"
+                  className="h-[48px] px-7 bg-[var(--color-gold-600)] text-white font-sans text-[11px] font-bold uppercase tracking-[0.18em] rounded-xs hover:bg-[var(--color-gold-700)] transition-colors cursor-pointer shadow-xs"
+                >
+                  SUBSCRIBE
+                </button>
+              </form>
+            )}
           </div>
         </section>
       </main>
 
-      {/* 12. Footer */}
       <Footer />
     </div>
   );

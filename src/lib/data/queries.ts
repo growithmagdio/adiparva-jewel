@@ -14,10 +14,9 @@ import {
 } from './types';
 import { getStoreData, saveStoreData, resetStore as resetLocalStore } from './store';
 
-// Helper to simulate dev network latency (180ms - 320ms)
+// Helper to return data instantly (0ms latency for ultra-fast page transitions)
 async function simulateLatency<T>(data: T): Promise<T> {
-  const ms = Math.floor(Math.random() * (320 - 180 + 1)) + 180;
-  return new Promise((resolve) => setTimeout(() => resolve(data), ms));
+  return Promise.resolve(data);
 }
 
 // Reset Demo Data Utility
@@ -30,12 +29,17 @@ export async function resetDemoData(): Promise<boolean> {
 
 export async function getProducts(options?: {
   categoryId?: string;
+  categoryIds?: string[];
   collectionTag?: string;
   status?: 'live' | 'draft' | 'archived' | 'all';
   search?: string;
   metal?: string;
+  stone?: string;
+  occasion?: string;
+  minPrice?: number;
+  maxPrice?: number;
   inStockOnly?: boolean;
-  sort?: 'curated' | 'price-asc' | 'price-desc' | 'newest';
+  sort?: 'curated' | 'price-asc' | 'price-desc' | 'newest' | 'latest' | 'best-selling';
 }): Promise<Product[]> {
   const store = getStoreData();
   let list = [...store.products];
@@ -50,12 +54,44 @@ export async function getProducts(options?: {
     list = list.filter((p) => p.categoryId === options.categoryId);
   }
 
+  if (options?.categoryIds && options.categoryIds.length > 0) {
+    list = list.filter((p) => options.categoryIds!.includes(p.categoryId));
+  }
+
   if (options?.collectionTag) {
     list = list.filter((p) => p.collectionTag === options.collectionTag);
   }
 
   if (options?.metal) {
-    list = list.filter((p) => p.variants.some((v) => v.metal === options.metal));
+    const targetMetal = options.metal.toLowerCase();
+    list = list.filter((p) => 
+      p.baseMetal?.toLowerCase().includes(targetMetal) ||
+      p.plating?.toLowerCase().includes(targetMetal) ||
+      p.variants.some((v) => v.metal.toLowerCase().includes(targetMetal))
+    );
+  }
+
+  if (options?.stone) {
+    const targetStone = options.stone.toLowerCase();
+    list = list.filter((p) => 
+      p.stones?.some((s) => s.toLowerCase().includes(targetStone)) ||
+      p.specs.some((spec) => spec.value.toLowerCase().includes(targetStone))
+    );
+  }
+
+  if (options?.occasion) {
+    const targetOccasion = options.occasion.toLowerCase();
+    list = list.filter((p) => 
+      p.occasion?.some((o) => o.toLowerCase().includes(targetOccasion))
+    );
+  }
+
+  if (options?.minPrice !== undefined) {
+    list = list.filter((p) => p.price >= options.minPrice!);
+  }
+
+  if (options?.maxPrice !== undefined) {
+    list = list.filter((p) => p.price <= options.maxPrice!);
   }
 
   if (options?.inStockOnly) {
@@ -75,8 +111,10 @@ export async function getProducts(options?: {
   if (options?.sort) {
     if (options.sort === 'price-asc') list.sort((a, b) => a.price - b.price);
     if (options.sort === 'price-desc') list.sort((a, b) => b.price - a.price);
-    if (options.sort === 'newest')
+    if (options.sort === 'newest' || options.sort === 'latest')
       list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    if (options.sort === 'best-selling')
+      list.sort((a, b) => b.reviewCount - a.reviewCount);
   }
 
   return simulateLatency(list);
@@ -118,30 +156,11 @@ export async function createProduct(product: Omit<Product, 'id' | 'createdAt'>):
   return simulateLatency(newProduct);
 }
 
-export async function updateProduct(id: string, updates: Partial<Product>): Promise<Product | null> {
-  const store = getStoreData();
-  const idx = store.products.findIndex((p) => p.id === id);
-  if (idx === -1) return simulateLatency(null);
-
-  store.products[idx] = { ...store.products[idx], ...updates };
-  saveStoreData(store);
-  return simulateLatency(store.products[idx]);
-}
-
-export async function deleteProduct(id: string): Promise<boolean> {
-  const store = getStoreData();
-  const initialLen = store.products.length;
-  store.products = store.products.filter((p) => p.id !== id);
-  saveStoreData(store);
-  return simulateLatency(store.products.length < initialLen);
-}
-
 // ---------------- CATEGORIES ----------------
 
 export async function getCategories(): Promise<Category[]> {
   const store = getStoreData();
-  const sorted = [...store.categories].sort((a, b) => a.order - b.order);
-  return simulateLatency(sorted);
+  return simulateLatency(store.categories);
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
@@ -152,249 +171,192 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 
 // ---------------- ORDERS ----------------
 
-export async function getOrders(options?: {
-  status?: OrderStatus | 'all';
-  customerId?: string;
-  search?: string;
-}): Promise<Order[]> {
+export async function getOrders(): Promise<Order[]> {
   const store = getStoreData();
-  let list = [...store.orders];
-
-  if (options?.status && options.status !== 'all') {
-    list = list.filter((o) => o.status === options.status);
-  }
-
-  if (options?.customerId) {
-    list = list.filter((o) => o.customerId === options.customerId);
-  }
-
-  if (options?.search) {
-    const q = options.search.toLowerCase().trim();
-    list = list.filter(
-      (o) =>
-        o.id.toLowerCase().includes(q) ||
-        o.customerName.toLowerCase().includes(q) ||
-        o.customerEmail.toLowerCase().includes(q)
-    );
-  }
-
-  list.sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime());
-  return simulateLatency(list);
+  return simulateLatency(store.orders);
 }
 
 export async function getOrderById(id: string): Promise<Order | null> {
   const store = getStoreData();
-  const cleanId = id.startsWith('#') ? id.slice(1) : id;
-  const found = store.orders.find((o) => o.id === cleanId || o.id === id) || null;
+  const found = store.orders.find((o) => o.id === id) || null;
   return simulateLatency(found);
 }
 
-export async function createOrder(
-  orderData: Omit<Order, 'id' | 'placedAt' | 'timeline'> & { placedAt?: string; timeline?: Order['timeline'] }
-): Promise<Order> {
+export async function updateOrderStatus(
+  orderId: string,
+  status: OrderStatus,
+  note: string
+): Promise<Order | null> {
   const store = getStoreData();
-  const nextNum = 7725 + store.orders.length;
-  const newOrder: Order = {
-    ...orderData,
-    id: `ORD-${nextNum}`,
-    placedAt: orderData.placedAt || new Date().toISOString(),
-    timeline: orderData.timeline || [
-      {
-        status: 'confirmed',
-        at: new Date().toISOString(),
-        note: 'Order reservation placed & payment verified',
-      },
-    ],
-  };
-  store.orders.unshift(newOrder);
-  saveStoreData(store);
-  return simulateLatency(newOrder);
-}
+  const order = store.orders.find((o) => o.id === orderId);
+  if (!order) return simulateLatency(null);
 
-export async function updateOrderStatus(id: string, newStatus: OrderStatus, note?: string): Promise<Order | null> {
-  const store = getStoreData();
-  const cleanId = id.startsWith('#') ? id.slice(1) : id;
-  const idx = store.orders.findIndex((o) => o.id === cleanId || o.id === id);
-  if (idx === -1) return simulateLatency(null);
-
-  const order = store.orders[idx];
-  order.status = newStatus;
+  order.status = status;
   order.timeline.push({
-    status: newStatus,
+    status,
     at: new Date().toISOString(),
-    note: note || `Status updated to ${newStatus}`,
+    note,
   });
 
-  store.orders[idx] = order;
   saveStoreData(store);
   return simulateLatency(order);
 }
 
-// ---------------- DASHBOARD STATS (Exact Reference Alignment) ----------------
-
-export async function getDashboardStats(): Promise<DashboardStats> {
+export async function createOrder(orderData: Omit<Order, 'id' | 'placedAt' | 'expectedBy' | 'timeline' | 'status'>): Promise<Order> {
   const store = getStoreData();
+  const now = new Date();
+  const expected = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000); // 5 days delivery
+  
+  const orderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
 
-  // Active orders: pending, confirmed, shipped
-  const activeOrders = store.orders.filter(
-    (o) => o.status === 'pending' || o.status === 'confirmed' || o.status === 'shipped'
-  );
+  const newOrder: Order = {
+    ...orderData,
+    id: orderId,
+    status: 'confirmed',
+    placedAt: now.toISOString(),
+    expectedBy: expected.toISOString(),
+    timeline: [
+      {
+        status: 'confirmed',
+        at: now.toISOString(),
+        note: 'Order confirmed and registered with the atelier.',
+      },
+    ],
+  };
 
-  // Compute live values
-  const totalRevenue = 218700; // Calibrated to reference figure ₹2,18,700
-  const activeOrdersCount = activeOrders.length; // 4
-  const totalCustomersCount = 3; // 3 active core patrons/collectors
-  const masterpiecesCount = store.products.filter((p) => p.collectionTag === 'Masterpiece' && p.status === 'live').length; // 2
-
-  return simulateLatency({
-    totalRevenue,
-    revenueDelta: '+12.5% ↗',
-    activeOrdersCount,
-    activeOrdersDelta: '+8.2% ↗',
-    totalCustomersCount,
-    totalCustomersDelta: '+15.3% ↗',
-    masterpiecesCount,
-    masterpiecesDelta: 'Stable',
-  });
+  store.orders.unshift(newOrder);
+  saveStoreData(store);
+  return simulateLatency(newOrder);
 }
 
 // ---------------- CUSTOMERS ----------------
 
 export async function getCustomers(): Promise<Customer[]> {
   const store = getStoreData();
-  return simulateLatency([...store.customers]);
+  return simulateLatency(store.customers);
 }
 
 // ---------------- COUPONS ----------------
 
 export async function getCoupons(): Promise<Coupon[]> {
   const store = getStoreData();
-  return simulateLatency([...store.coupons]);
+  return simulateLatency(store.coupons);
 }
 
-export async function validateCoupon(code: string, cartSubtotal: number): Promise<{ valid: boolean; coupon?: Coupon; message?: string }> {
+export async function validateCoupon(
+  code: string,
+  subtotal: number
+): Promise<{ valid: boolean; discount: number; coupon?: Coupon; message?: string }> {
   const store = getStoreData();
-  const found = store.coupons.find((c) => c.code.toUpperCase() === code.toUpperCase().trim());
+  const coupon = store.coupons.find(
+    (c) => c.code.toLowerCase() === code.toLowerCase().trim()
+  );
 
-  if (!found) {
-    return simulateLatency({ valid: false, message: 'Invalid coupon code.' });
+  if (!coupon) {
+    return simulateLatency({ valid: false, discount: 0, message: 'Invalid coupon code.' });
   }
 
-  if (found.status === 'expired') {
-    return simulateLatency({ valid: false, message: 'This coupon code has expired.' });
+  if (coupon.status !== 'active') {
+    return simulateLatency({ valid: false, discount: 0, message: 'This coupon has expired or is paused.' });
   }
 
-  if (found.status === 'paused') {
-    return simulateLatency({ valid: false, message: 'This coupon code is currently paused.' });
-  }
-
-  if (found.status === 'scheduled') {
-    return simulateLatency({ valid: false, message: 'This coupon is scheduled for an upcoming promotion.' });
-  }
-
-  if (cartSubtotal < found.minOrder) {
+  if (subtotal < coupon.minOrder) {
     return simulateLatency({
       valid: false,
-      message: `Minimum order total of ₹${found.minOrder.toLocaleString('en-IN')} required for coupon ${found.code}.`,
+      discount: 0,
+      message: `Minimum order amount of ₹${coupon.minOrder.toLocaleString('en-IN')} required.`,
     });
   }
 
-  if (found.usedCount >= found.usageLimit) {
-    return simulateLatency({ valid: false, message: 'This coupon code has reached its maximum usage limit.' });
+  let discount = 0;
+  if (coupon.type === 'percent') {
+    discount = Math.round((subtotal * coupon.value) / 100);
+    if (coupon.maxDiscount && discount > coupon.maxDiscount) {
+      discount = coupon.maxDiscount;
+    }
+  } else {
+    discount = coupon.value;
   }
 
-  return simulateLatency({ valid: true, coupon: found });
-}
-
-export async function createCoupon(coupon: Omit<Coupon, 'id' | 'usedCount'>): Promise<Coupon> {
-  const store = getStoreData();
-  const newCpn: Coupon = {
-    ...coupon,
-    id: `cpn-${Date.now()}`,
-    usedCount: 0,
-  };
-  store.coupons.unshift(newCpn);
-  saveStoreData(store);
-  return simulateLatency(newCpn);
+  return simulateLatency({ valid: true, discount, coupon, message: 'Coupon applied successfully.' });
 }
 
 // ---------------- OFFERS ----------------
 
-export async function getOffers(): Promise<SeasonalOffer[]> {
+export async function getSeasonalOffers(): Promise<SeasonalOffer[]> {
   const store = getStoreData();
-  return simulateLatency([...store.offers]);
+  return simulateLatency(store.offers);
+}
+
+export async function getOffers(): Promise<SeasonalOffer[]> {
+  return getSeasonalOffers();
 }
 
 // ---------------- HERO SLIDES ----------------
 
 export async function getHeroSlides(): Promise<HeroSlide[]> {
   const store = getStoreData();
-  const active = store.heroSlides.filter((s) => s.active).sort((a, b) => a.order - b.order);
-  return simulateLatency(active);
-}
-
-export async function getAllHeroSlides(): Promise<HeroSlide[]> {
-  const store = getStoreData();
-  const all = [...store.heroSlides].sort((a, b) => a.order - b.order);
-  return simulateLatency(all);
+  return simulateLatency(store.heroSlides);
 }
 
 export async function saveHeroSlides(slides: HeroSlide[]): Promise<HeroSlide[]> {
   const store = getStoreData();
   store.heroSlides = slides;
   saveStoreData(store);
-  return simulateLatency(slides);
+  return simulateLatency(store.heroSlides);
 }
 
 // ---------------- ADMIN USERS ----------------
 
 export async function getAdminUsers(): Promise<AdminUser[]> {
   const store = getStoreData();
-  return simulateLatency([...store.adminUsers]);
+  return simulateLatency(store.adminUsers);
 }
 
-export async function createAdminUser(user: Omit<AdminUser, 'id' | 'lastActive'>): Promise<AdminUser> {
-  const store = getStoreData();
-  const newUser: AdminUser = {
-    ...user,
-    id: `usr-${Date.now()}`,
-    lastActive: 'Just invited',
-  };
-  store.adminUsers.unshift(newUser);
-  saveStoreData(store);
-  return simulateLatency(newUser);
-}
-
-// ---------------- JOURNAL ----------------
-
-export async function getJournalArticles(): Promise<JournalArticle[]> {
-  const store = getStoreData();
-  return simulateLatency([...store.journalArticles]);
-}
-
-export async function getJournalArticleBySlug(slug: string): Promise<JournalArticle | null> {
-  const store = getStoreData();
-  const found = store.journalArticles.find((a) => a.slug === slug) || null;
-  return simulateLatency(found);
-}
-
-// ---------------- SITE CONTENT ----------------
+// ---------------- CONTENT ----------------
 
 export async function getSiteContent(): Promise<SiteContent> {
   const store = getStoreData();
-  return simulateLatency({ ...store.siteContent });
+  return simulateLatency(store.siteContent);
 }
 
 export async function saveSiteContent(content: SiteContent): Promise<SiteContent> {
   const store = getStoreData();
   store.siteContent = content;
   saveStoreData(store);
-  return simulateLatency(content);
+  return simulateLatency(store.siteContent);
 }
 
-export async function updateSiteContent(content: Partial<SiteContent>): Promise<SiteContent> {
+// ---------------- JOURNAL ----------------
+
+export async function getJournalArticles(): Promise<JournalArticle[]> {
   const store = getStoreData();
-  store.siteContent = { ...store.siteContent, ...content };
-  saveStoreData(store);
-  return simulateLatency({ ...store.siteContent });
+  return simulateLatency(store.journalArticles);
+}
+
+export async function getJournalArticleBySlug(slug: string): Promise<JournalArticle | null> {
+  const store = getStoreData();
+  const article = store.journalArticles.find((j: JournalArticle) => j.slug === slug) || null;
+  return simulateLatency(article);
+}
+
+// ---------------- DASHBOARD STATS ----------------
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+  const store = getStoreData();
+  const totalRevenue = store.orders.reduce((sum, o) => sum + o.total, 0);
+  const activeOrdersCount = store.orders.filter((o) =>
+    ['pending', 'confirmed', 'shipped'].includes(o.status)
+  ).length;
+
+  return simulateLatency({
+    totalRevenue,
+    revenueDelta: '+14.2%',
+    activeOrdersCount,
+    activeOrdersDelta: '+3 orders',
+    totalCustomersCount: store.customers.length,
+    totalCustomersDelta: '+8 total',
+    masterpiecesCount: store.products.filter((p) => p.collectionTag === 'Masterpiece').length,
+    masterpiecesDelta: 'Constant',
+  });
 }
