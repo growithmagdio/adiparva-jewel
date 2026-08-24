@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-import { Bodoni_Moda, Marcellus, Karla, Anek_Tamil } from 'next/font/google';
+import { Cormorant_Garamond, Marcellus, Jost, Noto_Serif_Tamil } from 'next/font/google';
 import './globals.css';
 
-const bodoniModa = Bodoni_Moda({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  variable: '--font-bodoni-moda',
+  variable: '--font-cormorant',
   style: ['normal', 'italic'],
-  weight: ['400', '500', '600'],
+  weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
 });
 
@@ -17,23 +17,23 @@ const marcellus = Marcellus({
   display: 'swap',
 });
 
-const karla = Karla({
+const jost = Jost({
   subsets: ['latin'],
-  variable: '--font-karla',
-  weight: ['400', '500', '600'],
+  variable: '--font-jost',
+  weight: ['300', '400', '500', '600'],
   display: 'swap',
 });
 
-const anekTamil = Anek_Tamil({
+const notoTamil = Noto_Serif_Tamil({
   subsets: ['tamil', 'latin'],
-  variable: '--font-anek-tamil',
+  variable: '--font-tamil',
   weight: ['400', '600'],
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Adi Parva — Direct-to-Consumer Temple Jewellery House',
-  description: 'Vault & Vitrine editorial house selling antique-finish temple necklaces, harams, jhumkas, bangles and bridal sets.',
+  title: 'Adi Parva — The Temple of Tradition | Royal Heritage Jewellery',
+  description: 'Thanjavur Vitrine living archive of handcrafted temple gold, Kundan, Polki, and bridal heirloom jewellery.',
 };
 
 export default function RootLayout({
@@ -44,11 +44,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bodoniModa.variable} ${marcellus.variable} ${karla.variable} ${anekTamil.variable}`}
+      className={`${cormorant.variable} ${marcellus.variable} ${jost.variable} ${notoTamil.variable}`}
     >
-      <body className="min-h-screen bg-[var(--color-ivory)] text-[var(--color-ink)] antialiased font-sans">
+      <body className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] antialiased font-sans">
         {children}
       </body>
     </html>
   );
 }
+

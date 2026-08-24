@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/storefront/header';
 import { Footer } from '@/components/storefront/footer';
 import { ProductCard } from '@/components/storefront/product-card';
-import { Button } from '@/components/primitives/button';
+import { KolamDivider } from '@/components/storefront/kolam-divider';
 import { getProducts, getCategories } from '@/lib/data/queries';
 import { Product, Category } from '@/lib/data/types';
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
@@ -25,7 +25,6 @@ export default function CollectionsPage() {
   const selectedCategory = searchParams.get('category') || 'all';
   const selectedMetal = searchParams.get('metal') || 'all';
   const selectedStone = searchParams.get('stone') || 'all';
-  const selectedOccasion = searchParams.get('occasion') || 'all';
   const priceRange = searchParams.get('price') || 'all';
   const sortBy = searchParams.get('sort') || 'latest';
 
@@ -61,24 +60,23 @@ export default function CollectionsPage() {
   const filteredProducts = products.filter((p) => {
     if (selectedCategory !== 'all' && p.categoryId !== selectedCategory) return false;
     if (selectedMetal !== 'all') {
-      const match = p.baseMetal?.toLowerCase().includes(selectedMetal) ||
-        p.plating?.toLowerCase().includes(selectedMetal) ||
-        p.variants.some((v) => v.metal.toLowerCase().includes(selectedMetal));
+      const match =
+        p.baseMetal?.toLowerCase().includes(selectedMetal.toLowerCase()) ||
+        p.plating?.toLowerCase().includes(selectedMetal.toLowerCase()) ||
+        p.variants.some((v) => v.metal.toLowerCase().includes(selectedMetal.toLowerCase()));
       if (!match) return false;
     }
     if (selectedStone !== 'all') {
-      const match = p.stones?.some((s) => s.toLowerCase().includes(selectedStone)) ||
-        p.specs.some((sp) => sp.value.toLowerCase().includes(selectedStone));
-      if (!match) return false;
-    }
-    if (selectedOccasion !== 'all') {
-      const match = p.occasion?.some((o) => o.toLowerCase().includes(selectedOccasion));
+      const match =
+        p.stones?.some((s) => s.toLowerCase().includes(selectedStone.toLowerCase())) ||
+        p.specs.some((sp) => sp.value.toLowerCase().includes(selectedStone.toLowerCase()));
       if (!match) return false;
     }
     if (priceRange !== 'all') {
-      if (priceRange === 'under-20k' && p.price >= 20000) return false;
-      if (priceRange === '20k-50k' && (p.price < 20000 || p.price > 50000)) return false;
-      if (priceRange === 'above-50k' && p.price <= 50000) return false;
+      if (priceRange === 'under-2k' && p.price >= 2000) return false;
+      if (priceRange === '2k-5k' && (p.price < 2000 || p.price > 5000)) return false;
+      if (priceRange === '5k-10k' && (p.price < 5000 || p.price > 10000)) return false;
+      if (priceRange === 'above-10k' && p.price <= 10000) return false;
     }
     return true;
   });
@@ -96,333 +94,249 @@ export default function CollectionsPage() {
     selectedCategory !== 'all',
     selectedMetal !== 'all',
     selectedStone !== 'all',
-    selectedOccasion !== 'all',
     priceRange !== 'all',
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-[var(--color-ivory)] text-[var(--color-ink)] flex flex-col font-sans">
+    <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] flex flex-col font-sans">
       <Header />
 
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12 space-y-12">
-        {/* Breadcrumb */}
-        <div className="font-karla text-[12px] text-[var(--color-ink)]/60 flex items-center gap-2">
-          <Link href="/" className="hover:text-[var(--color-gold)] transition-colors">Home</Link>
-          <span className="text-[var(--color-hairline)]">/</span>
-          <span className="text-[var(--color-ink)] font-medium">Collections</span>
-        </div>
-
-        {/* Page Head */}
-        <div className="space-y-2 border-b border-[var(--color-hairline)] pb-8">
-          <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
-            {filteredProducts.length} pieces available
-          </span>
-          <h1 className="font-bodoni text-[36px] sm:text-[44px] text-[var(--color-ink)]">
-            Shop all
-          </h1>
-          <p className="font-karla text-[16px] text-[var(--color-ink)]/70 max-w-[62ch]">
-            Browse our complete vault of antique-finished South Indian temple jewellery, Kundan foil work, uncut Polki diamonds, and grand bridal ensembles.
-          </p>
-        </div>
-
-        {/* Applied Filter Chips & Sort Controls */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          {/* Active Chips */}
-          <div className="flex flex-wrap items-center gap-2">
-            {selectedCategory !== 'all' && (
-              <button
-                onClick={() => updateParam('category', 'all')}
-                className="font-marcellus text-[11px] uppercase tracking-[0.18em] px-3 py-1 bg-[var(--color-bone)] border border-[var(--color-hairline)] text-[var(--color-ink)] flex items-center gap-1.5 rounded-[2px]"
-              >
-                <span>Category: {categories.find((c) => c.id === selectedCategory)?.name || selectedCategory}</span>
-                <X className="w-3 h-3 text-[var(--color-gold)]" />
-              </button>
-            )}
-            {selectedMetal !== 'all' && (
-              <button
-                onClick={() => updateParam('metal', 'all')}
-                className="font-marcellus text-[11px] uppercase tracking-[0.18em] px-3 py-1 bg-[var(--color-bone)] border border-[var(--color-hairline)] text-[var(--color-ink)] flex items-center gap-1.5 rounded-[2px]"
-              >
-                <span>Material: {selectedMetal}</span>
-                <X className="w-3 h-3 text-[var(--color-gold)]" />
-              </button>
-            )}
-            {selectedStone !== 'all' && (
-              <button
-                onClick={() => updateParam('stone', 'all')}
-                className="font-marcellus text-[11px] uppercase tracking-[0.18em] px-3 py-1 bg-[var(--color-bone)] border border-[var(--color-hairline)] text-[var(--color-ink)] flex items-center gap-1.5 rounded-[2px]"
-              >
-                <span>Stone: {selectedStone}</span>
-                <X className="w-3 h-3 text-[var(--color-gold)]" />
-              </button>
-            )}
-            {priceRange !== 'all' && (
-              <button
-                onClick={() => updateParam('price', 'all')}
-                className="font-marcellus text-[11px] uppercase tracking-[0.18em] px-3 py-1 bg-[var(--color-bone)] border border-[var(--color-hairline)] text-[var(--color-ink)] flex items-center gap-1.5 rounded-[2px]"
-              >
-                <span>Price: {priceRange}</span>
-                <X className="w-3 h-3 text-[var(--color-gold)]" />
-              </button>
-            )}
-
-            {activeFilterCount > 0 && (
-              <button
-                onClick={clearAllFilters}
-                className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)] underline underline-offset-4 ml-2 hover:text-[var(--color-gold-lit)]"
-              >
-                Clear all
-              </button>
-            )}
-          </div>
-
-          {/* Sort & Mobile Trigger */}
-          <div className="flex items-center gap-4 justify-between md:justify-end">
-            <button
-              onClick={() => setMobileFilterOpen(true)}
-              className="lg:hidden font-marcellus text-[11px] uppercase tracking-[0.18em] px-4 py-2 bg-[var(--color-bone)] border border-[var(--color-hairline)] text-[var(--color-ink)] flex items-center gap-2 rounded-[2px]"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[var(--color-gold)]" />
-              <span>Filters ({activeFilterCount})</span>
-            </button>
-
-            <div className="flex items-center gap-2 font-karla text-sm">
-              <span className="text-[var(--color-ink)]/60">Sort:</span>
-              <div className="relative">
-                <select
-                  value={sortBy}
-                  onChange={(e) => updateParam('sort', e.target.value)}
-                  className="bg-transparent border-none text-[var(--color-ink)] font-medium outline-none cursor-pointer pr-6 appearance-none"
-                >
-                  <option value="latest">Latest</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="best-selling">Best Selling</option>
-                </select>
-                <ChevronDown className="w-3.5 h-3.5 text-[var(--color-gold)] absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
+      <main className="flex-1">
+        {/* Collection Header Banner */}
+        <section className="bg-[var(--color-sanctum)] border-b border-[var(--color-temple-gold)]/20 py-12 px-6 sm:px-8">
+          <div className="max-w-[1440px] mx-auto space-y-4 text-center sm:text-left">
+            {/* Breadcrumbs in Gold */}
+            <div className="font-marcellus text-[11px] uppercase tracking-[0.25em] text-[var(--color-temple-gold)]">
+              <Link href="/" className="hover:text-[var(--color-gold-light)] transition-colors">HOME</Link>
+              <span className="mx-2 text-[var(--color-sandal)]/40">/</span>
+              <span>SHOP COLLECTION</span>
             </div>
-          </div>
-        </div>
 
-        {/* Main Content Layout: Sticky Left Filter + 3-Up Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          {/* Desktop Filter Sidebar (280px sticky rail) */}
-          <aside className="hidden lg:block lg:col-span-3 space-y-8 sticky top-28 divide-y divide-[var(--color-hairline)] font-karla text-sm">
-            {/* Category Section */}
-            <div className="space-y-3 pb-6">
-              <h3 className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
-                Category
-              </h3>
-              <ul className="space-y-2 text-[var(--color-ink)]/80">
-                <li>
+            <h1 className="font-serif text-[40px] sm:text-[56px] font-light text-[var(--color-ivory)]">
+              The <em className="italic text-gold-gradient font-normal">Living Archive</em>
+            </h1>
+            <p className="font-jost text-[15px] text-[var(--color-sandal)]/80 max-w-[60ch] font-light">
+              Explore hand-hammered temple gold, Kundan plaques, Polki diamonds, and antique bridal heirlooms presented as numbered vitrine plates.
+            </p>
+          </div>
+        </section>
+
+        <section className="max-w-[1440px] mx-auto px-6 sm:px-8 py-12">
+          <div className="flex flex-col lg:flex-row gap-10">
+            {/* Left Filter Rail on Sanctum Ground */}
+            <aside className="hidden lg:block w-[280px] shrink-0 space-y-8 bg-[var(--color-sanctum)] p-6 border border-[var(--color-temple-gold)]/20 rounded-[4px] h-fit sticky top-28">
+              <div className="flex items-center justify-between border-b border-[var(--color-temple-gold)]/20 pb-4">
+                <h3 className="font-marcellus text-[12px] uppercase tracking-[0.3em] text-[var(--color-temple-gold)]">
+                  FILTER PLATES
+                </h3>
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-kemp-red)] hover:underline"
+                  >
+                    CLEAR ALL ({activeFilterCount})
+                  </button>
+                )}
+              </div>
+
+              {/* Categories */}
+              <div className="space-y-3">
+                <h4 className="font-marcellus text-[11px] uppercase tracking-[0.2em] text-[var(--color-ivory)]">
+                  CATEGORIES
+                </h4>
+                <div className="space-y-2 font-jost text-sm text-[var(--color-sandal)]/90">
                   <button
                     onClick={() => updateParam('category', 'all')}
-                    className={`block text-left w-full hover:text-[var(--color-gold)] transition-colors ${
-                      selectedCategory === 'all' ? 'font-semibold text-[var(--color-gold)]' : ''
+                    className={`block w-full text-left transition-colors cursor-pointer ${
+                      selectedCategory === 'all' ? 'text-[var(--color-gold-light)] font-medium' : 'hover:text-[var(--color-ivory)]'
                     }`}
                   >
                     All Categories ({products.length})
                   </button>
-                </li>
-                {categories.map((cat) => (
-                  <li key={cat.id}>
-                    <button
-                      onClick={() => updateParam('category', cat.id)}
-                      className={`block text-left w-full hover:text-[var(--color-gold)] transition-colors ${
-                        selectedCategory === cat.id ? 'font-semibold text-[var(--color-gold)]' : ''
-                      }`}
-                    >
-                      {cat.name} ({cat.pieceCount})
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Price Section */}
-            <div className="pt-6 space-y-3 pb-6">
-              <h3 className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
-                Price Range
-              </h3>
-              <ul className="space-y-2 text-[var(--color-ink)]/80">
-                {[
-                  { label: 'All Prices', value: 'all' },
-                  { label: 'Under ₹20,000', value: 'under-20k' },
-                  { label: '₹20,000 – ₹50,000', value: '20k-50k' },
-                  { label: 'Above ₹50,000', value: 'above-50k' },
-                ].map((p) => (
-                  <li key={p.value}>
-                    <button
-                      onClick={() => updateParam('price', p.value)}
-                      className={`block text-left w-full hover:text-[var(--color-gold)] transition-colors ${
-                        priceRange === p.value ? 'font-semibold text-[var(--color-gold)]' : ''
-                      }`}
-                    >
-                      {p.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Material Section */}
-            <div className="pt-6 space-y-3 pb-6">
-              <h3 className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
-                Material
-              </h3>
-              <ul className="space-y-2 text-[var(--color-ink)]/80">
-                {['all', '22K Gold', 'Gold-plated', 'Antique Gold', 'Silver'].map((m) => (
-                  <li key={m}>
-                    <button
-                      onClick={() => updateParam('metal', m)}
-                      className={`block text-left w-full hover:text-[var(--color-gold)] transition-colors ${
-                        selectedMetal === m ? 'font-semibold text-[var(--color-gold)]' : ''
-                      }`}
-                    >
-                      {m === 'all' ? 'All Materials' : m}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Stone Section */}
-            <div className="pt-6 space-y-3 pb-6">
-              <h3 className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
-                Stone Type
-              </h3>
-              <ul className="space-y-2 text-[var(--color-ink)]/80">
-                {['all', 'Kemp', 'Pearl', 'Ruby', 'Emerald', 'Polki'].map((st) => (
-                  <li key={st}>
-                    <button
-                      onClick={() => updateParam('stone', st)}
-                      className={`block text-left w-full hover:text-[var(--color-gold)] transition-colors ${
-                        selectedStone === st ? 'font-semibold text-[var(--color-gold)]' : ''
-                      }`}
-                    >
-                      {st === 'all' ? 'All Stones' : st}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-
-          {/* Product Grid Area (3-up desktop with 32px column gap / 56px row gap) */}
-          <div className="lg:col-span-9 space-y-12">
-            {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-[32px] gap-y-[56px]">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="aspect-[4/5] bg-[var(--color-bone)] animate-pulse" />
-                ))}
+                  {categories.map((cat) => {
+                    const count = products.filter((p) => p.categoryId === cat.id).length;
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => updateParam('category', cat.id)}
+                        className={`block w-full text-left transition-colors cursor-pointer ${
+                          selectedCategory === cat.id ? 'text-[var(--color-gold-light)] font-medium' : 'hover:text-[var(--color-ivory)]'
+                        }`}
+                      >
+                        {cat.name} ({count})
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            ) : sortedProducts.length === 0 ? (
-              /* Empty State */
-              <div className="py-20 text-center space-y-6 max-w-md mx-auto">
-                <h3 className="font-bodoni text-2xl text-[var(--color-ink)]">
-                  No pieces match these filters.
-                </h3>
-                <p className="font-karla text-sm text-[var(--color-ink)]/70">
-                  Try adjusting your metal, stone, or price selections to discover available pieces from our archive.
-                </p>
-                <Button variant="ghost" onClick={clearAllFilters}>
-                  Clear all filters
-                </Button>
+
+              {/* Price Ranges */}
+              <div className="space-y-3 border-t border-[var(--color-temple-gold)]/20 pt-6">
+                <h4 className="font-marcellus text-[11px] uppercase tracking-[0.2em] text-[var(--color-ivory)]">
+                  PRICE RANGE
+                </h4>
+                <div className="space-y-2 font-jost text-sm text-[var(--color-sandal)]/90">
+                  {[
+                    { label: 'All Prices', val: 'all' },
+                    { label: 'Below ₹2,000', val: 'under-2k' },
+                    { label: '₹2,000 – ₹5,000', val: '2k-5k' },
+                    { label: '₹5,000 – ₹10,000', val: '5k-10k' },
+                    { label: 'Above ₹10,000', val: 'above-10k' },
+                  ].map((pr) => (
+                    <label key={pr.val} className="flex items-center gap-3 cursor-pointer hover:text-[var(--color-ivory)]">
+                      <input
+                        type="radio"
+                        name="priceRange"
+                        checked={priceRange === pr.val}
+                        onChange={() => updateParam('price', pr.val)}
+                        className="accent-[var(--color-temple-gold)]"
+                      />
+                      <span>{pr.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-x-[32px] gap-y-[56px]">
+
+              {/* Materials */}
+              <div className="space-y-3 border-t border-[var(--color-temple-gold)]/20 pt-6">
+                <h4 className="font-marcellus text-[11px] uppercase tracking-[0.2em] text-[var(--color-ivory)]">
+                  MATERIAL & FINISH
+                </h4>
+                <div className="space-y-2 font-jost text-sm text-[var(--color-sandal)]/90">
+                  {[
+                    { label: 'All Finishes', val: 'all' },
+                    { label: '22K Antique Gold', val: '22k gold' },
+                    { label: 'Gold-plated Silver', val: 'silver' },
+                    { label: 'Antique Gold Finish', val: 'antique' },
+                  ].map((m) => (
+                    <label key={m.val} className="flex items-center gap-3 cursor-pointer hover:text-[var(--color-ivory)]">
+                      <input
+                        type="radio"
+                        name="metalFinish"
+                        checked={selectedMetal === m.val}
+                        onChange={() => updateParam('metal', m.val)}
+                        className="accent-[var(--color-temple-gold)]"
+                      />
+                      <span>{m.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </aside>
+
+            {/* Right Product Grid Area */}
+            <div className="flex-1 space-y-6">
+              {/* Header Controls Bar */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[var(--color-sanctum)] p-4 border border-[var(--color-temple-gold)]/20 rounded-[4px]">
+                <div className="font-marcellus text-[11px] uppercase tracking-[0.2em] text-[var(--color-sandal)]">
+                  SHOWING {displayedProducts.length} OF {sortedProducts.length} PLATES
+                </div>
+
+                <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                  {/* Mobile Filter Button */}
+                  <button
+                    onClick={() => setMobileFilterOpen(true)}
+                    className="lg:hidden h-9 px-4 border border-[var(--color-temple-gold)]/40 text-[var(--color-temple-gold)] font-marcellus text-[11px] uppercase tracking-[0.18em] flex items-center gap-2 rounded-[2px]"
+                  >
+                    <SlidersHorizontal className="w-4 h-4" />
+                    <span>FILTERS ({activeFilterCount})</span>
+                  </button>
+
+                  {/* Sort Dropdown */}
+                  <div className="flex items-center gap-2">
+                    <span className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-sandal)] hidden sm:inline">
+                      SORT BY:
+                    </span>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => updateParam('sort', e.target.value)}
+                      className="bg-[var(--color-vault-black)] border border-[var(--color-temple-gold)]/30 text-[var(--color-ivory)] font-jost text-sm px-3 py-1.5 rounded-[2px] outline-none focus:border-[var(--color-gold-light)]"
+                    >
+                      <option value="latest">Latest Plates</option>
+                      <option value="price-asc">Price: Low to High</option>
+                      <option value="price-desc">Price: High to Low</option>
+                      <option value="best-selling">Rating & Popularity</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Grid */}
+              {displayedProducts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {displayedProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
+              ) : (
+                <div className="text-center py-20 space-y-4 bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px]">
+                  <KolamDivider />
+                  <p className="font-serif text-2xl text-[var(--color-ivory)]">No archive plates match your criteria.</p>
+                  <p className="font-jost text-sm text-[var(--color-sandal)]/70">Adjust your price range or category filter.</p>
+                  <button
+                    onClick={clearAllFilters}
+                    className="h-10 px-6 border border-[var(--color-temple-gold)] text-[var(--color-temple-gold)] font-marcellus text-[11px] uppercase tracking-[0.2em] rounded-[2px] hover:bg-[var(--color-burgundy-silk)]"
+                  >
+                    CLEAR FILTERS
+                  </button>
+                </div>
+              )}
 
-                {/* Pagination / Load More */}
-                {displayedProducts.length < sortedProducts.length && (
-                  <div className="pt-8 text-center space-y-4">
-                    <p className="font-karla text-xs text-[var(--color-ink)]/60">
-                      Showing {displayedProducts.length} of {sortedProducts.length} pieces
-                    </p>
-                    <Button
-                      variant="ghost"
-                      onClick={() => setVisibleCount((prev) => prev + 12)}
-                    >
-                      Load more pieces
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
+              {/* Numbered Pagination / Load More */}
+              {displayedProducts.length < sortedProducts.length && (
+                <div className="pt-8 text-center">
+                  <button
+                    onClick={() => setVisibleCount((prev) => prev + 12)}
+                    className="btn-gold-sheen h-[48px] px-9 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-[11px] uppercase tracking-[0.25em] font-semibold rounded-[2px] shadow-lg"
+                  >
+                    LOAD MORE PLATES ({sortedProducts.length - displayedProducts.length} REMAINING)
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </section>
 
-      {/* Mobile Filter Sheet Drawer */}
-      {mobileFilterOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex justify-end lg:hidden">
-          <div className="w-full max-w-xs bg-[var(--color-ivory)] h-full p-6 flex flex-col justify-between overflow-y-auto">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-[var(--color-hairline)] pb-4">
-                <h3 className="font-marcellus text-xs uppercase tracking-[0.18em] text-[var(--color-gold)]">
-                  Filter Collection
+        {/* Mobile Filter Sheet */}
+        {mobileFilterOpen && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex justify-end">
+            <div className="w-full max-w-[320px] bg-[var(--color-sanctum)] h-full p-6 space-y-6 overflow-y-auto border-l border-[var(--color-temple-gold)]/30">
+              <div className="flex items-center justify-between border-b border-[var(--color-temple-gold)]/20 pb-4">
+                <h3 className="font-marcellus text-sm uppercase tracking-[0.25em] text-[var(--color-temple-gold)]">
+                  FILTERS
                 </h3>
-                <button onClick={() => setMobileFilterOpen(false)}>
-                  <X className="w-5 h-5 text-[var(--color-ink)]" />
+                <button onClick={() => setMobileFilterOpen(false)} className="text-[var(--color-ivory)]">
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Mobile Filter Options */}
-              <div className="space-y-6 font-karla text-sm">
+              <div className="space-y-4 font-jost text-sm text-[var(--color-ivory)]">
                 <div>
-                  <h4 className="font-medium text-[var(--color-ink)] mb-2">Category</h4>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => updateParam('category', e.target.value)}
-                    className="w-full p-2 bg-[var(--color-bone)] border border-[var(--color-hairline)] rounded-[2px]"
+                  <h4 className="font-marcellus text-xs uppercase tracking-wider text-[var(--color-temple-gold)] mb-2">
+                    CATEGORIES
+                  </h4>
+                  <button
+                    onClick={() => { updateParam('category', 'all'); setMobileFilterOpen(false); }}
+                    className="block w-full text-left py-1 text-sm text-[var(--color-sandal)]"
                   >
-                    <option value="all">All Categories</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-[var(--color-ink)] mb-2">Price</h4>
-                  <select
-                    value={priceRange}
-                    onChange={(e) => updateParam('price', e.target.value)}
-                    className="w-full p-2 bg-[var(--color-bone)] border border-[var(--color-hairline)] rounded-[2px]"
-                  >
-                    <option value="all">All Prices</option>
-                    <option value="under-20k">Under ₹20,000</option>
-                    <option value="20k-50k">₹20,000 – ₹50,000</option>
-                    <option value="above-50k">Above ₹50,000</option>
-                  </select>
+                    All Categories
+                  </button>
+                  {categories.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => { updateParam('category', c.id); setMobileFilterOpen(false); }}
+                      className="block w-full text-left py-1 text-sm text-[var(--color-sandal)]"
+                    >
+                      {c.name}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
-
-            <div className="pt-6 border-t border-[var(--color-hairline)] space-y-2">
-              <Button
-                variant="gold"
-                className="w-full"
-                onClick={() => setMobileFilterOpen(false)}
-              >
-                Apply Filters ({filteredProducts.length})
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full"
-                onClick={clearAllFilters}
-              >
-                Clear All
-              </Button>
-            </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
 
       <Footer />
     </div>

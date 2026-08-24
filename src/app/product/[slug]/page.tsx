@@ -1,6 +1,3 @@
-import { redirect } from 'next/navigation';
+import ProductDetailPage from '../../piece/[slug]/page';
 
-export default async function ProductSlugPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  redirect(`/piece/${slug}`);
-}
+export default ProductDetailPage;

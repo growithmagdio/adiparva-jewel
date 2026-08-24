@@ -6,9 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/store/use-cart-store';
 import { createOrder } from '@/lib/data/queries';
-import { Button } from '@/components/primitives/button';
-import { GopuramRule } from '@/components/ui/GopuramRule';
-import { Lock, ArrowLeft, Loader2, Check } from 'lucide-react';
+import { KolamDivider } from '@/components/storefront/kolam-divider';
+import { Lock, ArrowLeft, Loader2, Check, ShieldCheck } from 'lucide-react';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -24,7 +23,6 @@ export default function CheckoutPage() {
   const [pincode, setPincode] = React.useState('600034');
   const [city, setCity] = React.useState('Chennai');
   const [stateName, setStateName] = React.useState('Tamil Nadu');
-  const [editingCityState, setEditingCityState] = React.useState(false);
 
   // Error States
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -42,11 +40,9 @@ export default function CheckoutPage() {
     sameday: 499,
   }[shippingMethod];
 
-  const codHandlingFee = paymentMethod === 'Cash on delivery' ? 49 : 0;
-  const total = subtotal + shippingCost + codHandlingFee;
+  const total = subtotal + shippingCost;
   const isCodDisabled = total > 50000;
 
-  // Auto-fill City/State based on Pincode
   const handlePincodeBlur = () => {
     if (pincode.length !== 6) {
       setErrors((prev) => ({ ...prev, pincode: 'Enter a valid 6-digit pincode.' }));
@@ -105,391 +101,324 @@ export default function CheckoutPage() {
         unitPrice: item.price,
         qty: item.qty,
       })),
-      subtotal: subtotal,
+      subtotal,
       discount: 0,
-      shipping: shippingCost + codHandlingFee,
+      shipping: shippingCost,
       gst: Math.round(subtotal * 0.03),
-      total: total,
+      total,
       shippingAddress: {
         id: 'addr-1',
-        label: 'Delivery Address',
+        label: 'Home',
         line1: addressLine,
         line2: landmark,
-        city: city,
+        city,
         state: stateName,
-        pincode: pincode,
-        phone: `+91 ${phone}`,
+        pincode,
+        phone,
         isDefault: true,
       },
-      paymentMethod: paymentMethod,
+      paymentMethod,
     });
 
     clearCart();
-    setIsProcessing(false);
     router.push(`/checkout/confirmed/${newOrder.id}`);
   };
 
   if (cartItems.length === 0 && !isProcessing) {
     return (
-      <div className="min-h-screen bg-[var(--color-ivory)] flex flex-col font-sans">
-        <header className="border-b border-[var(--color-hairline)] py-6 text-center">
-          <Link href="/" className="font-bodoni text-2xl tracking-[-0.02em] text-[var(--color-ink)]">
-            ADI PARVA
-          </Link>
-        </header>
-        <main className="flex-1 flex flex-col items-center justify-center p-12 text-center space-y-4">
-          <h2 className="font-bodoni text-3xl text-[var(--color-ink)]">Your bag is empty.</h2>
-          <p className="font-karla text-sm text-[var(--color-ink)]/70">Add pieces to your bag before checking out.</p>
-          <Link href="/collections">
-            <Button variant="gold">Explore collection</Button>
-          </Link>
-        </main>
+      <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] flex flex-col justify-center items-center p-6 text-center space-y-4 font-sans">
+        <KolamDivider />
+        <h2 className="font-serif text-3xl">No Reservation Items</h2>
+        <p className="font-jost text-sm text-[var(--color-sandal)]/70">Your cart is empty. Browse the archive to select pieces.</p>
+        <Link
+          href="/collections"
+          className="h-10 px-6 border border-[var(--color-temple-gold)] text-[var(--color-temple-gold)] font-marcellus text-xs uppercase tracking-[0.2em] inline-flex items-center justify-center rounded-[2px]"
+        >
+          RETURN TO ARCHIVE
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-ivory)] text-[var(--color-ink)] flex flex-col font-sans">
-      {/* Conversion-Focused Header: Wordmark + Encrypted Lock line */}
-      <header className="border-b border-[var(--color-hairline)] bg-[var(--color-ivory)] py-5 px-6 select-none">
+    <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] select-none font-sans">
+      {/* Top Header */}
+      <header className="border-b border-[var(--color-temple-gold)]/20 py-6 px-6 sm:px-8 bg-[var(--color-sanctum)]">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
-          <Link href="/" className="flex flex-col">
-            <span className="font-bodoni text-[22px] tracking-[-0.02em] text-[var(--color-ink)]">
-              ADI PARVA
-            </span>
-            <span className="font-marcellus text-[9px] uppercase tracking-[0.34em] text-[var(--color-gold)]">
-              THE TEMPLE OF TRADITION
-            </span>
+          <Link href="/cart" className="flex items-center gap-2 font-marcellus text-xs uppercase tracking-[0.2em] text-[var(--color-temple-gold)] hover:text-[var(--color-gold-light)] transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            <span>RETURN TO CART</span>
           </Link>
 
-          <div className="flex items-center gap-2 font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
-            <Lock className="w-3.5 h-3.5" />
-            <span>Secure Encrypted Checkout</span>
+          <Link href="/" className="font-marcellus text-xl tracking-[0.14em] text-[var(--color-ivory)]">
+            ADI PARVA
+          </Link>
+
+          <div className="flex items-center gap-2 font-marcellus text-xs uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
+            <Lock className="w-3.5 h-3.5 text-[var(--color-temple-gold)]" />
+            <span>100% SECURE CHECKOUT</span>
           </div>
         </div>
       </header>
 
-      {/* Main Single Page 60/40 Two Column Layout */}
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* Left Column 60% (lg:col-span-7) */}
-          <div className="lg:col-span-7 space-y-12">
-            <form onSubmit={handlePlaceOrder} className="space-y-12">
-              {/* 1. Contact Section */}
-              <section className="space-y-6">
-                <h2 className="font-marcellus text-[12px] uppercase tracking-[0.18em] text-[var(--color-gold)] border-b border-[var(--color-hairline)] pb-2">
-                  1. Contact Information
-                </h2>
+      {/* Main 2-Column Checkout Layout */}
+      <main className="max-w-[1440px] mx-auto px-6 sm:px-8 py-12">
+        <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          {/* Left Column: Billing Details & Options */}
+          <div className="lg:col-span-7 space-y-10">
+            {/* Step 1: Contact & Delivery Address */}
+            <div className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-6">
+              <h3 className="font-marcellus text-[12px] uppercase tracking-[0.3em] text-[var(--color-temple-gold)] border-b border-[var(--color-temple-gold)]/20 pb-3">
+                1. DELIVER TO (PATRON DETAILS)
+              </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 font-karla">
-                  <div className="space-y-1">
-                    <label className="block font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink)]/70">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      onBlur={() => validateForm()}
-                      className="w-full h-[52px] px-4 bg-[var(--color-bone)] border-b border-[var(--color-hairline)] focus:border-[var(--color-gold)] text-base outline-none rounded-[2px]"
-                      placeholder="name@example.com"
-                    />
-                    {errors.email && <p className="text-[12px] text-[var(--color-kumkum)] pt-1">{errors.email}</p>}
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink)]/70">
-                      Mobile Number
-                    </label>
-                    <div className="flex h-[52px] bg-[var(--color-bone)] border-b border-[var(--color-hairline)] rounded-[2px] overflow-hidden">
-                      <span className="px-3 flex items-center font-karla text-sm text-[var(--color-ink)]/60 bg-[var(--color-hairline)]/30">
-                        +91
-                      </span>
-                      <input
-                        type="tel"
-                        maxLength={10}
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                        onBlur={() => validateForm()}
-                        className="flex-1 px-3 bg-transparent text-base outline-none font-karla"
-                        placeholder="9876543210"
-                      />
-                    </div>
-                    {errors.phone && <p className="text-[12px] text-[var(--color-kumkum)] pt-1">{errors.phone}</p>}
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 font-jost text-sm">
+                <div className="space-y-1.5">
+                  <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">FULL NAME</label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3.5 py-2.5 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)] focus:shadow-[0_0_12px_rgba(201,162,75,0.25)] transition-all"
+                    required
+                  />
+                  {errors.fullName && <p className="text-xs text-[var(--color-kemp-red)]">{errors.fullName}</p>}
                 </div>
-              </section>
 
-              {/* 2. Delivery Address Section */}
-              <section className="space-y-6">
-                <h2 className="font-marcellus text-[12px] uppercase tracking-[0.18em] text-[var(--color-gold)] border-b border-[var(--color-hairline)] pb-2">
-                  2. Delivery Address
-                </h2>
-
-                <div className="space-y-6 font-karla">
-                  <div className="space-y-1">
-                    <label className="block font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink)]/70">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      onBlur={() => validateForm()}
-                      className="w-full h-[52px] px-4 bg-[var(--color-bone)] border-b border-[var(--color-hairline)] focus:border-[var(--color-gold)] text-base outline-none rounded-[2px]"
-                      placeholder="First and last name"
-                    />
-                    {errors.fullName && <p className="text-[12px] text-[var(--color-kumkum)] pt-1">{errors.fullName}</p>}
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="block font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink)]/70">
-                      Address Line
-                    </label>
-                    <input
-                      type="text"
-                      value={addressLine}
-                      onChange={(e) => setAddressLine(e.target.value)}
-                      onBlur={() => validateForm()}
-                      className="w-full h-[52px] px-4 bg-[var(--color-bone)] border-b border-[var(--color-hairline)] focus:border-[var(--color-gold)] text-base outline-none rounded-[2px]"
-                      placeholder="House number, street name"
-                    />
-                    {errors.addressLine && <p className="text-[12px] text-[var(--color-kumkum)] pt-1">{errors.addressLine}</p>}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-1">
-                      <label className="block font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink)]/70">
-                        Landmark (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        value={landmark}
-                        onChange={(e) => setLandmark(e.target.value)}
-                        className="w-full h-[52px] px-4 bg-[var(--color-bone)] border-b border-[var(--color-hairline)] focus:border-[var(--color-gold)] text-base outline-none rounded-[2px]"
-                        placeholder="Near landmark"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="block font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-ink)]/70">
-                        Pincode
-                      </label>
-                      <input
-                        type="text"
-                        maxLength={6}
-                        value={pincode}
-                        onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                        onBlur={handlePincodeBlur}
-                        className="w-full h-[52px] px-4 bg-[var(--color-bone)] border-b border-[var(--color-hairline)] focus:border-[var(--color-gold)] text-base outline-none rounded-[2px]"
-                        placeholder="6-digit pincode"
-                      />
-                      {errors.pincode && <p className="text-[12px] text-[var(--color-kumkum)] pt-1">{errors.pincode}</p>}
-                    </div>
-                  </div>
-
-                  {/* Auto-filled City & State Read-Only Chips */}
-                  <div className="flex items-center gap-3 pt-2">
-                    <span className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-gold)]">
-                      City & State:
-                    </span>
-                    {!editingCityState ? (
-                      <div className="flex items-center gap-2">
-                        <span className="px-3 py-1 bg-[var(--color-bone)] border border-[var(--color-hairline)] text-xs font-medium rounded-[2px]">
-                          {city}, {stateName}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setEditingCityState(true)}
-                          className="font-marcellus text-[10px] uppercase tracking-[0.14em] text-[var(--color-gold)] underline"
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={city}
-                          onChange={(e) => setCity(e.target.value)}
-                          className="w-28 px-2 py-1 bg-[var(--color-bone)] border border-[var(--color-hairline)] text-xs"
-                        />
-                        <input
-                          type="text"
-                          value={stateName}
-                          onChange={(e) => setStateName(e.target.value)}
-                          className="w-28 px-2 py-1 bg-[var(--color-bone)] border border-[var(--color-hairline)] text-xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setEditingCityState(false)}
-                          className="text-xs text-[var(--color-gold)] font-medium"
-                        >
-                          Done
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                <div className="space-y-1.5">
+                  <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">MOBILE PHONE</label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3.5 py-2.5 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)] focus:shadow-[0_0_12px_rgba(201,162,75,0.25)] transition-all"
+                    required
+                  />
+                  {errors.phone && <p className="text-xs text-[var(--color-kemp-red)]">{errors.phone}</p>}
                 </div>
-              </section>
 
-              {/* 3. Shipping Method Section */}
-              <section className="space-y-6">
-                <h2 className="font-marcellus text-[12px] uppercase tracking-[0.18em] text-[var(--color-gold)] border-b border-[var(--color-hairline)] pb-2">
-                  3. Shipping Method
-                </h2>
+                <div className="sm:col-span-2 space-y-1.5">
+                  <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">EMAIL ADDRESS</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3.5 py-2.5 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)] focus:shadow-[0_0_12px_rgba(201,162,75,0.25)] transition-all"
+                    required
+                  />
+                  {errors.email && <p className="text-xs text-[var(--color-kemp-red)]">{errors.email}</p>}
+                </div>
 
-                <div className="space-y-3 font-karla">
-                  {[
-                    { id: 'standard', title: 'Standard Armored Transit (5–7 Days)', price: 'Free', val: 0 },
-                    { id: 'express', title: 'Express Insured Air (2–3 Days)', price: '₹199', val: 199 },
-                    { id: 'sameday', title: 'Same-Day Atelier Courier (Madurai Only)', price: '₹499', val: 499 },
-                  ].map((option) => (
+                <div className="sm:col-span-2 space-y-1.5">
+                  <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">STREET ADDRESS & HOUSE NO.</label>
+                  <input
+                    type="text"
+                    value={addressLine}
+                    onChange={(e) => setAddressLine(e.target.value)}
+                    className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3.5 py-2.5 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)] focus:shadow-[0_0_12px_rgba(201,162,75,0.25)] transition-all"
+                    required
+                  />
+                  {errors.addressLine && <p className="text-xs text-[var(--color-kemp-red)]">{errors.addressLine}</p>}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">LANDMARK (OPTIONAL)</label>
+                  <input
+                    type="text"
+                    value={landmark}
+                    onChange={(e) => setLandmark(e.target.value)}
+                    className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3.5 py-2.5 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)] focus:shadow-[0_0_12px_rgba(201,162,75,0.25)] transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">PINCODE</label>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={pincode}
+                    onChange={(e) => setPincode(e.target.value)}
+                    onBlur={handlePincodeBlur}
+                    className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3.5 py-2.5 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)] focus:shadow-[0_0_12px_rgba(201,162,75,0.25)] transition-all"
+                    required
+                  />
+                  {errors.pincode && <p className="text-xs text-[var(--color-kemp-red)]">{errors.pincode}</p>}
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">CITY</label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3.5 py-2.5 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)] focus:shadow-[0_0_12px_rgba(201,162,75,0.25)] transition-all"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">STATE</label>
+                  <input
+                    type="text"
+                    value={stateName}
+                    onChange={(e) => setStateName(e.target.value)}
+                    className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3.5 py-2.5 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)] focus:shadow-[0_0_12px_rgba(201,162,75,0.25)] transition-all"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2: Shipping Method Radio Cards */}
+            <div className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-6">
+              <h3 className="font-marcellus text-[12px] uppercase tracking-[0.3em] text-[var(--color-temple-gold)] border-b border-[var(--color-temple-gold)]/20 pb-3">
+                2. SHIPPING METHOD
+              </h3>
+
+              <div className="space-y-3 font-jost text-sm">
+                {[
+                  { id: 'standard', label: 'Standard Insured Transit', time: '5–7 Business Days', price: 'FREE' },
+                  { id: 'express', label: 'Express Priority Transit', time: '2–3 Business Days', price: '₹199' },
+                  { id: 'sameday', label: 'Same-Day Atelier Courier', time: 'Within City Limits', price: '₹499' },
+                ].map((s) => (
+                  <label
+                    key={s.id}
+                    onClick={() => setShippingMethod(s.id as any)}
+                    className={`flex items-center justify-between p-4 rounded-[2px] border cursor-pointer transition-all ${
+                      shippingMethod === s.id
+                        ? 'border-[var(--color-temple-gold)] bg-[var(--color-burgundy-silk)] text-[var(--color-ivory)]'
+                        : 'border-[#3A2A22] bg-transparent text-[var(--color-sandal)]/80 hover:border-[var(--color-temple-gold)]/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                        shippingMethod === s.id ? 'border-[var(--color-gold-light)] bg-[var(--color-gold-light)]' : 'border-[#3A2A22]'
+                      }`}>
+                        {shippingMethod === s.id && <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-vault-black)]" />}
+                      </div>
+                      <div>
+                        <div className="font-marcellus text-xs uppercase tracking-wider text-[var(--color-ivory)]">{s.label}</div>
+                        <div className="text-xs text-[var(--color-sandal)]/70">{s.time}</div>
+                      </div>
+                    </div>
+                    <span className="font-marcellus text-xs text-[var(--color-temple-gold)] font-medium">{s.price}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Step 3: Payment Method Radio Cards */}
+            <div className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-6">
+              <h3 className="font-marcellus text-[12px] uppercase tracking-[0.3em] text-[var(--color-temple-gold)] border-b border-[var(--color-temple-gold)]/20 pb-3">
+                3. PAYMENT METHOD
+              </h3>
+
+              <div className="space-y-3 font-jost text-sm">
+                {[
+                  { id: 'UPI', label: 'UPI / QR Code', desc: 'Instant Google Pay, PhonePe, Paytm transfer' },
+                  { id: 'Card', label: 'Credit / Debit Card', desc: 'Visa, Mastercard, RuPay' },
+                  { id: 'Net banking', label: 'Net Banking', desc: 'All major Indian banks supported' },
+                  { id: 'Cash on delivery', label: 'Cash on Delivery', desc: isCodDisabled ? 'Disabled for orders above ₹50,000' : 'Pay cash at your doorstep' },
+                ].map((p) => {
+                  const disabled = p.id === 'Cash on delivery' && isCodDisabled;
+                  return (
                     <label
-                      key={option.id}
-                      onClick={() => setShippingMethod(option.id as any)}
-                      className={`flex items-center justify-between p-4 bg-[var(--color-ivory)] border border-[var(--color-hairline)] transition-all cursor-pointer rounded-[2px] ${
-                        shippingMethod === option.id
-                          ? 'border-l-4 border-l-[var(--color-gold)] border-y-[var(--color-hairline)] border-r-[var(--color-hairline)]'
-                          : ''
+                      key={p.id}
+                      onClick={() => !disabled && setPaymentMethod(p.id as any)}
+                      className={`flex items-center justify-between p-4 rounded-[2px] border transition-all ${
+                        disabled
+                          ? 'border-gray-800 opacity-50 cursor-not-allowed'
+                          : paymentMethod === p.id
+                          ? 'border-[var(--color-temple-gold)] bg-[var(--color-burgundy-silk)] text-[var(--color-ivory)] cursor-pointer'
+                          : 'border-[#3A2A22] bg-transparent text-[var(--color-sandal)]/80 hover:border-[var(--color-temple-gold)]/50 cursor-pointer'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <input
-                          type="radio"
-                          name="shipping"
-                          checked={shippingMethod === option.id}
-                          onChange={() => setShippingMethod(option.id as any)}
-                          className="accent-[var(--color-gold)]"
-                        />
-                        <span className="text-sm font-medium text-[var(--color-ink)]">{option.title}</span>
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                          paymentMethod === p.id ? 'border-[var(--color-gold-light)] bg-[var(--color-gold-light)]' : 'border-[#3A2A22]'
+                        }`}>
+                          {paymentMethod === p.id && <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-vault-black)]" />}
+                        </div>
+                        <div>
+                          <div className="font-marcellus text-xs uppercase tracking-wider text-[var(--color-ivory)]">{p.label}</div>
+                          <div className="text-xs text-[var(--color-sandal)]/70">{p.desc}</div>
+                        </div>
                       </div>
-                      <span className="text-sm font-semibold text-[var(--color-ink)]">{option.price}</span>
                     </label>
-                  ))}
-                </div>
-              </section>
-
-              {/* 4. Payment Method Section */}
-              <section className="space-y-6">
-                <h2 className="font-marcellus text-[12px] uppercase tracking-[0.18em] text-[var(--color-gold)] border-b border-[var(--color-hairline)] pb-2">
-                  4. Payment Options
-                </h2>
-
-                <div className="space-y-3 font-karla">
-                  {[
-                    { id: 'UPI', label: 'UPI / QR Payment' },
-                    { id: 'Card', label: 'Credit / Debit Cards (Visa / Mastercard)' },
-                    { id: 'Net banking', label: 'Net Banking' },
-                    { id: 'Cash on delivery', label: 'Cash on Delivery' },
-                  ].map((pay) => {
-                    const isDisabled = pay.id === 'Cash on delivery' && isCodDisabled;
-                    return (
-                      <div key={pay.id} className="space-y-2">
-                        <label
-                          onClick={() => !isDisabled && setPaymentMethod(pay.id as any)}
-                          className={`flex items-center justify-between p-4 bg-[var(--color-ivory)] border border-[var(--color-hairline)] transition-all cursor-pointer rounded-[2px] ${
-                            paymentMethod === pay.id
-                              ? 'border-l-4 border-l-[var(--color-gold)] border-y-[var(--color-hairline)] border-r-[var(--color-hairline)]'
-                              : ''
-                          } ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="radio"
-                              name="payment"
-                              disabled={isDisabled}
-                              checked={paymentMethod === pay.id}
-                              onChange={() => setPaymentMethod(pay.id as any)}
-                              className="accent-[var(--color-gold)]"
-                            />
-                            <span className="text-sm font-medium text-[var(--color-ink)]">{pay.label}</span>
-                          </div>
-                          {pay.id === 'Cash on delivery' && (
-                            <span className="text-xs text-[var(--color-ink)]/60">₹49 handling fee</span>
-                          )}
-                        </label>
-                        {isDisabled && pay.id === 'Cash on delivery' && (
-                          <p className="text-xs text-[var(--color-kumkum)] pl-7">
-                            Cash on delivery is disabled for orders exceeding ₹50,000.
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-
-              {/* 5. Place Order Button (Gold Foil Gradient) */}
-              <div className="pt-4">
-                <Button
-                  type="submit"
-                  variant="gold"
-                  isLoading={isProcessing}
-                  className="w-full h-[60px] text-sm bg-foil-gold text-[var(--color-vault)] font-bold tracking-[0.2em]"
-                >
-                  {isProcessing ? 'Verifying Atelier Reservation...' : `Place Order · ₹${total.toLocaleString('en-IN')}`}
-                </Button>
+                  );
+                })}
               </div>
-            </form>
+            </div>
           </div>
 
-          {/* Right Sticky Order Summary 40% (lg:col-span-5) */}
-          <div className="lg:col-span-5 sticky top-28 bg-[var(--color-ivory)] border border-[var(--color-hairline)] p-6 space-y-6 rounded-[2px] font-karla">
-            <h3 className="font-marcellus text-[11px] uppercase tracking-[0.18em] text-[var(--color-gold)] border-b border-[var(--color-hairline)] pb-3">
-              Order Summary ({cartItems.reduce((acc, item) => acc + item.qty, 0)})
+          {/* Right Column: Sticky Order Summary */}
+          <div className="lg:col-span-5 bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-6 sticky top-28">
+            <h3 className="font-marcellus text-[12px] uppercase tracking-[0.3em] text-[var(--color-temple-gold)] border-b border-[var(--color-temple-gold)]/20 pb-3">
+              ORDER SUMMARY ({cartItems.length} ITEMS)
             </h3>
 
-            {/* Line Items with 56px Thumbnails */}
-            <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2">
-              {cartItems.map((item) => (
-                <div key={`${item.productId}-${item.variantId}`} className="flex items-center gap-3">
-                  <div className="w-[56px] h-[56px] bg-[var(--color-vault)] relative overflow-hidden shrink-0">
-                    <Image src={item.image} alt={item.name} fill className="object-cover" sizes="56px" />
+            {/* Line Items */}
+            <div className="space-y-4 max-h-[280px] overflow-y-auto pr-2 divide-y divide-[var(--color-temple-gold)]/10">
+              {cartItems.map((item) => {
+                const plateNo = `PLATE AP-${String(Math.abs(item.productId.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % 800 + 100).padStart(4, '0')}`;
+                return (
+                  <div key={`${item.productId}-${item.variantId}`} className="pt-3 first:pt-0 flex gap-4 items-center">
+                    <div className="relative w-14 aspect-[3/4] bg-[var(--color-vault-black)] rounded-[2px] overflow-hidden border border-[var(--color-temple-gold)]/30 shrink-0">
+                      <Image src={item.image} alt={item.name} fill className="object-cover" />
+                    </div>
+                    <div className="flex-1 space-y-0.5">
+                      <div className="font-marcellus text-[9px] uppercase tracking-wider text-[var(--color-temple-gold)]">{plateNo}</div>
+                      <div className="font-serif text-sm text-[var(--color-ivory)] line-clamp-1">{item.name}</div>
+                      <div className="font-jost text-xs text-[var(--color-sandal)]/70">Qty: {item.qty}</div>
+                    </div>
+                    <div className="font-sans text-sm text-[var(--color-ivory)] tabular-nums">
+                      ₹{(item.price * item.qty).toLocaleString('en-IN')}
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-xs text-[var(--color-ink)] truncate">{item.name}</h4>
-                    <p className="text-[11px] text-[var(--color-ink)]/60">Qty: {item.qty}</p>
-                  </div>
-                  <span className="font-medium text-xs text-[var(--color-ink)] [font-variant-numeric:tabular-nums]">
-                    ₹{(item.price * item.qty).toLocaleString('en-IN')}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            <GopuramRule size="sm" />
-
             {/* Totals Breakdown */}
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between text-[var(--color-ink)]/80">
+            <div className="border-t border-[var(--color-temple-gold)]/20 pt-4 space-y-2.5 font-jost text-sm text-[var(--color-sandal)]">
+              <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="[font-variant-numeric:tabular-nums]">₹{subtotal.toLocaleString('en-IN')}</span>
+                <span className="text-[var(--color-ivory)] tabular-nums">₹{subtotal.toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between text-[var(--color-ink)]/80">
-                <span>Armored Shipping</span>
-                <span>{shippingCost === 0 ? <span className="text-[var(--color-leaf)]">Free</span> : `₹${shippingCost}`}</span>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span className="text-[var(--color-temple-gold)]">{shippingCost === 0 ? 'FREE' : `₹${shippingCost}`}</span>
               </div>
-              {codHandlingFee > 0 && (
-                <div className="flex justify-between text-[var(--color-ink)]/80">
-                  <span>COD Handling Fee</span>
-                  <span>₹{codHandlingFee}</span>
-                </div>
-              )}
-              <div className="flex justify-between items-baseline pt-2 border-t border-[var(--color-hairline)]">
-                <span className="font-marcellus text-xs uppercase tracking-[0.18em] text-[var(--color-gold)]">Total</span>
-                <span className="font-bodoni text-[28px] text-[var(--color-ink)] [font-variant-numeric:tabular-nums]">
+              <div className="flex justify-between border-t border-[var(--color-temple-gold)]/20 pt-3">
+                <span className="font-marcellus text-sm uppercase tracking-wider text-[var(--color-ivory)]">TOTAL</span>
+                <span className="font-serif text-[28px] text-[var(--color-ivory)] font-light tabular-nums">
                   ₹{total.toLocaleString('en-IN')}
                 </span>
               </div>
             </div>
 
-            {/* Single Line Trust Rule (Replaces icon strips) */}
-            <div className="pt-4 border-t border-[var(--color-hairline)] text-center font-marcellus text-[10px] uppercase tracking-[0.16em] text-[var(--color-gold)]">
-              Secure payment · 7-day returns · COD available
+            {/* Submit Order Button */}
+            <button
+              type="submit"
+              disabled={isProcessing}
+              className="btn-gold-sheen w-full h-[54px] bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-[11px] uppercase tracking-[0.3em] font-semibold flex items-center justify-center gap-2 rounded-[2px] shadow-xl cursor-pointer disabled:opacity-50"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin text-black" />
+                  <span>REGISTERING ORDER...</span>
+                </>
+              ) : (
+                <span>PLACE ORDER</span>
+              )}
+            </button>
+
+            <div className="flex items-center justify-center gap-2 font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-sandal)]/60 pt-2">
+              <ShieldCheck className="w-4 h-4 text-[var(--color-temple-gold)]" />
+              <span>100% SECURE ENCRYPTED TRANSACTIONS</span>
             </div>
           </div>
-        </div>
+        </form>
       </main>
     </div>
   );

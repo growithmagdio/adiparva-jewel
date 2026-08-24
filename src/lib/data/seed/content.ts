@@ -13,7 +13,7 @@ export const seedSiteContent: SiteContent = {
     paragraphs: [
       'Adi Parva—named for the first book of the Mahabharata, "the book of beginnings"—was founded on a singular custodial promise: to keep and preserve Indian heritage jewellery in its purest form.',
       'We do not view our creations as commercial products to be sold. We treat every piece as a sacred heirloom to be kept in trust, crafted by hereditary artisan clusters using techniques unchanged since the Chola and Maratha dynasties.',
-      'From hand-hammered temple nakashi repoussé in Nagercoil to pure gold foil burnished Kundan in Jaipur, our collection reflects the living soul of Indian craftsmanship.',
+      'From hand-hammered temple nakashi repoussé in Tamil Nadu to pure gold foil burnished Kundan in Jaipur, our collection reflects the living soul of Indian craftsmanship.',
     ],
   },
   craftOverview: {

@@ -1,96 +1,154 @@
 @import "tailwindcss";
 
 @theme {
-  /* Vault & Vitrine Surfaces */
-  --color-vault:    #1C0F07;  /* near-black espresso */
-  --color-ink:      #1C0F07;  /* primary text on light, secondary dark surface */
-  --color-ink-900:  #1C0F07;  /* deepest */
-  --color-ink-800:  #2C1810;  /* sidebar surface */
-  --color-ink-700:  #3D2418;  /* sidebar hover */
+  /* Thanjavur Vitrine Palette */
+  --color-vault-black:   #120D0E;  /* Page ground (warm aubergine-black) */
+  --color-sanctum:       #241014;  /* Alternate section ground, cards */
+  --color-burgundy-silk: #471722;  /* Feature panels, bridal section, hover fills */
+  --color-temple-gold:   #C9A24B;  /* Hairline borders (1px), icons, eyebrows, dividers */
+  --color-gold-light:    #EAD9A6;  /* Hover shimmer, active states, fine highlights */
+  --color-ivory:         #F3EBDD;  /* Headings, primary text */
+  --color-sandal:        #C9BCA4;  /* Body text, secondary */
+  --color-kemp-red:      #9E1B1B;  /* Sale tags, wax seals, accents */
+  --color-deep-footer:   #0C0809;  /* Footer ground */
 
-  /* Cream — page ground & surface (Replacing pure white) */
-  --color-cream-50:  #FDF7EF;  /* warm cream background */
-  --color-cream-100: #FAF0E4;  /* card & section ground */
-  --color-cream-200: #F2E6D6;  /* hairlines, dividers */
-  --color-cream-300: #E6D5BF;  /* borders */
-  
-  --color-ivory:    #FDF7EF;  /* main page background */
-  --color-bone:     #FAF0E4;  /* input fills & cards */
-  --color-hairline: #F2E6D6;  /* dividers */
-  --color-surface:  #FDF7EF;  /* surface replacing pure white */
-
-  /* Metals & Signals */
-  --color-gold:     #A67A2E;  /* primary accent */
-  --color-gold-700: #96601A;
-  --color-gold-600: #B8761F;
-  --color-gold-500: #C8891F;
-  --color-gold-400: #D9A441;
-  --color-gold-100: #F6EDE1;
-  --color-gold-lit: #D6AC5E;
-  --color-kumkum:   #8C2F26;
-  --color-leaf:     #2E5E45;
+  /* Legacy aliases for backward compatibility */
+  --color-vault:         #120D0E;
+  --color-ink:           #F3EBDD;
+  --color-ink-900:       #120D0E;
+  --color-ink-800:       #241014;
+  --color-ink-700:       #471722;
+  --color-gold:          #C9A24B;
+  --color-gold-lit:      #EAD9A6;
+  --color-hairline:      #C9A24B;
+  --color-surface:       #241014;
 
   /* Typography Font Families */
-  --font-bodoni:    var(--font-bodoni-moda), Georgia, serif;
+  --font-cormorant: var(--font-cormorant), Georgia, serif;
+  --font-bodoni:    var(--font-cormorant), Georgia, serif;
   --font-marcellus: var(--font-marcellus), Georgia, serif;
-  --font-karla:     var(--font-karla), system-ui, sans-serif;
-  --font-tamil:     var(--font-anek-tamil), sans-serif;
+  --font-jost:      var(--font-jost), system-ui, sans-serif;
+  --font-karla:     var(--font-jost), system-ui, sans-serif;
+  --font-tamil:     var(--font-tamil), serif;
 }
 
 @layer base {
   html {
-    color-scheme: light;
-    background-color: var(--color-ivory);
-    color: var(--color-ink);
-    font-family: var(--font-karla), system-ui, sans-serif;
+    color-scheme: dark;
+    background-color: var(--color-vault-black);
+    color: var(--color-ivory);
+    font-family: var(--font-jost), system-ui, sans-serif;
     font-size: 16px;
-    line-height: 1.65;
+    line-height: 1.8;
   }
 
-  /* Universal Strict Rules: No box shadows, 1px hairlines */
+  body {
+    background-color: var(--color-vault-black);
+    color: var(--color-ivory);
+    overflow-x: hidden;
+  }
+
+  /* Universal Strict Rules: 1px hairlines in temple-gold/25 */
   *, ::before, ::after {
-    border-color: var(--color-hairline);
+    border-color: rgba(201, 162, 75, 0.25);
   }
 
   /* Keyboard Focus Ring */
   :focus-visible {
-    outline: 1px solid var(--color-gold) !important;
-    outline-offset: 3px !important;
+    outline: 2px solid var(--color-temple-gold) !important;
+    outline-offset: 2px !important;
   }
 
   /* Headings Default */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-bodoni), Georgia, serif;
-    color: var(--color-ink);
-    letter-spacing: -0.02em;
-    line-height: 1.04;
+    font-family: var(--font-cormorant), Georgia, serif;
+    color: var(--color-ivory);
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    font-weight: 300;
   }
 }
 
-/* Foil Gradient Utility */
-.bg-foil-gold {
-  background: linear-gradient(100deg, #8A6224 0%, #D6AC5E 38%, #F0DCA8 50%, #D6AC5E 62%, #8A6224 100%);
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-vault-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-temple-gold);
+  border-radius: 3px;
 }
 
-.text-foil-gold {
-  background: linear-gradient(100deg, #8A6224 0%, #D6AC5E 38%, #F0DCA8 50%, #D6AC5E 62%, #8A6224 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Gopuram Arch Vitrine Frame */
+.vitrine-arch {
+  aspect-ratio: 3 / 4;
+  border-radius: 999px 999px 10px 10px;
+  position: relative;
+  overflow: hidden;
 }
 
+.vitrine-arch-inner {
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(201, 162, 75, 0.4);
+  border-radius: 999px 999px 6px 6px;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.75);
+  pointer-events: none;
+  z-index: 10;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.vitrine-arch:hover .vitrine-arch-inner {
+  border-color: var(--color-gold-light);
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.85);
+}
+
+.vitrine-arch img {
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vitrine-arch:hover img {
+  transform: scale(1.05);
+}
+
+/* Gold Sheen Button Gradient */
+.btn-gold-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gold-sheen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(234, 217, 166, 0.4) 50%,
+    transparent 100%
+  );
+  transition: left 0.6s ease;
+}
+
+.btn-gold-sheen:hover::after {
+  left: 100%;
+}
+
+/* Gold Gradient utilities */
 .text-gold-gradient {
-  background: linear-gradient(135deg, #FFF0C9 0%, #D4AF37 45%, #B8761F 100%);
+  background: linear-gradient(135deg, #F3EBDD 0%, #C9A24B 50%, #EAD9A6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.shadow-royal-gold {
-  box-shadow: 0 12px 35px -8px rgba(166, 122, 46, 0.28);
-}
-
-.border-gold-glow {
-  border: 1px solid rgba(212, 175, 55, 0.45);
-  box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1), 0 4px 20px rgba(0, 0, 0, 0.2);
+.bg-gold-sheen {
+  background: linear-gradient(135deg, #C9A24B 0%, #EAD9A6 50%, #B88E3A 100%);
 }
 
 /* Reduced Motion Override */
@@ -100,6 +158,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+    transform: none !important;
   }
 }
 
@@ -113,3 +172,4 @@
     display: none !important;
   }
 }
+

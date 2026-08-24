@@ -2,9 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Search, X, ArrowRight, Tag } from 'lucide-react';
-import { MicroLabel, Price } from '@/components/primitives';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import Image from 'next/image';
+import { Search, X, ArrowRight } from 'lucide-react';
 import { getProducts } from '@/lib/data/queries';
 import { Product } from '@/lib/data/types';
 
@@ -16,7 +15,6 @@ export interface SearchOverlayProps {
 export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const [query, setQuery] = React.useState('');
   const [products, setProducts] = React.useState<Product[]>([]);
-  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     async function loadData() {
@@ -38,7 +36,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
   if (!isOpen) return null;
 
-  const popularSearches = ['Temple Necklace', 'Polki Jhumka', 'Kundan Choker', 'Kasu Mala', 'Meenakari Bangles'];
+  const popularSearches = ['Temple Necklace', 'Peacock Jhumka', 'Kundan Choker', 'Kasu Haram', 'Meenakari Bangles'];
 
   const filteredProducts = query.trim()
     ? products.filter(
@@ -50,21 +48,21 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     : [];
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[var(--color-surface)]/98 backdrop-blur-md animate-in fade-in duration-200 select-none">
+    <div className="fixed inset-0 z-50 flex flex-col bg-[var(--color-vault-black)]/98 backdrop-blur-md text-[var(--color-ivory)] select-none animate-in fade-in duration-200">
       {/* Top Header Bar */}
-      <div className="max-w-[1440px] w-full mx-auto px-6 sm:px-8 h-[108px] flex items-center justify-between border-b border-[var(--color-cream-200)]">
+      <div className="max-w-[1440px] w-full mx-auto px-6 sm:px-8 h-[96px] flex items-center justify-between border-b border-[var(--color-temple-gold)]/20">
         <Link href="/" onClick={onClose} className="flex flex-col">
-          <span className="font-serif text-2xl font-medium tracking-[0.06em] text-[var(--color-text-900)]">
+          <span className="font-marcellus text-2xl tracking-[0.14em] text-[var(--color-ivory)]">
             ADI PARVA
           </span>
-          <MicroLabel className="text-[var(--color-gold-600)] text-[9px] tracking-[0.2em]">
-            SEARCH REPOSITORY
-          </MicroLabel>
+          <span className="font-marcellus text-[9px] uppercase tracking-[0.35em] text-[var(--color-temple-gold)]">
+            ARCHIVE SEARCH REPOSITORY
+          </span>
         </Link>
 
         <button
           onClick={onClose}
-          className="p-2 text-[var(--color-text-700)] hover:text-[var(--color-text-900)] rounded-full hover:bg-[var(--color-cream-100)] transition-colors cursor-pointer"
+          className="p-2 text-[var(--color-ivory)] hover:text-[var(--color-gold-light)] rounded-full transition-colors cursor-pointer"
           aria-label="Close search"
         >
           <X className="w-6 h-6" />
@@ -73,20 +71,20 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
       {/* Main Search Input Area */}
       <div className="max-w-4xl w-full mx-auto px-6 pt-12 pb-6 space-y-8 flex-1 overflow-y-auto">
-        <div className="relative flex items-center border-b-2 border-[var(--color-gold-600)] pb-4">
-          <Search className="w-8 h-8 text-[var(--color-gold-600)] shrink-0 mr-4" />
+        <div className="relative flex items-center border-b border-[var(--color-temple-gold)] pb-4">
+          <Search className="w-7 h-7 text-[var(--color-temple-gold)] shrink-0 mr-4 stroke-[1.5]" />
           <input
             type="text"
             autoFocus
             placeholder="Search temple gold, Kundan, Polki heirlooms..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full font-serif text-2xl sm:text-4xl text-[var(--color-text-900)] placeholder-[var(--color-text-400)] bg-transparent outline-none"
+            className="w-full font-serif font-light text-2xl sm:text-4xl text-[var(--color-ivory)] placeholder-[var(--color-sandal)]/40 bg-transparent outline-none"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="p-1 text-[var(--color-text-400)] hover:text-[var(--color-text-900)]"
+              className="p-1 text-[var(--color-sandal)] hover:text-[var(--color-ivory)]"
             >
               <X className="w-5 h-5" />
             </button>
@@ -96,59 +94,63 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         {/* Popular Searches */}
         {!query && (
           <div className="space-y-4 pt-4">
-            <MicroLabel className="text-[var(--color-gold-600)]">POPULAR SEARCHES</MicroLabel>
-            <div className="flex flex-wrap gap-2.5">
+            <div className="font-marcellus text-[11px] uppercase tracking-[0.3em] text-[var(--color-temple-gold)]">
+              POPULAR REPOSITORY SEARCHES
+            </div>
+            <div className="flex flex-wrap gap-2.5 font-jost text-sm">
               {popularSearches.map((term) => (
                 <button
                   key={term}
                   onClick={() => setQuery(term)}
-                  className="px-4 py-2 bg-[var(--color-cream-100)] hover:bg-[var(--color-gold-100)] hover:text-[var(--color-gold-700)] text-xs font-sans font-medium text-[var(--color-text-700)] rounded-[var(--radius-pill)] border border-[var(--color-cream-200)] transition-colors cursor-pointer flex items-center gap-2"
+                  className="px-4 py-2 bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 text-[var(--color-sandal)] hover:text-[var(--color-gold-light)] hover:border-[var(--color-temple-gold)]/50 rounded-[2px] transition-all cursor-pointer"
                 >
-                  <Tag className="w-3 h-3 text-[var(--color-gold-600)]" />
-                  <span>{term}</span>
+                  {term}
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* Search Results Grid */}
-        {query && (
-          <div className="space-y-6 pt-2">
-            <div className="flex items-center justify-between border-b border-[var(--color-cream-200)] pb-2">
-              <MicroLabel className="text-[var(--color-gold-600)]">
-                MATCHING PIECES ({filteredProducts.length})
-              </MicroLabel>
+        {/* Search Results */}
+        {query.trim() && (
+          <div className="space-y-4 pt-4">
+            <div className="font-marcellus text-[11px] uppercase tracking-[0.25em] text-[var(--color-temple-gold)]">
+              FOUND {filteredProducts.length} MATCHING ARCHIVE PLATES
             </div>
 
-            {filteredProducts.length === 0 ? (
-              <div className="py-12 text-center space-y-2">
-                <p className="font-serif text-xl text-[var(--color-text-900)]">No heritage pieces match your query</p>
-                <p className="text-xs text-[var(--color-text-500)]">Try searching for &quot;Temple&quot;, &quot;Kundan&quot;, or &quot;Jhumka&quot;</p>
+            {filteredProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredProducts.map((p) => {
+                  const plateNo = `PLATE AP-${String(Math.abs(p.id.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % 800 + 100).padStart(4, '0')}`;
+                  return (
+                    <Link
+                      key={p.id}
+                      href={`/piece/${p.slug}`}
+                      onClick={onClose}
+                      className="group flex gap-4 p-3 bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] hover:border-[var(--color-temple-gold)]/60 transition-all"
+                    >
+                      <div className="relative w-16 aspect-[3/4] bg-[var(--color-vault-black)] rounded-[2px] overflow-hidden border border-[var(--color-temple-gold)]/30 shrink-0">
+                        <Image src={p.images[0]} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform" />
+                      </div>
+                      <div className="flex-1 space-y-1 my-auto">
+                        <div className="font-marcellus text-[9px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
+                          {plateNo}
+                        </div>
+                        <h4 className="font-serif text-base text-[var(--color-ivory)] group-hover:text-[var(--color-gold-light)] line-clamp-1">
+                          {p.name}
+                        </h4>
+                        <div className="font-sans text-xs text-[var(--color-ivory)] tabular-nums">
+                          ₹{p.price.toLocaleString('en-IN')}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
-                  <Link
-                    key={product.id}
-                    href={`/piece/${product.slug}`}
-                    onClick={onClose}
-                    className="flex items-center space-x-4 p-3 bg-[var(--color-cream-50)] hover:bg-[var(--color-cream-100)] border border-[var(--color-cream-200)] rounded-[var(--radius-card)] transition-colors group"
-                  >
-                    <div className="w-16 h-16 relative bg-[var(--color-cream-200)] rounded-[var(--radius-card)] overflow-hidden shrink-0">
-                      <ImageWithFallback src={product.images[0]} alt={product.name} fill className="object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h5 className="font-serif text-sm font-medium text-[var(--color-text-900)] group-hover:text-[var(--color-gold-600)] transition-colors truncate">
-                        {product.name}
-                      </h5>
-                      <p className="text-[11px] text-[var(--color-text-500)] truncate mt-0.5">
-                        {product.artisanCluster}
-                      </p>
-                      <Price amount={product.price} size="sm" className="font-sans font-semibold mt-1" />
-                    </div>
-                  </Link>
-                ))}
+              <div className="text-center py-12 space-y-2 text-[var(--color-sandal)]/70 font-jost">
+                <p className="font-serif text-xl text-[var(--color-ivory)]">No archive plates match "{query}"</p>
+                <p className="text-xs font-light">Try searching for terms like "Temple", "Jhumka", or "Haram".</p>
               </div>
             )}
           </div>

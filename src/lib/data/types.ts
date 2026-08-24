@@ -31,6 +31,7 @@ export interface Product {
   id: string;
   slug: string;
   name: string;
+  plateNumber?: string; // "PLATE AP-0104"
   categoryId: string;
   collectionTag?: 'Masterpiece' | 'New arrival' | 'Bridal' | 'Archive' | 'Bestseller';
   collection?: string;
