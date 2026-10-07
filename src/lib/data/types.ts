@@ -7,9 +7,14 @@ export interface Category {
   tagline: string;
   description: string;
   heroImage: string;
+  image?: string;
   pieceCount: number;
   order: number;
+  sortOrder?: number;
   featured: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ProductVariant {
@@ -20,6 +25,7 @@ export interface ProductVariant {
   priceDelta: Currency;
   stock: number;
   sku: string;
+  image?: string;
 }
 
 export interface ProductSpec {
@@ -31,6 +37,7 @@ export interface Product {
   id: string;
   slug: string;
   name: string;
+  code?: string; // Product Code e.g. AP-7K3QXM
   plateNumber?: string; // "PLATE AP-0104"
   categoryId: string;
   collectionTag?: 'Masterpiece' | 'New arrival' | 'Bridal' | 'Archive' | 'Bestseller';
@@ -48,6 +55,7 @@ export interface Product {
   careNotes: string[];
   status: 'live' | 'draft' | 'archived';
   totalStock: number;
+  lowStockThreshold?: number; // default 3
   rating: number;
   reviewCount: number;
   createdAt: string;
@@ -80,6 +88,8 @@ export interface OrderItem {
   productId: string;
   variantId: string;
   name: string;
+  variantLabel?: string;
+  code?: string;
   image: string;
   unitPrice: Currency;
   qty: number;
@@ -96,6 +106,7 @@ export interface Order {
   customerId: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string;
   items: OrderItem[];
   subtotal: Currency;
   discount: Currency;
@@ -107,6 +118,9 @@ export interface Order {
   timeline: OrderTimelineItem[];
   shippingAddress: Address;
   paymentMethod: 'Card' | 'UPI' | 'Net banking' | 'Cash on delivery';
+  paymentStatus?: 'paid' | 'pending' | 'cod_pending' | 'failed';
+  razorpayPaymentId?: string;
+  razorpayOrderId?: string;
   placedAt: string;
   expectedBy: string;
 }
@@ -223,4 +237,24 @@ export interface DashboardStats {
   totalCustomersDelta: string;
   masterpiecesCount: number;
   masterpiecesDelta: string;
+}
+
+export type StockMovementReason = 'initial' | 'restock' | 'sale' | 'adjustment' | 'return' | 'damaged';
+
+export interface StockMovement {
+  id: string;
+  productId: string;
+  productCode: string;
+  productName: string;
+  variantId: string;
+  variantLabel: string;
+  changeQty: number; // + or -
+  stockBefore: number;
+  stockAfter: number;
+  reason: StockMovementReason;
+  orderId?: string;
+  note?: string;
+  adminUid: string;
+  adminName: string;
+  createdAt: string;
 }

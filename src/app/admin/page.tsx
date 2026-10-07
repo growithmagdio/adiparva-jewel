@@ -10,15 +10,26 @@ import {
   Card,
   Skeleton,
 } from '@/components/primitives';
+import dynamic from 'next/dynamic';
 import { StatCard } from '@/components/admin/stat-card';
 import { InventorySnapshot } from '@/components/admin/inventory-snapshot';
-import { RevenueChart } from '@/components/admin/revenue-chart';
-import { getDashboardStats, getOrders, getProducts } from '@/lib/data/queries';
+
+const RevenueChart = dynamic(
+  () => import('@/components/admin/revenue-chart').then((mod) => mod.RevenueChart),
+  { ssr: false }
+);
+import { getDashboardStats, getOrders, getProducts, getInventoryStats } from '@/lib/data/queries';
 import { DashboardStats, Order, Product } from '@/lib/data/types';
-import { DollarSign, ShoppingBag, Users, Gem, ArrowRight } from 'lucide-react';
+import { DollarSign, ShoppingBag, Users, Gem, ArrowRight, Package, Boxes, AlertTriangle, AlertOctagon } from 'lucide-react';
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = React.useState<DashboardStats | null>(null);
+  const [invStats, setInvStats] = React.useState<{
+    totalProducts: number;
+    totalStockUnits: number;
+    lowStockCount: number;
+    soldOutCount: number;
+  } | null>(null);
   const [recentOrders, setRecentOrders] = React.useState<Order[]>([]);
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -26,12 +37,14 @@ export default function AdminDashboardPage() {
   React.useEffect(() => {
     async function loadDashboard() {
       setLoading(true);
-      const [sData, oData, pData] = await Promise.all([
+      const [sData, iData, oData, pData] = await Promise.all([
         getDashboardStats(),
+        getInventoryStats(),
         getOrders(),
         getProducts({ status: 'all' }),
       ]);
       setStats(sData);
+      setInvStats(iData);
       setRecentOrders(oData.slice(0, 4));
       setProducts(pData);
       setLoading(false);
@@ -56,7 +69,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Four Stat Cards */}
+      {/* Main Revenue & Order Stat Cards */}
       {loading || !stats ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -94,6 +107,85 @@ export default function AdminDashboardPage() {
             icon={Gem}
             index={3}
           />
+        </div>
+      )}
+
+      {/* Stock Inventory Summary Row */}
+      {loading || !invStats ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} variant="rect" className="h-[120px] w-full" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Link href="/admin/products" className="block group">
+            <Card className="p-5 flex items-center justify-between border-l-4 border-l-[var(--color-gold-600)] hover:border-[var(--color-gold-500)] transition-all">
+              <div>
+                <MicroLabel className="text-[var(--color-text-500)]">TOTAL PRODUCTS</MicroLabel>
+                <div className="font-serif text-2xl font-semibold text-[var(--color-text-900)] mt-1">
+                  {invStats.totalProducts}
+                </div>
+                <span className="text-[11px] text-[var(--color-gold-600)] font-medium group-hover:underline mt-1 block">
+                  View Catalogue →
+                </span>
+              </div>
+              <div className="p-3 bg-[var(--color-cream-100)] rounded-full text-[var(--color-gold-600)]">
+                <Package className="w-5 h-5" />
+              </div>
+            </Card>
+          </Link>
+
+          <Link href="/admin/inventory" className="block group">
+            <Card className="p-5 flex items-center justify-between border-l-4 border-l-[var(--color-gold-600)] hover:border-[var(--color-gold-500)] transition-all">
+              <div>
+                <MicroLabel className="text-[var(--color-text-500)]">TOTAL STOCK UNITS</MicroLabel>
+                <div className="font-serif text-2xl font-semibold text-[var(--color-text-900)] mt-1">
+                  {invStats.totalStockUnits}
+                </div>
+                <span className="text-[11px] text-[var(--color-gold-600)] font-medium group-hover:underline mt-1 block">
+                  Manage Inventory →
+                </span>
+              </div>
+              <div className="p-3 bg-[var(--color-cream-100)] rounded-full text-[var(--color-gold-600)]">
+                <Boxes className="w-5 h-5" />
+              </div>
+            </Card>
+          </Link>
+
+          <Link href="/admin/inventory?tab=low_stock" className="block group">
+            <Card className="p-5 flex items-center justify-between border-l-4 border-l-[var(--color-warn-fg)] hover:border-[var(--color-warn-fg)] transition-all">
+              <div>
+                <MicroLabel className="text-[var(--color-warn-fg)] font-semibold">LOW-STOCK COUNT</MicroLabel>
+                <div className="font-serif text-2xl font-semibold text-[var(--color-warn-fg)] mt-1">
+                  {invStats.lowStockCount}
+                </div>
+                <span className="text-[11px] text-[var(--color-warn-fg)] font-medium group-hover:underline mt-1 block">
+                  View Low Stock Tab →
+                </span>
+              </div>
+              <div className="p-3 bg-[var(--color-warn-bg)] rounded-full text-[var(--color-warn-fg)]">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+            </Card>
+          </Link>
+
+          <Link href="/admin/inventory?tab=sold_out" className="block group">
+            <Card className="p-5 flex items-center justify-between border-l-4 border-l-[var(--color-risk-fg)] hover:border-[var(--color-risk-fg)] transition-all">
+              <div>
+                <MicroLabel className="text-[var(--color-risk-fg)] font-semibold">SOLD-OUT COUNT</MicroLabel>
+                <div className="font-serif text-2xl font-semibold text-[var(--color-risk-fg)] mt-1">
+                  {invStats.soldOutCount}
+                </div>
+                <span className="text-[11px] text-[var(--color-risk-fg)] font-medium group-hover:underline mt-1 block">
+                  View Sold Out Tab →
+                </span>
+              </div>
+              <div className="p-3 bg-[var(--color-risk-bg)] rounded-full text-[var(--color-risk-fg)]">
+                <AlertOctagon className="w-5 h-5" />
+              </div>
+            </Card>
+          </Link>
         </div>
       )}
 

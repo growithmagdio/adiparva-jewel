@@ -32,11 +32,11 @@ function CustomTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
       <div className="bg-[var(--color-ink-900)] text-white p-3 rounded-[var(--radius-card)] shadow-xl border border-[var(--color-ink-700)] text-xs font-sans space-y-1">
-        <p className="font-semibold text-[var(--color-gold-400)]">{label}</p>
-        <p className="text-white flex items-center gap-1">
+        <div className="font-semibold text-[var(--color-gold-400)]">{label}</div>
+        <div className="text-white flex items-center gap-1">
           <span>Revenue:</span>
           <Price amount={payload[0].value} size="sm" className="text-white font-sans text-xs" />
-        </p>
+        </div>
       </div>
     );
   }

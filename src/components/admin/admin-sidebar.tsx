@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
@@ -15,6 +16,8 @@ import {
   Ticket,
   Users,
   FileText,
+  FolderTree,
+  Boxes,
   X,
 } from 'lucide-react';
 import { MicroLabel } from '@/components/primitives';
@@ -28,6 +31,8 @@ export interface NavItem {
 export const ADMIN_NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { label: 'Products', href: '/admin/products', icon: Package },
+  { label: 'Stock Inventory', href: '/admin/inventory', icon: Boxes },
+  { label: 'Categories', href: '/admin/categories', icon: FolderTree },
   { label: 'Orders', href: '/admin/orders', icon: ShoppingBag },
   { label: 'Hero Settings', href: '/admin/hero', icon: Sliders },
   { label: 'Seasonal Offers', href: '/admin/offers', icon: Tag },
@@ -47,31 +52,23 @@ export function AdminSidebar({ onCloseMobile, className }: AdminSidebarProps) {
   return (
     <aside
       className={twMerge(
-        'w-[264px] h-screen bg-[var(--color-ink-800)] text-white flex flex-col shrink-0 select-none sticky top-0 overflow-y-auto z-40 border-r border-[var(--color-ink-900)]/40',
+        'w-[264px] h-screen bg-[#F4EEDF] text-[#2A1E17] flex flex-col shrink-0 select-none sticky top-0 overflow-y-auto z-40 border-r border-[#E2D6BC]',
         className
       )}
     >
       {/* Brand Block */}
-      <div className="p-6 pb-6 flex items-center justify-between border-b border-[var(--color-ink-700)]/50">
+      <div className="p-6 pb-6 flex items-center justify-between border-b border-[#E2D6BC]">
         <Link href="/admin" className="flex items-center space-x-3.5 group">
-          {/* 34px Filigree Rosette Mark SVG */}
-          <svg
-            className="w-[34px] h-[34px] text-[var(--color-gold-500)] opacity-80 group-hover:opacity-100 transition-opacity"
-            viewBox="0 0 34 34"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <circle cx="17" cy="17" r="15" stroke="currentColor" strokeWidth="1" strokeDasharray="2 2" />
-            <circle cx="17" cy="17" r="10" stroke="currentColor" strokeWidth="1" />
-            <circle cx="17" cy="17" r="5" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M17 2V32M2 17H32M6.39 6.39L27.61 27.61M6.39 27.61L27.61 6.39" stroke="currentColor" strokeWidth="0.75" strokeOpacity="0.6" />
-          </svg>
+          <Image
+            src="/logo.jpeg"
+            alt="Adi Parva Admin"
+            width={200}
+            height={60}
+            className="h-12 w-auto object-contain rounded-[2px]"
+            priority
+          />
           <div className="flex flex-col">
-            <span className="font-serif text-lg font-medium tracking-[0.06em] leading-tight text-white">
-              ADI PARVA
-            </span>
-            <MicroLabel className="text-[var(--color-gold-500)] text-[10px] tracking-[0.14em]">
+            <MicroLabel className="text-[#8A6A1F] text-[10px] tracking-[0.14em] font-semibold">
               HERITAGE ADMIN
             </MicroLabel>
           </div>
@@ -80,7 +77,7 @@ export function AdminSidebar({ onCloseMobile, className }: AdminSidebarProps) {
         {onCloseMobile && (
           <button
             onClick={onCloseMobile}
-            className="lg:hidden text-[var(--color-cream-300)]/70 hover:text-white p-1"
+            className="lg:hidden text-[#6B5B4E] hover:text-[#2A1E17] p-1 cursor-pointer"
             aria-label="Close navigation sidebar"
           >
             <X className="w-5 h-5" />
@@ -104,23 +101,23 @@ export function AdminSidebar({ onCloseMobile, className }: AdminSidebarProps) {
               href={item.href}
               onClick={onCloseMobile}
               className={clsx(
-                'relative flex items-center h-[44px] px-3.5 rounded-[var(--radius-card)] font-sans font-medium text-[13px] uppercase tracking-[0.08em] transition-colors duration-140 group',
+                'relative flex items-center h-[44px] px-3.5 rounded-[4px] font-sans font-medium text-[13px] uppercase tracking-[0.08em] transition-colors duration-140 group',
                 isActive
-                  ? 'text-white font-semibold'
-                  : 'text-[var(--color-cream-300)]/70 hover:text-white hover:bg-[var(--color-ink-700)]'
+                  ? 'text-[#FBF7EE] font-semibold'
+                  : 'text-[#6B5B4E] hover:text-[#2A1E17] hover:bg-[#E2D6BC]/50'
               )}
             >
-              {/* Active Golden Background with Shared Framer-Motion layoutId */}
+              {/* Active Maroon Background with Shared Framer-Motion layoutId */}
               {isActive && (
                 <motion.div
                   layoutId="admin-nav-active"
-                  className="absolute inset-0 bg-[var(--color-gold-600)] rounded-[var(--radius-card)] z-0"
+                  className="absolute inset-0 bg-[#5C1A1B] rounded-[4px] z-0"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
               )}
 
               <span className="relative z-10 flex items-center gap-3">
-                <Icon className={clsx('w-4 h-4 shrink-0', isActive ? 'text-white' : 'text-[var(--color-cream-300)]/70 group-hover:text-white')} />
+                <Icon className={clsx('w-4 h-4 shrink-0', isActive ? 'text-[#FBF7EE]' : 'text-[#8A6A1F] group-hover:text-[#2A1E17]')} />
                 <span>{item.label}</span>
               </span>
             </Link>
@@ -129,8 +126,8 @@ export function AdminSidebar({ onCloseMobile, className }: AdminSidebarProps) {
       </nav>
 
       {/* Sidebar Pinned Footer */}
-      <div className="p-4 px-6 border-t border-[var(--color-ink-700)]/40 mt-auto">
-        <span className="font-sans font-medium text-[10px] tracking-[0.14em] uppercase text-[var(--color-ink-600)] block">
+      <div className="p-4 px-6 border-t border-[#E2D6BC] mt-auto">
+        <span className="font-sans font-medium text-[10px] tracking-[0.14em] uppercase text-[#6B5B4E] block">
           IMPERIAL TRADITION V1.0
         </span>
       </div>

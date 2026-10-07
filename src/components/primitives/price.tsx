@@ -4,7 +4,7 @@ import * as React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-export interface PriceProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PriceProps extends React.HTMLAttributes<HTMLSpanElement> {
   amount: number;
   compareAtAmount?: number;
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -19,7 +19,7 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export const Price = React.forwardRef<HTMLDivElement, PriceProps>(
+export const Price = React.forwardRef<HTMLSpanElement, PriceProps>(
   (
     {
       className,
@@ -43,7 +43,7 @@ export const Price = React.forwardRef<HTMLDivElement, PriceProps>(
     };
 
     return (
-      <div
+      <span
         ref={ref}
         className={twMerge(
           clsx(
@@ -61,7 +61,7 @@ export const Price = React.forwardRef<HTMLDivElement, PriceProps>(
             {formattedCompareAt}
           </span>
         )}
-      </div>
+      </span>
     );
   }
 );

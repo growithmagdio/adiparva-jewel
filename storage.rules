@@ -1,0 +1,43 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return request.auth.token.role;
+    }
+
+    function isAdminRole() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        getUserRole() in ['Chief Curator', 'Curator', 'Registrar']
+      );
+    }
+
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') &&
+             request.resource.size < 5 * 1024 * 1024; // Max 5 MB
+    }
+
+    // Product & Category media images
+    match /images/{allPaths=**} {
+      // Public read access for images
+      allow read: if true;
+
+      // Upload allowed only for admin roles with valid image type and size < 5MB
+      allow create, update: if isAdminRole() && isValidImage();
+
+      // Delete allowed only for admin roles
+      allow delete: if isAdminRole();
+    }
+
+    // Default deny for all other paths
+    match /{allPaths=**} {
+      allow read, write: if isAdminRole();
+    }
+  }
+}

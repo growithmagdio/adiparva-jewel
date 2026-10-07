@@ -8,3 +8,4 @@ export * from './users';
 export * from './hero';
 export * from './journal';
 export * from './content';
+export * from './stock-movements';

@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for Granular Role-Based Access Control (RBAC)
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return request.auth.token.role;
+    }
+
+    function isChiefCuratorOrAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        getUserRole() == 'Chief Curator'
+      );
+    }
+
+    function isCuratorOrRegistrar() {
+      return isAuthenticated() && (
+        isChiefCuratorOrAdmin() ||
+        getUserRole() in ['Curator', 'Registrar']
+      );
+    }
+
+    function isStaff() {
+      return isAuthenticated() && (
+        isCuratorOrRegistrar() ||
+        getUserRole() == 'Support'
+      );
+    }
+
+    // Categories Collection
+    match /categories/{categoryId} {
+      allow read: if resource == null || resource.data.isActive == true || isStaff();
+      allow create, update: if isCuratorOrRegistrar();
+      allow delete: if isChiefCuratorOrAdmin();
+    }
+
+    // Products Collection
+    match /products/{productId} {
+      allow read: if resource == null || resource.data.status == 'live' || isStaff();
+      allow create, update: if isCuratorOrRegistrar();
+      allow delete: if isChiefCuratorOrAdmin();
+    }
+
+    // Stock Movements Collection
+    match /stockMovements/{movementId} {
+      allow read: if isStaff();
+      allow create, update: if isCuratorOrRegistrar();
+      allow delete: if isChiefCuratorOrAdmin();
+    }
+
+    // Orders Collection: Clients CANNOT create or update orders directly
+    match /orders/{orderId} {
+      allow read: if isStaff() || (isAuthenticated() && resource.data.customerId == request.auth.uid);
+      allow create: if false; // Direct client creation forbidden (Server Action via Admin SDK required)
+      allow update: if isStaff(); // e.g. Support updating status only
+      allow delete: if isChiefCuratorOrAdmin();
+    }
+
+    // Default deny for all other collections
+    match /{document=**} {
+      allow read, write: if isStaff();
+    }
+  }
+}

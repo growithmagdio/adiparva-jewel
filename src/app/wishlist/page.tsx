@@ -9,17 +9,32 @@ import { KolamDivider } from '@/components/storefront/kolam-divider';
 import { useWishlistStore } from '@/lib/store/use-wishlist-store';
 import { getProducts } from '@/lib/data/queries';
 import { Product } from '@/lib/data/types';
+import { AlertTriangle } from 'lucide-react';
 
 export default function WishlistPage() {
   const wishlistProductIds = useWishlistStore((state) => state.wishlistProductIds);
+  const toggleWishlist = useWishlistStore((state) => state.toggleWishlist);
   const [products, setProducts] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [removedAlert, setRemovedAlert] = React.useState(false);
 
   React.useEffect(() => {
     async function loadData() {
       setLoading(true);
       const all = await getProducts({ status: 'live' });
       const saved = all.filter((p) => wishlistProductIds.includes(p.id));
+
+      if (wishlistProductIds.length > saved.length) {
+        // Clean up stale wishlist IDs
+        const liveIds = new Set(saved.map((s) => s.id));
+        wishlistProductIds.forEach((id) => {
+          if (!liveIds.has(id)) {
+            toggleWishlist(id);
+          }
+        });
+        setRemovedAlert(true);
+      }
+
       setProducts(saved);
       setLoading(false);
     }
@@ -47,6 +62,18 @@ export default function WishlistPage() {
             Saved <em className="italic text-gold-gradient font-normal">Heirlooms</em> ({products.length})
           </h1>
         </div>
+
+        {removedAlert && (
+          <div className="p-4 bg-[var(--color-warn-bg)] text-[var(--color-warn-fg)] border border-[var(--color-warn-fg)]/30 rounded flex items-center justify-between font-sans text-xs">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-[var(--color-warn-fg)]" />
+              <span>This item is no longer available and has been removed from your saved heirlooms.</span>
+            </div>
+            <button onClick={() => setRemovedAlert(false)} className="underline ml-4 cursor-pointer font-semibold">
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">

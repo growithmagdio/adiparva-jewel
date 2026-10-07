@@ -9,6 +9,7 @@ import {
   AdminUser,
   JournalArticle,
   SiteContent,
+  StockMovement,
 } from './types';
 import {
   seedCategories,
@@ -21,6 +22,7 @@ import {
   seedAdminUsers,
   seedJournalArticles,
   seedSiteContent,
+  seedStockMovements,
 } from './seed';
 
 const STORAGE_KEY = 'adi_parva_store_v1';
@@ -36,6 +38,7 @@ export interface StoreData {
   adminUsers: AdminUser[];
   journalArticles: JournalArticle[];
   siteContent: SiteContent;
+  stockMovements: StockMovement[];
 }
 
 export function getInitialSeedData(): StoreData {
@@ -50,6 +53,7 @@ export function getInitialSeedData(): StoreData {
     adminUsers: [...seedAdminUsers],
     journalArticles: [...seedJournalArticles],
     siteContent: { ...seedSiteContent },
+    stockMovements: [...seedStockMovements],
   };
 }
 

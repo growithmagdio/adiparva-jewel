@@ -10,13 +10,9 @@ import { CartSheet } from './cart-sheet';
 import { SearchOverlay } from './search-overlay';
 import { useCartStore } from '@/lib/store/use-cart-store';
 import { useWishlistStore } from '@/lib/store/use-wishlist-store';
-
-const MEGA_MENU_COLLECTIONS = [
-  { name: 'Temple Jewellery', href: '/collections/temple-jewellery', image: '/images/categories/temple-jewellery.jpg', count: '32 Plates' },
-  { name: 'Kundan & Jadau', href: '/collections/kundan', image: '/images/categories/kundan.jpg', count: '18 Plates' },
-  { name: 'Uncut Polki', href: '/collections/polki', image: '/images/categories/polki.jpg', count: '15 Plates' },
-  { name: 'Bridal Register', href: '/collections/bridal-sets', image: '/images/categories/bridal-sets.jpg', count: '12 Ensembles' },
-];
+import { LogoLockup } from '@/components/brand/logo-lockup';
+import { getCategories } from '@/lib/data/queries';
+import { Category } from '@/lib/data/types';
 
 export function Header() {
   const pathname = usePathname();
@@ -24,12 +20,21 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const [categories, setCategories] = React.useState<Category[]>([]);
 
   const cartItems = useCartStore((state) => state.items);
   const toggleCart = useCartStore((state) => state.toggleCart);
   const wishlistProductIds = useWishlistStore((state) => state.wishlistProductIds);
 
   const totalCartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
+
+  React.useEffect(() => {
+    async function loadCategories() {
+      const activeCats = await getCategories({ activeOnly: true });
+      setCategories(activeCats);
+    }
+    loadCategories();
+  }, []);
 
   // Scroll detection
   React.useEffect(() => {
@@ -55,41 +60,27 @@ export function Header() {
 
   return (
     <>
-      {/* 1. Announcement Bar — Vault Black with 30s Linear Marquee */}
-      <div className="h-[36px] bg-[var(--color-vault-black)] text-[var(--color-gold-light)] font-marcellus text-[11px] uppercase tracking-[0.25em] flex items-center overflow-hidden border-b border-[var(--color-temple-gold)]/30 z-50 relative select-none">
-        <div className="whitespace-nowrap animate-marquee flex items-center gap-8 w-full justify-around">
-          <span>Free Shipping Above ₹1999 ✦ Handmade Heritage Jewellery ✦ Cash on Delivery Available ✦ 7-Day Easy Returns</span>
-          <span>Free Shipping Above ₹1999 ✦ Handmade Heritage Jewellery ✦ Cash on Delivery Available ✦ 7-Day Easy Returns</span>
-        </div>
-      </div>
 
       {/* 2. Header Navbar */}
       <header
         className={`sticky top-0 z-40 transition-all duration-500 select-none ${
           isScrolled
-            ? 'bg-[#120D0E]/90 backdrop-blur-md border-b border-[var(--color-temple-gold)]/30 shadow-xl'
-            : 'bg-transparent border-b border-transparent'
+            ? 'bg-[#FBF7EE]/95 backdrop-blur-md border-b border-[#E2D6BC] shadow-md'
+            : 'bg-[#FBF7EE]/80 backdrop-blur-sm border-b border-[#E2D6BC]/60'
         }`}
       >
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 h-[84px] flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 min-h-[96px] md:min-h-[110px] py-2 flex items-center justify-between">
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="xl:hidden p-2 text-[var(--color-ivory)] hover:text-[var(--color-temple-gold)] transition-colors cursor-pointer"
+            className="xl:hidden p-2 text-[#2A1E17] hover:text-[#8A6A1F] transition-colors cursor-pointer"
             aria-label="Toggle navigation menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6 stroke-[1.5]" /> : <Menu className="w-6 h-6 stroke-[1.5]" />}
           </button>
 
           {/* Logo Brand Block */}
-          <Link href="/" className="flex flex-col items-center xl:items-start group shrink-0">
-            <span className="font-marcellus text-[22px] sm:text-[24px] tracking-[0.14em] font-normal text-[var(--color-ivory)] group-hover:text-[var(--color-gold-light)] transition-colors leading-none">
-              ADI PARVA
-            </span>
-            <span className="font-marcellus text-[9px] uppercase tracking-[0.45em] text-[var(--color-temple-gold)] mt-1">
-              THE TEMPLE OF TRADITION
-            </span>
-          </Link>
+          <LogoLockup />
 
           {/* Desktop Navigation Links */}
           <nav className="hidden xl:flex items-center space-x-10">
@@ -106,16 +97,16 @@ export function Header() {
                     href={link.href}
                     className={`font-marcellus text-[11px] uppercase tracking-[0.35em] transition-colors relative flex items-center gap-1.5 ${
                       isActive
-                        ? 'text-[var(--color-gold-light)]'
-                        : 'text-[var(--color-ivory)]/90 hover:text-[var(--color-temple-gold)]'
+                        ? 'text-[#8A6A1F] font-semibold'
+                        : 'text-[#2A1E17]/90 hover:text-[#8A6A1F]'
                     }`}
                   >
                     <span>{link.label}</span>
-                    {link.hasMega && <ChevronDown className="w-3 h-3 text-[var(--color-temple-gold)]" />}
+                    {link.hasMega && <ChevronDown className="w-3 h-3 text-[#8A6A1F]" />}
                     
                     {/* Gold Underline Slide-in */}
                     <span
-                      className={`absolute -bottom-1 left-0 h-[1px] bg-[var(--color-temple-gold)] transition-all duration-300 ${
+                      className={`absolute -bottom-1 left-0 h-[1.5px] bg-[#8A6A1F] transition-all duration-300 ${
                         isActive ? 'w-full' : 'w-0 group-hover:w-full'
                       }`}
                     />
@@ -128,36 +119,39 @@ export function Header() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 12 }}
                       transition={{ duration: 0.3 }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 w-[920px] bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/40 p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-50 text-[var(--color-ivory)]"
+                      className="absolute top-full left-1/2 -translate-x-1/2 w-[920px] bg-[#F4EEDF] border border-[#E2D6BC] p-8 shadow-2xl z-50 text-[#2A1E17]"
                     >
                       <div className="grid grid-cols-4 gap-6">
-                        {MEGA_MENU_COLLECTIONS.map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => setIsMegaMenuOpen(false)}
-                            className="group/item flex flex-col space-y-3"
-                          >
-                            <div className="aspect-[4/5] relative overflow-hidden rounded-[4px] border border-[var(--color-temple-gold)]/30">
-                              <Image
-                                src={item.image}
-                                alt={item.name}
-                                fill
-                                className="object-cover transition-transform duration-700 group-hover/item:scale-105"
-                                sizes="220px"
-                              />
-                              <div className="absolute inset-0 bg-black/40 group-hover/item:bg-black/20 transition-colors" />
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="font-serif text-lg text-[var(--color-ivory)] group-hover/item:text-[var(--color-gold-light)] transition-colors">
-                                {item.name}
-                              </span>
-                              <span className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
-                                {item.count}
-                              </span>
-                            </div>
-                          </Link>
-                        ))}
+                        {categories.slice(0, 4).map((cat) => {
+                          const displayImg = cat.image || cat.heroImage || `/images/categories/${cat.slug}.jpg`;
+                          return (
+                            <Link
+                              key={cat.id}
+                              href={`/collections/${cat.slug}`}
+                              onClick={() => setIsMegaMenuOpen(false)}
+                              className="group/item flex flex-col space-y-3"
+                            >
+                              <div className="aspect-[4/5] relative overflow-hidden rounded-[4px] border border-[#E2D6BC]">
+                                <Image
+                                  src={displayImg}
+                                  alt={cat.name}
+                                  fill
+                                  className="object-cover transition-transform duration-700 group-hover/item:scale-105"
+                                  sizes="220px"
+                                />
+                                <div className="absolute inset-0 bg-black/20 group-hover/item:bg-black/10 transition-colors" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="font-serif text-lg text-[#2A1E17] group-hover/item:text-[#8A6A1F] transition-colors">
+                                  {cat.name}
+                                </span>
+                                <span className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[#8A6A1F]">
+                                  {cat.pieceCount} Pieces
+                                </span>
+                              </div>
+                            </Link>
+                          );
+                        })}
                       </div>
                     </motion.div>
                   )}
@@ -167,10 +161,10 @@ export function Header() {
           </nav>
 
           {/* Action Icons — 1.5px Gold Stroke */}
-          <div className="flex items-center space-x-6 text-[var(--color-temple-gold)]">
+          <div className="flex items-center space-x-6 text-[#8A6A1F]">
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="p-1.5 hover:text-[var(--color-gold-light)] transition-colors cursor-pointer"
+              className="p-1.5 hover:text-[#5C1A1B] transition-colors cursor-pointer"
               aria-label="Search collection"
             >
               <Search className="w-5 h-5 stroke-[1.5]" />
@@ -178,32 +172,32 @@ export function Header() {
 
             <Link
               href="/wishlist"
-              className="p-1.5 hover:text-[var(--color-gold-light)] transition-colors relative"
+              className="p-1.5 hover:text-[#5C1A1B] transition-colors relative"
               aria-label="View wishlist"
             >
               <Heart className="w-5 h-5 stroke-[1.5]" />
               {wishlistProductIds.length > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[var(--color-kemp-red)] border border-black" />
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#5C1A1B] border border-[#FBF7EE]" />
               )}
             </Link>
 
             <Link
               href="/account"
-              className="p-1.5 hover:text-[var(--color-gold-light)] transition-colors hidden sm:block"
+              className="p-1.5 hover:text-[#5C1A1B] transition-colors hidden sm:block"
               aria-label="Account"
             >
               <User className="w-5 h-5 stroke-[1.5]" />
             </Link>
 
-            {/* Cart Icon + Kemp Red Count Badge */}
+            {/* Cart Icon + Maroon Count Badge */}
             <button
               onClick={toggleCart}
-              className="p-1.5 hover:text-[var(--color-gold-light)] transition-colors relative flex items-center cursor-pointer"
+              className="p-1.5 hover:text-[#5C1A1B] transition-colors relative flex items-center cursor-pointer"
               aria-label="View shopping bag"
             >
               <ShoppingBag className="w-5 h-5 stroke-[1.5]" />
               {totalCartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[var(--color-kemp-red)] text-[var(--color-ivory)] font-marcellus text-[9px] font-bold flex items-center justify-center border border-[var(--color-temple-gold)]/50">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#5C1A1B] text-[#FBF7EE] font-marcellus text-[9px] font-bold flex items-center justify-center border border-[#FBF7EE]">
                   {totalCartCount}
                 </span>
               )}
@@ -219,7 +213,7 @@ export function Header() {
               animate={{ opacity: 1, height: '100vh' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.4 }}
-              className="xl:hidden fixed inset-0 top-[120px] bg-[var(--color-vault-black)] z-50 p-8 flex flex-col justify-between border-t border-[var(--color-temple-gold)]/30"
+              className="xl:hidden fixed inset-0 top-[120px] bg-[#FBF7EE] z-50 p-8 flex flex-col justify-between border-t border-[#E2D6BC]"
             >
               <nav className="flex flex-col space-y-6 pt-4">
                 {navLinks.map((link, idx) => (
@@ -232,7 +226,7 @@ export function Header() {
                     <Link
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="font-serif text-[32px] font-light text-[var(--color-ivory)] hover:text-[var(--color-gold-light)] transition-colors block border-b border-[var(--color-temple-gold)]/15 pb-3"
+                      className="font-serif text-[32px] font-light text-[#2A1E17] hover:text-[#8A6A1F] transition-colors block border-b border-[#E2D6BC] pb-3"
                     >
                       {link.label}
                     </Link>
@@ -244,11 +238,11 @@ export function Header() {
                 <Link
                   href="/account"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="font-marcellus text-sm uppercase tracking-[0.3em] text-[var(--color-temple-gold)] block"
+                  className="font-marcellus text-sm uppercase tracking-[0.3em] text-[#8A6A1F] block"
                 >
                   CURATOR ACCOUNT →
                 </Link>
-                <div className="font-marcellus text-[10px] uppercase tracking-[0.25em] text-[var(--color-sandal)]/60">
+                <div className="font-marcellus text-[10px] uppercase tracking-[0.25em] text-[#6B5B4E]">
                   ADI PARVA · THE TEMPLE OF TRADITION
                 </div>
               </div>

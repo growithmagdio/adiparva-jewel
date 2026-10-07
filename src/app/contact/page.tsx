@@ -7,8 +7,11 @@ import { Footer } from '@/components/storefront/footer';
 import { KolamDivider } from '@/components/storefront/kolam-divider';
 import { MapPin, Phone, Mail, Clock, Check, MessageSquare } from 'lucide-react';
 
+import { getSiteConfig } from '@/lib/config/site-config';
+
 export default function ContactPage() {
   const [submitted, setSubmitted] = React.useState(false);
+  const siteConfig = getSiteConfig();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,19 +22,19 @@ export default function ContactPage() {
     {
       city: 'Chennai Flagship',
       address: 'No. 42 Khader Nawaz Khan Road, Nungambakkam',
-      phone: '+91 44 2833 7700',
+      phone: siteConfig.displayPhone || '+91 97917 77949',
       hours: 'Mon - Sat: 10:30 AM - 7:30 PM',
     },
     {
       city: 'Bengaluru Atelier',
       address: 'Lavelle Heights, Lavelle Road, Shanthala Nagar',
-      phone: '+91 80 4112 8899',
+      phone: siteConfig.displayPhone || '+91 97917 77949',
       hours: 'Mon - Sat: 10:30 AM - 7:30 PM',
     },
     {
       city: 'Mumbai Salon',
       address: 'Kala Ghoda Heritage District, Fort',
-      phone: '+91 22 2288 1144',
+      phone: siteConfig.displayPhone || '+91 97917 77949',
       hours: 'By Private Appointment Only',
     },
   ];
@@ -85,25 +88,27 @@ export default function ContactPage() {
         </div>
 
         {/* WhatsApp Direct Concierge Card */}
-        <div className="bg-[var(--color-burgundy-silk)] border border-[var(--color-temple-gold)]/40 p-8 rounded-[4px] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="font-marcellus text-[10px] uppercase tracking-[0.25em] text-[var(--color-gold-light)]">
-              INSTANT CONCIERGE
+        {siteConfig.isWhatsAppEnabled && (
+          <div className="bg-[var(--color-burgundy-silk)] border border-[var(--color-temple-gold)]/40 p-8 rounded-[4px] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+            <div className="space-y-2 text-center md:text-left">
+              <div className="font-marcellus text-[10px] uppercase tracking-[0.25em] text-[var(--color-gold-light)]">
+                INSTANT CONCIERGE
+              </div>
+              <h3 className="font-serif text-2xl font-light text-[var(--color-ivory)]">Connect Directly on WhatsApp</h3>
+              <p className="font-jost text-xs text-[var(--color-sandal)] font-light">Speak with our senior curator for immediate assistance or custom bridal quotes.</p>
             </div>
-            <h3 className="font-serif text-2xl font-light text-[var(--color-ivory)]">Connect Directly on WhatsApp</h3>
-            <p className="font-jost text-xs text-[var(--color-sandal)] font-light">Speak with our senior curator for immediate assistance or custom bridal quotes.</p>
-          </div>
 
-          <a
-            href="https://wa.me/919876543210"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-gold-sheen h-12 px-8 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-[11px] uppercase tracking-[0.25em] font-semibold flex items-center gap-2 rounded-[2px] shrink-0"
-          >
-            <MessageSquare className="w-4 h-4 text-[var(--color-vault-black)] stroke-[1.5]" />
-            <span>OPEN WHATSAPP CHAT</span>
-          </a>
-        </div>
+            <a
+              href={`https://wa.me/${siteConfig.whatsappNumber}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-gold-sheen h-12 px-8 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-[11px] uppercase tracking-[0.25em] font-semibold flex items-center gap-2 rounded-[2px] shrink-0"
+            >
+              <MessageSquare className="w-4 h-4 text-[var(--color-vault-black)] stroke-[1.5]" />
+              <span>OPEN WHATSAPP CHAT</span>
+            </a>
+          </div>
+        )}
 
         {/* Private Inquiry Form */}
         <div className="max-w-3xl mx-auto bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 p-8 sm:p-12 rounded-[4px] shadow-2xl space-y-6">

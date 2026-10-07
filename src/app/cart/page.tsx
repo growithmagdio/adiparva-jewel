@@ -7,9 +7,9 @@ import { Header } from '@/components/storefront/header';
 import { Footer } from '@/components/storefront/footer';
 import { KolamDivider } from '@/components/storefront/kolam-divider';
 import { useCartStore } from '@/lib/store/use-cart-store';
-import { validateCoupon } from '@/lib/data/queries';
+import { getProducts, validateCoupon } from '@/lib/data/queries';
 import { Coupon } from '@/lib/data/types';
-import { X, ShieldCheck, Truck, RotateCcw, ArrowRight } from 'lucide-react';
+import { X, ShieldCheck, Truck, RotateCcw, ArrowRight, AlertTriangle } from 'lucide-react';
 
 export default function CartPage() {
   const cartItems = useCartStore((state) => state.items);
@@ -19,6 +19,29 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = React.useState('');
   const [appliedCoupon, setAppliedCoupon] = React.useState<Coupon | null>(null);
   const [couponError, setCouponError] = React.useState('');
+  const [removedAlert, setRemovedAlert] = React.useState(false);
+
+  React.useEffect(() => {
+    async function validateCartItems() {
+      const liveProducts = await getProducts({ status: 'live' });
+      const liveIds = new Set(liveProducts.map((p) => p.id));
+      let hadUnavailable = false;
+
+      cartItems.forEach((item) => {
+        if (!liveIds.has(item.productId)) {
+          removeItem(item.productId, item.variantId);
+          hadUnavailable = true;
+        }
+      });
+
+      if (hadUnavailable) {
+        setRemovedAlert(true);
+      }
+    }
+    if (cartItems.length > 0) {
+      validateCartItems();
+    }
+  }, []);
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
 
@@ -72,6 +95,18 @@ export default function CartPage() {
             Your Shopping <em className="italic text-gold-gradient font-normal">Vitrine</em>
           </h1>
         </div>
+
+        {removedAlert && (
+          <div className="p-4 bg-[var(--color-warn-bg)] text-[var(--color-warn-fg)] border border-[var(--color-warn-fg)]/30 rounded flex items-center justify-between font-sans text-xs">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-[var(--color-warn-fg)]" />
+              <span>This item is no longer available and has been removed from your cart.</span>
+            </div>
+            <button onClick={() => setRemovedAlert(false)} className="underline ml-4 cursor-pointer font-semibold">
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {cartItems.length === 0 ? (
           <div className="py-20 text-center space-y-6 max-w-xl mx-auto bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-8">

@@ -11,7 +11,7 @@ import { getProducts, getCategories } from '@/lib/data/queries';
 import { Product, Category } from '@/lib/data/types';
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 
-export default function CollectionsPage() {
+function CollectionsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -32,7 +32,7 @@ export default function CollectionsPage() {
     async function loadData() {
       setLoading(true);
       const [cats, prods] = await Promise.all([
-        getCategories(),
+        getCategories({ activeOnly: true }),
         getProducts({ status: 'live' }),
       ]);
       setCategories(cats);
@@ -340,5 +340,13 @@ export default function CollectionsPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function CollectionsPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-[#FBF7EE]" />}>
+      <CollectionsContent />
+    </React.Suspense>
   );
 }
