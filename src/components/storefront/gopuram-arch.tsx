@@ -37,18 +37,18 @@ export function GopuramArch({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-t-[999px] rounded-b-[10px] bg-[#120D0E] group ${aspectClass} ${className}`}
+      className={`relative overflow-hidden rounded-t-[999px] rounded-b-[10px] bg-[#3B090D] group ${aspectClass} ${className}`}
     >
-      {/* 1px Inset Hairline Gold Frame */}
+      {/* 1px Inset Hairline Antique Gold Frame */}
       <div
-        className="absolute inset-[8px] sm:inset-[10px] pointer-events-none z-20 border border-[var(--color-temple-gold)]/40 rounded-t-[999px] rounded-b-[6px] transition-all duration-500 group-hover:border-[var(--color-gold-light)] group-hover:inset-[6px]"
+        className="absolute inset-[8px] sm:inset-[10px] pointer-events-none z-20 border border-[#B68A3A]/45 rounded-t-[999px] rounded-b-[6px] transition-all duration-500 group-hover:border-[#B68A3A] group-hover:inset-[6px]"
         style={{
-          boxShadow: 'inset 0 0 80px rgba(0, 0, 0, 0.75)',
+          boxShadow: 'inset 0 0 70px rgba(59, 9, 13, 0.65)',
         }}
       />
 
-      {/* Deep Vignette Overlay */}
-      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-black/80 via-transparent to-black/40" />
+      {/* Subtle Warm Burgundy Vignette Overlay */}
+      <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-t from-[#3B090D]/70 via-transparent to-[#3B090D]/30" />
 
       {/* Main Image */}
       <Image

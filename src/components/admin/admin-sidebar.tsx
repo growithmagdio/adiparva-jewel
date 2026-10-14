@@ -60,11 +60,11 @@ export function AdminSidebar({ onCloseMobile, className }: AdminSidebarProps) {
       <div className="p-6 pb-6 flex items-center justify-between border-b border-[#E2D6BC]">
         <Link href="/admin" className="flex items-center space-x-3.5 group">
           <Image
-            src="/logo.jpeg"
+            src="/logo..png"
             alt="Adi Parva Admin"
-            width={200}
-            height={60}
-            className="h-12 w-auto object-contain rounded-[2px]"
+            width={1536}
+            height={1024}
+            className="h-12 w-auto object-contain"
             priority
           />
           <div className="flex flex-col">

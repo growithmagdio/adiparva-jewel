@@ -138,7 +138,20 @@ async function fetchProductsRaw(options?: {
 
 async function fetchProductBySlugRaw(slug: string): Promise<Product | null> {
   const store = getStoreData();
-  return store.products.find((p) => p.slug === slug) || null;
+  const found = store.products.find((p) => p.slug === slug || p.id === slug);
+  if (found) return found;
+
+  try {
+    const q = query(collection(db, 'products'), where('slug', '==', slug), firestoreLimit(1));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return { id: snap.docs[0].id, ...snap.docs[0].data() } as Product;
+    }
+  } catch (err) {
+    console.warn('Firestore fallback failed for getProductBySlug:', err);
+  }
+
+  return null;
 }
 
 async function fetchCategoriesRaw(): Promise<Category[]> {
@@ -231,6 +244,7 @@ export async function getProductById(id: string): Promise<Product | null> {
   const store = getStoreData();
   return store.products.find((p) => p.id === id) || null;
 }
+
 
 export async function saveProduct(product: Product): Promise<Product> {
   const store = getStoreData();

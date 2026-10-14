@@ -61,20 +61,20 @@ export default function CraftPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans">
       <Header />
 
       <main className="flex-1 space-y-20 sm:space-y-28 pb-24">
         {/* Header */}
         <section className="max-w-[1440px] mx-auto px-6 sm:px-8 pt-16 space-y-4 text-center max-w-3xl">
           <KolamDivider />
-          <span className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[var(--color-temple-gold)]">
+          <span className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[#B68A3A] font-semibold">
             HERITAGE MÉTIER
           </span>
-          <h1 className="font-serif text-[36px] sm:text-[52px] font-light text-[var(--color-ivory)] leading-tight">
-            The Stages of <em className="italic text-gold-gradient font-normal">Making</em>
+          <h1 className="font-serif text-[36px] sm:text-[52px] font-normal text-[#5B1018] leading-tight">
+            The Stages of <em className="italic font-normal text-[#B68A3A]">Making</em>
           </h1>
-          <p className="font-jost text-[16px] text-[var(--color-sandal)]/80 leading-[1.65] font-light">
+          <p className="font-jost text-[16px] text-[#765E55] leading-[1.65]">
             Walk through the six bench stages required to create a single Adi Parva temple gold or Kundan heirloom. Over 200 hours of hereditary hand labor per parure.
           </p>
         </section>
@@ -86,28 +86,28 @@ export default function CraftPage() {
             return (
               <div
                 key={stage.number}
-                className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center rounded-[4px] shadow-2xl"
+                className="bg-white border border-[#E7D7C0] p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center rounded-[4px] shadow-xs"
               >
                 {/* Content Side */}
                 <div className={`lg:col-span-6 space-y-4 ${isEven ? 'lg:order-1' : 'lg:order-2'}`}>
                   <div className="flex items-center gap-3">
-                    <span className="font-serif text-3xl font-light text-[var(--color-temple-gold)]">
+                    <span className="font-serif text-3xl font-normal text-[#B68A3A]">
                       {stage.number}
                     </span>
-                    <span className="font-marcellus text-[10px] uppercase tracking-[0.25em] text-[var(--color-gold-light)]">
+                    <span className="font-marcellus text-[10px] uppercase tracking-[0.25em] text-[#5B1018] font-semibold">
                       {stage.subtitle}
                     </span>
                   </div>
 
-                  <h2 className="font-serif text-2xl sm:text-3xl text-[var(--color-ivory)] font-light">
+                  <h2 className="font-serif text-2xl sm:text-3xl text-[#5B1018] font-normal">
                     {stage.title}
                   </h2>
 
-                  <p className="font-jost text-sm text-[var(--color-sandal)]/90 leading-relaxed font-light">
+                  <p className="font-jost text-sm text-[#765E55] leading-relaxed">
                     {stage.description}
                   </p>
 
-                  <div className="pt-2 font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
+                  <div className="pt-2 font-marcellus text-[10px] uppercase tracking-[0.2em] text-[#B68A3A] font-semibold">
                     {stage.hours}
                   </div>
                 </div>
@@ -120,7 +120,7 @@ export default function CraftPage() {
                       alt={stage.title}
                       aspect="portrait"
                       sizes="450px"
-                      className="shadow-xl border border-[var(--color-temple-gold)]/30"
+                      className="shadow-sm border border-[#E7D7C0]"
                     />
                   </div>
                 </div>

@@ -24,6 +24,9 @@ export default function JournalArticlePage() {
       const item = all.find((a) => a.slug === slug) || all[0];
       setArticle(item);
       setRelated(all.filter((a) => a.id !== item?.id).slice(0, 3));
+      if (item?.title) {
+        document.title = `${item.title} | ADI PARVA`;
+      }
     }
     if (slug) loadArticle();
   }, [slug]);
@@ -31,7 +34,7 @@ export default function JournalArticlePage() {
   if (!article) return null;
 
   return (
-    <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans select-none">
       <Header />
 
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12 space-y-12">
@@ -39,7 +42,7 @@ export default function JournalArticlePage() {
         <div>
           <Link
             href="/journal"
-            className="inline-flex items-center gap-2 font-marcellus text-[11px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)] hover:text-[var(--color-gold-light)] transition-colors"
+            className="inline-flex items-center gap-2 font-marcellus text-[11px] uppercase tracking-[0.2em] text-[#B68A3A] hover:text-[#5B1018] transition-colors font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>RETURN TO PARVA CHRONICLE</span>
@@ -48,26 +51,26 @@ export default function JournalArticlePage() {
 
         {/* Article Header */}
         <div className="max-w-3xl mx-auto space-y-4 text-center">
-          <span className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[var(--color-temple-gold)]">
+          <span className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[#B68A3A] font-semibold">
             {article.category}
           </span>
-          <h1 className="font-serif font-light text-3xl sm:text-5xl text-[var(--color-ivory)] leading-tight">
+          <h1 className="font-serif font-normal text-3xl sm:text-5xl text-[#5B1018] leading-tight">
             {article.title}
           </h1>
 
-          <div className="flex items-center justify-center gap-6 font-jost text-xs text-[var(--color-sandal)]/70 pt-2">
+          <div className="flex items-center justify-center gap-6 font-jost text-xs text-[#765E55] pt-2">
             <span className="flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-[var(--color-temple-gold)]" />
+              <User className="w-3.5 h-3.5 text-[#B68A3A]" />
               <span>{article.author}</span>
             </span>
             <span>•</span>
             <span className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-[var(--color-temple-gold)]" />
+              <Calendar className="w-3.5 h-3.5 text-[#B68A3A]" />
               <span>{article.publishedAt}</span>
             </span>
             <span>•</span>
             <span className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-[var(--color-temple-gold)]" />
+              <Clock className="w-3.5 h-3.5 text-[#B68A3A]" />
               <span>{article.readTime}</span>
             </span>
           </div>
@@ -80,14 +83,14 @@ export default function JournalArticlePage() {
             alt={article.title}
             aspect="wide"
             sizes="(max-width: 1024px) 100vw, 900px"
-            className="shadow-2xl"
+            className="shadow-sm border border-[#E7D7C0]"
           />
         </div>
 
         {/* Article Content */}
-        <article className="max-w-2xl mx-auto space-y-6 font-jost text-base sm:text-lg text-[var(--color-sandal)]/90 leading-relaxed font-light">
+        <article className="max-w-2xl mx-auto space-y-6 font-jost text-base sm:text-lg text-[#765E55] leading-relaxed">
           {article.content.map((paragraph, index) => (
-            <p key={index} className="first-letter:text-4xl first-letter:font-serif first-letter:text-[var(--color-temple-gold)] first-letter:mr-2 first-letter:float-left">
+            <p key={index} className="first-letter:text-4xl first-letter:font-serif first-letter:text-[#5B1018] first-letter:mr-2 first-letter:float-left">
               {paragraph}
             </p>
           ))}
@@ -98,7 +101,7 @@ export default function JournalArticlePage() {
         {/* Related Articles */}
         {related.length > 0 && (
           <div className="max-w-4xl mx-auto space-y-6 pt-6">
-            <h3 className="font-marcellus text-[12px] uppercase tracking-[0.3em] text-[var(--color-temple-gold)] text-center">
+            <h3 className="font-marcellus text-[12px] uppercase tracking-[0.3em] text-[#B68A3A] text-center font-semibold">
               FURTHER READINGS FROM THE ARCHIVE
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -106,12 +109,12 @@ export default function JournalArticlePage() {
                 <Link
                   key={rel.id}
                   href={`/journal/${rel.slug}`}
-                  className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 p-5 rounded-[4px] space-y-3 hover:border-[var(--color-temple-gold)]/60 transition-all group"
+                  className="bg-white border border-[#E7D7C0] p-5 rounded-[4px] space-y-3 hover:border-[#B68A3A] transition-all group shadow-xs"
                 >
-                  <h4 className="font-serif text-base text-[var(--color-ivory)] font-light group-hover:text-[var(--color-gold-light)] line-clamp-2">
+                  <h4 className="font-serif text-base text-[#5B1018] font-normal group-hover:text-[#B68A3A] line-clamp-2">
                     {rel.title}
                   </h4>
-                  <div className="font-marcellus text-[9px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
+                  <div className="font-marcellus text-[9px] uppercase tracking-[0.2em] text-[#B68A3A] font-semibold">
                     {rel.category}
                   </div>
                 </Link>

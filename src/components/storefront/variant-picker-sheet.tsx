@@ -33,7 +33,9 @@ export function VariantPickerSheet({ product, isOpen, onClose }: VariantPickerSh
   const handleProceedToBuyNow = () => {
     if (!selectedVariant || isSoldOut) return;
     onClose();
-    router.push(`/checkout?buyNow=${product.id}&variant=${selectedVariant.id}&qty=1`);
+    router.push(
+      `/checkout?buyNow=${product.id}&slug=${product.slug}&variant=${selectedVariant.id}&qty=1&from=${encodeURIComponent(`/piece/${product.slug}`)}`
+    );
   };
 
   return (

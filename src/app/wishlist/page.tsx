@@ -42,34 +42,34 @@ export default function WishlistPage() {
   }, [wishlistProductIds]);
 
   return (
-    <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans select-none">
       <Header />
 
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12 space-y-12">
         {/* Breadcrumb */}
-        <div className="font-marcellus text-[11px] uppercase tracking-[0.2em] text-[var(--color-sandal)]/60 flex items-center gap-2">
-          <Link href="/" className="hover:text-[var(--color-gold-light)] transition-colors">Home</Link>
-          <span className="text-[var(--color-temple-gold)]/40">/</span>
-          <span className="text-[var(--color-temple-gold)]">Saved Heirlooms</span>
+        <div className="font-marcellus text-[11px] uppercase tracking-[0.2em] text-[#765E55]/80 flex items-center gap-2">
+          <Link href="/" className="hover:text-[#B68A3A] transition-colors">Home</Link>
+          <span className="text-[#B68A3A]/40">/</span>
+          <span className="text-[#5B1018] font-medium">Saved Heirlooms</span>
         </div>
 
         {/* Page Head */}
-        <div className="space-y-3 border-b border-[var(--color-temple-gold)]/20 pb-8">
-          <span className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[var(--color-temple-gold)]">
+        <div className="space-y-3 border-b border-[#E7D7C0] pb-8">
+          <span className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[#B68A3A] font-semibold">
             SAVED REPOSITORY
           </span>
-          <h1 className="font-serif text-[36px] sm:text-[48px] font-light text-[var(--color-ivory)]">
-            Saved <em className="italic text-gold-gradient font-normal">Heirlooms</em> ({products.length})
+          <h1 className="font-serif text-[36px] sm:text-[48px] font-normal text-[#5B1018]">
+            Saved <em className="italic font-normal text-[#B68A3A]">Heirlooms</em> ({products.length})
           </h1>
         </div>
 
         {removedAlert && (
-          <div className="p-4 bg-[var(--color-warn-bg)] text-[var(--color-warn-fg)] border border-[var(--color-warn-fg)]/30 rounded flex items-center justify-between font-sans text-xs">
+          <div className="p-4 bg-[#FDF7EF] text-[#B68A3A] border border-[#E7D7C0] rounded flex items-center justify-between font-sans text-xs">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-[var(--color-warn-fg)]" />
-              <span>This item is no longer available and has been removed from your saved heirlooms.</span>
+              <AlertTriangle className="w-4 h-4 shrink-0 text-[#B68A3A]" />
+              <span className="text-[#5B1018]">This item is no longer available and has been removed from your saved heirlooms.</span>
             </div>
-            <button onClick={() => setRemovedAlert(false)} className="underline ml-4 cursor-pointer font-semibold">
+            <button onClick={() => setRemovedAlert(false)} className="underline ml-4 cursor-pointer font-semibold text-[#5B1018]">
               Dismiss
             </button>
           </div>
@@ -78,17 +78,17 @@ export default function WishlistPage() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[3/4] bg-[var(--color-sanctum)] rounded-[4px] animate-pulse border border-[var(--color-temple-gold)]/10" />
+              <div key={i} className="aspect-[3/4] bg-[#F2E7D7]/50 rounded-[4px] animate-pulse border border-[#E7D7C0]" />
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center py-20 bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 p-8 rounded-[4px] space-y-4">
+          <div className="text-center py-20 bg-white border border-[#E7D7C0] p-8 rounded-[4px] space-y-4 shadow-sm">
             <KolamDivider />
-            <h2 className="font-serif text-2xl text-[var(--color-ivory)]">Your wishlist repository is empty</h2>
-            <p className="font-jost text-sm text-[var(--color-sandal)]/70">Click the heart icon on any piece to save it to your personal repository.</p>
+            <h2 className="font-serif text-2xl text-[#5B1018]">Your wishlist repository is empty</h2>
+            <p className="font-jost text-sm text-[#765E55]">Click the heart icon on any piece to save it to your personal repository.</p>
             <Link
               href="/collections"
-              className="h-10 px-6 border border-[var(--color-temple-gold)] text-[var(--color-temple-gold)] font-marcellus text-[11px] uppercase tracking-[0.2em] inline-flex items-center justify-center rounded-[2px]"
+              className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-marcellus text-[11px] uppercase tracking-[0.2em] inline-flex items-center justify-center rounded-[2px] transition-colors"
             >
               EXPLORE THE COLLECTION
             </Link>

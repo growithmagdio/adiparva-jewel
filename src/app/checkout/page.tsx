@@ -12,6 +12,7 @@ import {
   CheckoutSummaryResult,
 } from '@/app/actions/server-order';
 import { CHECKOUT_CONFIG } from '@/lib/config/checkout-config';
+import { getStoreData } from '@/lib/data/store';
 import { auth, db } from '@/lib/firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
@@ -40,7 +41,7 @@ export interface SavedAddress {
   isDefault?: boolean;
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -48,12 +49,71 @@ export default function CheckoutPage() {
   const buyNowProductId = searchParams.get('buyNow');
   const buyNowVariantId = searchParams.get('variant');
   const buyNowQtyParam = searchParams.get('qty');
+  const buyNowSlug = searchParams.get('slug');
+  const fromParam = searchParams.get('from');
 
   const isBuyNow = Boolean(buyNowProductId);
 
   // Cart store for standard checkout
   const cartItems = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
+
+  // Resolve target product for accurate navigation back to the piece
+  const targetProduct = React.useMemo(() => {
+    if (!isBuyNow) return null;
+    const store = getStoreData();
+    if (buyNowSlug) {
+      const found = store.products.find((p) => p.slug === buyNowSlug);
+      if (found) return found;
+    }
+    if (buyNowProductId) {
+      const found = store.products.find(
+        (p) => p.id === buyNowProductId || p.slug === buyNowProductId
+      );
+      if (found) return found;
+    }
+    return null;
+  }, [isBuyNow, buyNowProductId, buyNowSlug]);
+
+  // Determine fallback URL for return navigation
+  const returnHref = React.useMemo(() => {
+    if (isBuyNow) {
+      if (fromParam && fromParam.startsWith('/piece/')) {
+        return fromParam;
+      }
+      if (targetProduct?.slug) {
+        return `/piece/${targetProduct.slug}`;
+      }
+      if (buyNowSlug) {
+        return `/piece/${buyNowSlug}`;
+      }
+      if (buyNowProductId && !buyNowProductId.startsWith('prod-')) {
+        return `/piece/${buyNowProductId}`;
+      }
+      return '/collections';
+    }
+    return '/cart';
+  }, [isBuyNow, fromParam, targetProduct, buyNowSlug, buyNowProductId]);
+
+  const handleReturn = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Check if the customer arrived from within the site and from a product page
+    if (
+      typeof window !== 'undefined' &&
+      window.history.length > 1 &&
+      document.referrer &&
+      document.referrer.includes(window.location.host) &&
+      document.referrer.includes('/piece/')
+    ) {
+      router.back();
+      return;
+    }
+
+    // Direct navigation fallback (e.g. page refresh, direct link, or arrived via collection)
+    router.push(returnHref);
+  };
 
   // Active accordion step (1: Auth, 2: Address, 3: Summary, 4: Payment)
   const [activeStep, setActiveStep] = React.useState<number>(1);
@@ -461,15 +521,15 @@ export default function CheckoutPage() {
   // Invalid item error state
   if (!loadingSummary && summary && !summary.valid) {
     return (
-      <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] flex flex-col justify-center items-center p-6 text-center space-y-4 font-sans select-none">
+      <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col justify-center items-center p-6 text-center space-y-4 font-sans select-none">
         <KolamDivider />
-        <h2 className="font-serif text-3xl text-[var(--color-ivory)]">This item is not available</h2>
-        <p className="font-jost text-sm text-[var(--color-sandal)]/70 max-w-md">
-          {summary.message || 'The selected item or variant is no longer available in the active vault.'}
+        <h2 className="font-serif text-3xl text-[#5B1018]">This item is not available</h2>
+        <p className="text-sm text-[#765E55] max-w-md">
+          {summary.message || 'The selected piece or option is no longer available.'}
         </p>
         <Link
           href="/collections"
-          className="h-10 px-6 border border-[var(--color-temple-gold)] text-[var(--color-temple-gold)] font-marcellus text-xs uppercase tracking-[0.2em] inline-flex items-center justify-center rounded-[2px]"
+          className="h-11 px-7 bg-[#5B1018] text-[#FAF5EC] font-sans text-xs uppercase tracking-[0.2em] font-semibold inline-flex items-center justify-center rounded-[2px] hover:bg-[#3B090D] transition-colors"
         >
           RETURN TO COLLECTION
         </Link>
@@ -480,25 +540,27 @@ export default function CheckoutPage() {
   const activeAddr = savedAddresses.find((a) => a.id === selectedAddrId);
 
   return (
-    <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] select-none font-sans pb-28 lg:pb-12">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] select-none font-sans pb-28 lg:pb-12 selection:bg-[#5B1018] selection:text-[#FAF5EC]">
       {/* Top Header */}
-      <header className="border-b border-[var(--color-temple-gold)]/20 py-5 px-6 sm:px-8 bg-[var(--color-sanctum)] sticky top-0 z-30 shadow-md">
+      <header className="border-b border-[#E7D7C0] py-4 px-6 sm:px-8 bg-[#FAF5EC]/95 backdrop-blur-md sticky top-0 z-30 shadow-xs">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
-          <Link
-            href={isBuyNow ? `/piece/${summary?.items[0]?.productId ? summary.items[0].productId : ''}` : '/cart'}
-            className="flex items-center gap-2 font-marcellus text-xs uppercase tracking-[0.2em] text-[var(--color-temple-gold)] hover:text-[var(--color-gold-light)] transition-colors"
+          <button
+            type="button"
+            onClick={handleReturn}
+            className="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#B68A3A] hover:text-[#5B1018] transition-colors cursor-pointer"
+            aria-label={isBuyNow ? 'Return to piece' : 'Return to cart'}
           >
             <ArrowLeft className="w-4 h-4" />
             <span>{isBuyNow ? 'RETURN TO PIECE' : 'RETURN TO CART'}</span>
-          </Link>
+          </button>
 
-          <Link href="/" className="font-marcellus text-xl tracking-[0.18em] text-[var(--color-ivory)]">
+          <Link href="/" className="font-serif text-xl tracking-[0.15em] font-normal text-[#5B1018]">
             ADI PARVA
           </Link>
 
-          <div className="flex items-center gap-2 font-marcellus text-xs uppercase tracking-[0.18em] text-[var(--color-temple-gold)]">
-            <Lock className="w-3.5 h-3.5 text-[var(--color-temple-gold)]" />
-            <span className="hidden sm:inline">CHECKOUT</span>
+          <div className="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#B68A3A]">
+            <Lock className="w-3.5 h-3.5 text-[#B68A3A]" />
+            <span className="hidden sm:inline">SECURE CHECKOUT</span>
           </div>
         </div>
       </header>
@@ -512,20 +574,20 @@ export default function CheckoutPage() {
             {/* ==================================================== */}
             {/* STEP 1: AUTH / CONTACT DETAILS                       */}
             {/* ==================================================== */}
-            <div className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-4 shadow-lg transition-all">
-              <div className="flex items-center justify-between border-b border-[var(--color-temple-gold)]/20 pb-3">
+            <div className="bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-4 shadow-sm transition-all">
+              <div className="flex items-center justify-between border-b border-[#E7D7C0] pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-xs font-bold flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
                     1
                   </span>
-                  <h3 className="font-marcellus text-xs uppercase tracking-[0.25em] text-[var(--color-temple-gold)]">
+                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#5B1018]">
                     CONTACT DETAILS
                   </h3>
                 </div>
                 {(currentUser || guestModeConfirmed) && activeStep > 1 && (
                   <button
                     onClick={() => setActiveStep(1)}
-                    className="text-xs font-marcellus text-[var(--color-gold-light)] flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-[#B68A3A] flex items-center gap-1 hover:underline cursor-pointer"
                   >
                     <Edit2 className="w-3 h-3" />
                     <span>Change</span>
@@ -534,23 +596,23 @@ export default function CheckoutPage() {
               </div>
 
               {isAuthLoading ? (
-                <div className="h-12 bg-[var(--color-vault-black)] animate-pulse rounded-[2px]" />
+                <div className="h-12 bg-[#F2E7D7] animate-pulse rounded-[2px]" />
               ) : currentUser || guestModeConfirmed ? (
-                <div className="flex items-center justify-between bg-[var(--color-vault-black)] p-4 rounded-[2px] border border-[var(--color-temple-gold)]/30 font-jost text-sm">
+                <div className="flex items-center justify-between bg-[#F2E7D7]/40 p-4 rounded-[4px] border border-[#E7D7C0] text-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[var(--color-gold-700)] text-[var(--color-cream-50)] font-marcellus text-xs flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs flex items-center justify-center font-bold">
                       {(currentUser?.displayName || authName || 'P').charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <div className="font-medium text-[var(--color-ivory)]">
-                        {currentUser?.displayName || authName || 'Patron'} {currentUser?.phoneNumber || authPhone ? `(${currentUser?.phoneNumber || authPhone})` : ''}
+                      <div className="font-semibold text-[#5B1018]">
+                        {currentUser?.displayName || authName || 'Customer'} {currentUser?.phoneNumber || authPhone ? `(${currentUser?.phoneNumber || authPhone})` : ''}
                       </div>
-                      <div className="text-xs text-[var(--color-sandal)]/70">
-                        {currentUser?.email || authEmail || 'Contact provided'}
+                      <div className="text-xs text-[#765E55]">
+                        {currentUser?.email || authEmail || 'Contact details provided'}
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs font-marcellus text-emerald-400 flex items-center gap-1 border border-emerald-500/30 px-2.5 py-1 rounded-[2px]">
+                  <span className="text-xs font-semibold text-emerald-800 flex items-center gap-1 bg-emerald-50 border border-emerald-500/30 px-2.5 py-1 rounded">
                     <Check className="w-3 h-3" /> VERIFIED
                   </span>
                 </div>
@@ -559,38 +621,38 @@ export default function CheckoutPage() {
                   {!otpSent ? (
                     <form onSubmit={handleSendOtp} className="space-y-4">
                       <div className="space-y-1.5">
-                        <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
+                        <label className="text-[10px] uppercase tracking-[0.18em] text-[#B68A3A] font-semibold">
                           MOBILE PHONE NUMBER
                         </label>
                         <div className="relative">
-                          <Phone className="w-4 h-4 text-[var(--color-temple-gold)] absolute left-3.5 top-3" />
+                          <Phone className="w-4 h-4 text-[#B68A3A] absolute left-3.5 top-3" />
                           <input
                             type="tel"
                             value={authPhone}
                             onChange={(e) => setAuthPhone(e.target.value)}
                             placeholder="Enter 10-digit mobile number"
-                            className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] pl-10 pr-3.5 py-2.5 text-[var(--color-ivory)] text-sm outline-none focus:border-[var(--color-temple-gold)] transition-all"
+                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] pl-10 pr-3.5 py-2.5 text-[#5B1018] font-medium text-sm outline-none focus:border-[#B68A3A] transition-all"
                           />
                         </div>
                       </div>
 
-                      {authError && <p className="text-xs text-[#B3261E]">{authError}</p>}
+                      {authError && <p className="text-xs text-[#B3261E] font-medium">{authError}</p>}
 
                       <button
                         type="submit"
-                        className="h-10 px-6 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-xs uppercase tracking-[0.2em] font-semibold rounded-[2px] cursor-pointer hover:bg-[var(--color-gold-light)] transition-colors"
+                        className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] cursor-pointer transition-colors shadow-xs"
                       >
                         SEND OTP CODE
                       </button>
                     </form>
                   ) : (
                     <form onSubmit={handleVerifyOtp} className="space-y-4">
-                      <div className="p-3 bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/30 rounded-[2px] text-xs text-[var(--color-sandal)]">
-                        Verification code sent to <strong className="text-[var(--color-ivory)]">{authPhone}</strong>.
+                      <div className="p-3 bg-[#F2E7D7]/50 border border-[#E7D7C0] rounded-[2px] text-xs text-[#765E55]">
+                        Verification code sent to <strong className="text-[#5B1018]">{authPhone}</strong>.
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
+                        <label className="text-[10px] uppercase tracking-[0.18em] text-[#B68A3A] font-semibold">
                           ENTER 6-DIGIT OTP
                         </label>
                         <input
@@ -599,23 +661,23 @@ export default function CheckoutPage() {
                           value={otpCode}
                           onChange={(e) => setOtpCode(e.target.value)}
                           placeholder="123456"
-                          className="w-28 tracking-[0.4em] text-center font-mono text-base bg-transparent border border-[#3A2A22] rounded-[2px] py-2 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                          className="w-32 tracking-[0.4em] text-center font-mono text-base bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] py-2 text-[#5B1018] font-bold outline-none focus:border-[#B68A3A]"
                         />
                       </div>
 
-                      {authError && <p className="text-xs text-[#B3261E]">{authError}</p>}
+                      {authError && <p className="text-xs text-[#B3261E] font-medium">{authError}</p>}
 
                       <div className="flex gap-3">
                         <button
                           type="submit"
-                          className="h-10 px-6 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-xs uppercase tracking-[0.2em] font-semibold rounded-[2px] cursor-pointer"
+                          className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] cursor-pointer shadow-xs transition-colors"
                         >
                           VERIFY & CONTINUE
                         </button>
                         <button
                           type="button"
                           onClick={() => setOtpSent(false)}
-                          className="h-10 px-4 border border-[var(--color-temple-gold)]/40 text-[var(--color-sandal)] font-marcellus text-xs uppercase tracking-wider rounded-[2px]"
+                          className="h-10 px-4 border border-[#B68A3A] text-[#5B1018] bg-[#FFFFFF] hover:bg-[#F2E7D7] font-sans text-xs uppercase tracking-wider rounded-[2px] cursor-pointer"
                         >
                           BACK
                         </button>
@@ -624,9 +686,9 @@ export default function CheckoutPage() {
                   )}
 
                   {/* Or Guest Mode */}
-                  <div className="border-t border-[var(--color-temple-gold)]/10 pt-4 space-y-3">
-                    <span className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-sandal)]/60">
-                      OR CONTINUE WITH DETAILS
+                  <div className="border-t border-[#E7D7C0] pt-4 space-y-3">
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-[#B68A3A] font-semibold">
+                      OR CONTINUE AS GUEST
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <input
@@ -634,20 +696,20 @@ export default function CheckoutPage() {
                         value={authName}
                         onChange={(e) => setAuthName(e.target.value)}
                         placeholder="Full Name"
-                        className="bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-sm text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                        className="bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-sm text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                       />
                       <input
                         type="email"
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
                         placeholder="Email Address"
-                        className="bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-sm text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                        className="bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-sm text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={handleContinueAsGuest}
-                      className="h-9 px-6 border border-[var(--color-temple-gold)] text-[var(--color-temple-gold)] hover:bg-[var(--color-sanctum)] hover:text-[var(--color-gold-light)] font-marcellus text-[10px] uppercase tracking-[0.2em] rounded-[2px] transition-colors cursor-pointer"
+                      className="h-9 px-6 bg-[#FAF5EC] border border-[#B68A3A] text-[#5B1018] hover:bg-[#5B1018] hover:text-[#FAF5EC] font-sans text-[11px] uppercase tracking-[0.18em] font-semibold rounded-[2px] transition-colors cursor-pointer"
                     >
                       CONTINUE TO ADDRESS
                     </button>
@@ -659,13 +721,13 @@ export default function CheckoutPage() {
             {/* ==================================================== */}
             {/* STEP 2: DELIVERY ADDRESS                              */}
             {/* ==================================================== */}
-            <div className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-4 shadow-lg transition-all">
-              <div className="flex items-center justify-between border-b border-[var(--color-temple-gold)]/20 pb-3">
+            <div className="bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-4 shadow-sm transition-all">
+              <div className="flex items-center justify-between border-b border-[#E7D7C0] pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-xs font-bold flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
                     2
                   </span>
-                  <h3 className="font-marcellus text-xs uppercase tracking-[0.25em] text-[var(--color-temple-gold)]">
+                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#5B1018]">
                     DELIVERY ADDRESS
                   </h3>
                 </div>
@@ -786,13 +848,13 @@ export default function CheckoutPage() {
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             placeholder="Recipient full name"
-                            className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                           />
                           {addressErrors.fullName && <p className="text-xs text-[#B3261E]">{addressErrors.fullName}</p>}
                         </div>
 
                         <div className="space-y-1">
-                          <label className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-temple-gold)]">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
                             MOBILE PHONE
                           </label>
                           <input
@@ -801,13 +863,13 @@ export default function CheckoutPage() {
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="10-digit mobile number"
-                            className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                           />
                           {addressErrors.phone && <p className="text-xs text-[#B3261E]">{addressErrors.phone}</p>}
                         </div>
 
                         <div className="sm:col-span-2 space-y-1">
-                          <label className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-temple-gold)]">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
                             STREET ADDRESS & HOUSE NO.
                           </label>
                           <input
@@ -815,13 +877,13 @@ export default function CheckoutPage() {
                             value={addressLine}
                             onChange={(e) => setAddressLine(e.target.value)}
                             placeholder="Flat / House No. / Building / Street"
-                            className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                           />
                           {addressErrors.addressLine && <p className="text-xs text-[#B3261E]">{addressErrors.addressLine}</p>}
                         </div>
 
                         <div className="space-y-1">
-                          <label className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-temple-gold)]">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
                             AREA / LOCALITY (OPTIONAL)
                           </label>
                           <input
@@ -829,12 +891,12 @@ export default function CheckoutPage() {
                             value={area}
                             onChange={(e) => setArea(e.target.value)}
                             placeholder="Area or Locality"
-                            className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                           />
                         </div>
 
                         <div className="space-y-1">
-                          <label className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-temple-gold)]">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
                             PINCODE
                           </label>
                           <input
@@ -843,13 +905,13 @@ export default function CheckoutPage() {
                             value={pincode}
                             onChange={handlePincodeChange}
                             placeholder="6-digit Pincode"
-                            className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                           />
                           {addressErrors.pincode && <p className="text-xs text-[#B3261E]">{addressErrors.pincode}</p>}
                         </div>
 
                         <div className="space-y-1">
-                          <label className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-temple-gold)]">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
                             CITY
                           </label>
                           <input
@@ -857,13 +919,13 @@ export default function CheckoutPage() {
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
                             placeholder="City"
-                            className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                           />
                           {addressErrors.city && <p className="text-xs text-[#B3261E]">{addressErrors.city}</p>}
                         </div>
 
                         <div className="space-y-1">
-                          <label className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-temple-gold)]">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
                             STATE
                           </label>
                           <input
@@ -871,7 +933,7 @@ export default function CheckoutPage() {
                             value={stateName}
                             onChange={(e) => setStateName(e.target.value)}
                             placeholder="State"
-                            className="w-full bg-transparent border border-[#3A2A22] rounded-[2px] px-3 py-2 text-[var(--color-ivory)] outline-none focus:border-[var(--color-temple-gold)]"
+                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
                           />
                           {addressErrors.stateName && <p className="text-xs text-[#B3261E]">{addressErrors.stateName}</p>}
                         </div>
@@ -880,7 +942,7 @@ export default function CheckoutPage() {
                       <button
                         type="button"
                         onClick={handleConfirmAddress}
-                        className="h-10 px-8 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-xs uppercase tracking-[0.2em] font-semibold rounded-[2px] cursor-pointer hover:bg-[var(--color-gold-light)] transition-colors"
+                        className="h-10 px-8 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.18em] font-semibold rounded-[2px] cursor-pointer shadow-xs transition-colors"
                       >
                         DELIVER HERE
                       </button>
@@ -893,20 +955,20 @@ export default function CheckoutPage() {
             {/* ==================================================== */}
             {/* STEP 3: ORDER SUMMARY & ITEM CONFIRMATION             */}
             {/* ==================================================== */}
-            <div className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-4 shadow-lg transition-all">
-              <div className="flex items-center justify-between border-b border-[var(--color-temple-gold)]/20 pb-3">
+            <div className="bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-4 shadow-sm transition-all">
+              <div className="flex items-center justify-between border-b border-[#E7D7C0] pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-xs font-bold flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
                     3
                   </span>
-                  <h3 className="font-marcellus text-xs uppercase tracking-[0.25em] text-[var(--color-temple-gold)]">
+                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#5B1018]">
                     ORDER SUMMARY ({summary?.items.length || 0} ITEMS)
                   </h3>
                 </div>
                 {activeStep > 3 && (
                   <button
                     onClick={() => setActiveStep(3)}
-                    className="text-xs font-marcellus text-[var(--color-gold-light)] flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-[#B68A3A] flex items-center gap-1 hover:underline cursor-pointer"
                   >
                     <Edit2 className="w-3 h-3" />
                     <span>Change</span>
@@ -915,13 +977,13 @@ export default function CheckoutPage() {
               </div>
 
               {activeStep > 3 ? (
-                <div className="bg-[var(--color-vault-black)] p-4 rounded-[2px] border border-[var(--color-temple-gold)]/30 font-jost text-xs space-y-2">
+                <div className="bg-[#F2E7D7]/40 p-4 rounded-[4px] border border-[#E7D7C0] text-xs space-y-2">
                   {summary?.items.map((it) => (
                     <div key={`${it.productId}-${it.variantId}`} className="flex justify-between items-center">
-                      <span className="text-[var(--color-ivory)] font-serif text-sm">
+                      <span className="text-[#5B1018] font-medium text-sm">
                         {it.name} ({it.variantLabel}) x {it.qty}
                       </span>
-                      <span className="text-[var(--color-gold-light)] font-serif text-sm">
+                      <span className="text-[#5B1018] font-semibold text-sm">
                         ₹{it.lineTotal.toLocaleString('en-IN')}
                       </span>
                     </div>
@@ -929,50 +991,50 @@ export default function CheckoutPage() {
                 </div>
               ) : activeStep === 3 ? (
                 <div className="space-y-6 pt-2">
-                  <div className="space-y-4 divide-y divide-[var(--color-temple-gold)]/10">
+                  <div className="space-y-4 divide-y divide-[#E7D7C0]">
                     {summary?.items.map((item) => (
                       <div
                         key={`${item.productId}-${item.variantId}`}
                         className="pt-4 first:pt-0 flex gap-4 items-center justify-between"
                       >
                         <div className="flex gap-4 items-center">
-                          <div className="relative w-16 aspect-[3/4] bg-[var(--color-vault-black)] rounded-[2px] overflow-hidden border border-[var(--color-temple-gold)]/30 shrink-0">
+                          <div className="relative w-16 aspect-[3/4] bg-[#3B090D] rounded-[3px] overflow-hidden border border-[#B68A3A]/40 shrink-0">
                             <Image src={item.image} alt={item.name} fill className="object-cover" />
                           </div>
                           <div className="space-y-1">
-                            <div className="font-marcellus text-[9px] uppercase tracking-wider text-[var(--color-temple-gold)] font-medium">
+                            <div className="text-[10px] uppercase tracking-wider text-[#B68A3A] font-semibold">
                               CODE: {item.code}
                             </div>
-                            <h4 className="font-serif text-base text-[var(--color-ivory)] font-light leading-snug">
+                            <h4 className="font-serif text-base text-[#5B1018] font-normal leading-snug">
                               {item.name}
                             </h4>
-                            <div className="text-xs font-jost text-[var(--color-sandal)]/80">
+                            <div className="text-xs text-[#765E55]">
                               Option: {item.variantLabel}
                             </div>
-                            <div className="text-xs font-serif text-[var(--color-ivory)]">
-                              Unit Price: ₹{item.unitPrice.toLocaleString('en-IN')}
+                            <div className="text-xs font-semibold text-[#5B1018]">
+                              Unit: ₹{item.unitPrice.toLocaleString('en-IN')}
                             </div>
                           </div>
                         </div>
 
                         {/* Quantity Stepper & Line Total */}
                         <div className="text-right space-y-2 shrink-0">
-                          <div className="font-serif text-base text-[var(--color-ivory)] font-medium">
+                          <div className="font-sans text-base text-[#5B1018] font-semibold">
                             ₹{item.lineTotal.toLocaleString('en-IN')}
                           </div>
 
-                          <div className="inline-flex items-center border border-[var(--color-temple-gold)]/40 rounded-[2px] h-8 bg-[var(--color-vault-black)]">
+                          <div className="inline-flex items-center border border-[#B68A3A] rounded-[2px] h-8 bg-[#FFFFFF]">
                             <button
                               type="button"
                               onClick={() =>
                                 handleUpdateItemQty(item.productId, item.variantId, item.qty, item.maxStock, -1)
                               }
                               disabled={item.qty <= 1}
-                              className="w-7 h-full flex items-center justify-center text-xs text-[var(--color-ivory)] hover:bg-[var(--color-sanctum)] disabled:opacity-30 cursor-pointer"
+                              className="w-7 h-full flex items-center justify-center text-xs text-[#5B1018] hover:bg-[#F2E7D7] disabled:opacity-30 cursor-pointer font-bold"
                             >
                               -
                             </button>
-                            <span className="w-8 text-center font-jost text-xs text-[var(--color-ivory)]">
+                            <span className="w-8 text-center text-xs font-semibold text-[#5B1018]">
                               {item.qty}
                             </span>
                             <button
@@ -981,7 +1043,7 @@ export default function CheckoutPage() {
                                 handleUpdateItemQty(item.productId, item.variantId, item.qty, item.maxStock, 1)
                               }
                               disabled={item.qty >= item.maxStock}
-                              className="w-7 h-full flex items-center justify-center text-xs text-[var(--color-ivory)] hover:bg-[var(--color-sanctum)] disabled:opacity-30 cursor-pointer"
+                              className="w-7 h-full flex items-center justify-center text-xs text-[#5B1018] hover:bg-[#F2E7D7] disabled:opacity-30 cursor-pointer font-bold"
                             >
                               +
                             </button>
@@ -994,7 +1056,7 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setActiveStep(4)}
-                    className="h-10 px-8 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-xs uppercase tracking-[0.2em] font-semibold rounded-[2px] cursor-pointer hover:bg-[var(--color-gold-light)] transition-colors"
+                    className="h-10 px-8 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.18em] font-semibold rounded-[2px] cursor-pointer shadow-xs transition-colors"
                   >
                     CONTINUE TO PAYMENT
                   </button>
@@ -1005,21 +1067,21 @@ export default function CheckoutPage() {
             {/* ==================================================== */}
             {/* STEP 4: PAYMENT INSTRUMENT                            */}
             {/* ==================================================== */}
-            <div className="bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-5 shadow-lg">
-              <div className="flex items-center gap-3 border-b border-[var(--color-temple-gold)]/20 pb-3">
-                <span className="w-6 h-6 rounded-full bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-xs font-bold flex items-center justify-center">
+            <div className="bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-5 shadow-sm">
+              <div className="flex items-center gap-3 border-b border-[#E7D7C0] pb-3">
+                <span className="w-6 h-6 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
                   4
                 </span>
-                <h3 className="font-marcellus text-xs uppercase tracking-[0.25em] text-[var(--color-temple-gold)]">
-                  PAYMENT INSTRUMENT
+                <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#5B1018]">
+                  PAYMENT METHOD
                 </h3>
               </div>
 
               {activeStep === 4 && (
-                <form onSubmit={handlePlaceOrder} className="space-y-6 pt-2 font-jost text-sm">
+                <form onSubmit={handlePlaceOrder} className="space-y-6 pt-2 text-sm">
                   {/* Payment Failure Retry State Alert */}
                   {paymentError && (
-                    <div className="p-4 bg-[#B3261E]/15 border border-[#B3261E]/40 rounded-[2px] text-[#FBE9E7] text-xs space-y-2 animate-in fade-in">
+                    <div className="p-4 bg-[#FBE9E7] border border-[#B3261E]/40 rounded-[2px] text-[#B3261E] text-xs space-y-2 animate-in fade-in">
                       <div className="flex items-center gap-2 font-semibold">
                         <AlertCircle className="w-4 h-4 text-[#B3261E] shrink-0" />
                         <span>{isSoldOutError ? 'Item Sold Out' : 'Payment Failed'}</span>
@@ -1061,36 +1123,36 @@ export default function CheckoutPage() {
                         <div
                           key={pm.id}
                           onClick={() => !pm.disabled && setPaymentMethod(pm.id as any)}
-                          className={`p-4 rounded-[2px] border transition-all ${
+                          className={`p-4 rounded-[3px] border transition-all ${
                             pm.disabled
-                              ? 'border-[#2C1810] opacity-40 cursor-not-allowed bg-[var(--color-vault-black)]'
+                              ? 'border-[#E7D7C0] opacity-40 cursor-not-allowed bg-[#F2E7D7]'
                               : isSel
-                              ? 'border-[var(--color-gold-light)] bg-[var(--color-gold-700)]/30 text-[var(--color-ivory)] cursor-pointer shadow-md'
-                              : 'border-[#3A2A22] bg-[var(--color-vault-black)] text-[var(--color-sandal)]/80 hover:border-[var(--color-temple-gold)]/50 cursor-pointer'
+                              ? 'border-[#5B1018] bg-[#F2E7D7]/50 text-[#5B1018] ring-1 ring-[#5B1018] cursor-pointer shadow-xs'
+                              : 'border-[#E7D7C0] bg-[#FFFFFF] text-[#765E55] hover:border-[#B68A3A] cursor-pointer'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div
                                 className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                  isSel ? 'border-[var(--color-gold-light)] bg-[var(--color-gold-light)]' : 'border-[#3A2A22]'
+                                  isSel ? 'border-[#5B1018] bg-[#5B1018]' : 'border-[#E7D7C0]'
                                 }`}
                               >
-                                {isSel && <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-vault-black)]" />}
+                                {isSel && <div className="w-1.5 h-1.5 rounded-full bg-[#FAF5EC]" />}
                               </div>
                               <div>
-                                <div className="font-marcellus text-xs uppercase tracking-wider text-[var(--color-ivory)] font-medium">
+                                <div className="text-xs uppercase tracking-wider text-[#5B1018] font-bold">
                                   {pm.label}
                                 </div>
-                                <div className="text-xs text-[var(--color-sandal)]/70">{pm.desc}</div>
+                                <div className="text-xs text-[#765E55]">{pm.desc}</div>
                               </div>
                             </div>
                           </div>
 
                           {/* Extra VPA ID input for UPI */}
                           {isSel && pm.id === 'UPI' && (
-                            <div className="mt-3 pt-3 border-t border-[var(--color-temple-gold)]/20 space-y-1">
-                              <label className="font-marcellus text-[9px] uppercase tracking-wider text-[var(--color-gold-light)]">
+                            <div className="mt-3 pt-3 border-t border-[#E7D7C0] space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider text-[#B68A3A] font-semibold">
                                 ENTER UPI ID (OPTIONAL)
                               </label>
                               <input
@@ -1098,7 +1160,7 @@ export default function CheckoutPage() {
                                 value={upiId}
                                 onChange={(e) => setUpiId(e.target.value)}
                                 placeholder="name@upi or mobile@paytm"
-                                className="w-full bg-[var(--color-vault-black)] border border-[var(--color-temple-gold)]/40 rounded-[2px] px-3 py-1.5 text-xs text-[var(--color-ivory)] outline-none focus:border-[var(--color-gold-light)]"
+                                className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3 py-1.5 text-xs text-[#5B1018] outline-none focus:border-[#B68A3A]"
                               />
                             </div>
                           )}
@@ -1111,12 +1173,12 @@ export default function CheckoutPage() {
                   <button
                     type="submit"
                     disabled={isProcessing || !summary?.valid}
-                    className="btn-gold-sheen w-full h-[54px] bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-[11px] uppercase tracking-[0.3em] font-bold flex items-center justify-center gap-2 rounded-[2px] shadow-xl cursor-pointer disabled:opacity-50"
+                    className="w-full h-[52px] bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 rounded-[2px] shadow-sm cursor-pointer disabled:opacity-50 transition-colors"
                   >
                     {isProcessing ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin text-black" />
-                        <span>PROCESSING...</span>
+                        <Loader2 className="w-5 h-5 animate-spin text-[#FAF5EC]" />
+                        <span>PROCESSING ORDER...</span>
                       </>
                     ) : paymentMethod === 'Cash on delivery' ? (
                       <span>PLACE ORDER (COD)</span>
@@ -1130,16 +1192,16 @@ export default function CheckoutPage() {
           </div>
 
           {/* Right Column: Price Details Box */}
-          <div className="lg:col-span-5 bg-[var(--color-sanctum)] border border-[var(--color-temple-gold)]/20 rounded-[4px] p-6 space-y-6 lg:sticky lg:top-24 shadow-xl">
-            <h3 className="font-marcellus text-[12px] uppercase tracking-[0.3em] text-[var(--color-temple-gold)] border-b border-[var(--color-temple-gold)]/20 pb-3">
+          <div className="lg:col-span-5 bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-6 lg:sticky lg:top-24 shadow-sm">
+            <h3 className="text-[12px] uppercase tracking-[0.25em] text-[#B68A3A] font-bold border-b border-[#E7D7C0] pb-3">
               PRICE DETAILS
             </h3>
 
-            {/* Breakdown Table (Font is same as rest of site, not monospace) */}
-            <div className="space-y-3 font-jost text-sm text-[var(--color-sandal)]">
+            {/* Breakdown Table */}
+            <div className="space-y-3 text-sm text-[#765E55]">
               <div className="flex justify-between">
                 <span>Items Subtotal</span>
-                <span className="text-[var(--color-ivory)] font-serif text-base">
+                <span className="text-[#5B1018] font-semibold text-base tabular-nums">
                   ₹{summary?.subtotal.toLocaleString('en-IN') || 0}
                 </span>
               </div>
@@ -1147,42 +1209,42 @@ export default function CheckoutPage() {
               <div className="flex justify-between items-center">
                 <span>Delivery Charge</span>
                 {summary?.shipping === 0 ? (
-                  <span className="text-emerald-400 font-marcellus text-xs uppercase tracking-wider font-semibold">
+                  <span className="text-emerald-700 text-xs uppercase tracking-wider font-semibold">
                     FREE (OVER ₹1999)
                   </span>
                 ) : (
-                  <span className="text-[var(--color-ivory)] font-serif text-base">
+                  <span className="text-[#5B1018] font-semibold text-base tabular-nums">
                     ₹{summary?.shipping}
                   </span>
                 )}
               </div>
 
-              {/* GST Display: Inclusive mode shows "Inclusive of all taxes" without extra line */}
+              {/* GST Display */}
               {summary?.gstMode === 'exclusive' && summary.gst > 0 ? (
                 <div className="flex justify-between">
                   <span>GST (3%)</span>
-                  <span className="text-[var(--color-ivory)] font-serif text-base">
+                  <span className="text-[#5B1018] font-semibold text-base tabular-nums">
                     ₹{summary.gst.toLocaleString('en-IN')}
                   </span>
                 </div>
               ) : (
-                <div className="text-xs text-[var(--color-sandal)]/60 font-marcellus uppercase tracking-wider pt-1">
+                <div className="text-xs text-[#765E55]/80 uppercase tracking-wider pt-1">
                   Inclusive of all taxes
                 </div>
               )}
 
               {summary && summary.totalSavings > 0 && (
-                <div className="p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-[2px] flex items-center justify-between text-xs text-emerald-300 font-medium">
+                <div className="p-3 bg-emerald-50 border border-emerald-500/30 rounded-[2px] flex items-center justify-between text-xs text-emerald-800 font-semibold">
                   <span>YOUR SAVINGS</span>
                   <span className="font-serif">₹{summary.totalSavings.toLocaleString('en-IN')}</span>
                 </div>
               )}
 
-              <div className="border-t border-[var(--color-temple-gold)]/20 pt-4 flex justify-between items-baseline">
-                <span className="font-marcellus text-sm uppercase tracking-wider text-[var(--color-ivory)] font-semibold">
+              <div className="border-t border-[#E7D7C0] pt-4 flex justify-between items-baseline">
+                <span className="text-sm uppercase tracking-wider text-[#5B1018] font-bold">
                   TOTAL AMOUNT
                 </span>
-                <span className="font-serif text-[28px] text-[var(--color-gold-light)] font-normal">
+                <span className="font-serif text-[28px] text-[#5B1018] font-medium tabular-nums">
                   ₹{summary?.total.toLocaleString('en-IN') || 0}
                 </span>
               </div>
@@ -1192,12 +1254,12 @@ export default function CheckoutPage() {
       </main>
 
       {/* Mobile Sticky Bottom Action Bar (375px) */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#1C0F07] border-t border-[#3D2418] p-3 z-40 flex items-center justify-between shadow-2xl">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#FAF5EC] border-t border-[#E7D7C0] p-3 z-40 flex items-center justify-between shadow-2xl">
         <div>
-          <div className="font-marcellus text-[9px] uppercase tracking-wider text-[var(--color-temple-gold)]">
+          <div className="font-sans text-[10px] uppercase tracking-wider text-[#765E55]">
             TOTAL AMOUNT
           </div>
-          <div className="font-serif text-xl text-[var(--color-gold-light)] font-normal">
+          <div className="font-serif text-xl text-[#5B1018] font-semibold">
             ₹{summary?.total.toLocaleString('en-IN') || 0}
           </div>
         </div>
@@ -1206,7 +1268,7 @@ export default function CheckoutPage() {
           <button
             onClick={handlePlaceOrder}
             disabled={isProcessing || !summary?.valid}
-            className="btn-gold-sheen h-11 px-6 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-[10px] uppercase tracking-[0.2em] font-bold rounded-[2px] shadow-lg disabled:opacity-50 cursor-pointer"
+            className="h-11 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.2em] font-bold rounded-[2px] shadow-sm disabled:opacity-50 cursor-pointer"
           >
             {isProcessing ? (
               <span>PROCESSING...</span>
@@ -1219,12 +1281,26 @@ export default function CheckoutPage() {
         ) : (
           <button
             onClick={() => setActiveStep((s) => Math.min(4, s + 1))}
-            className="h-11 px-6 bg-[var(--color-temple-gold)] text-[var(--color-vault-black)] font-marcellus text-[10px] uppercase tracking-[0.2em] font-semibold rounded-[2px]"
+            className="h-11 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.2em] font-semibold rounded-[2px] cursor-pointer"
           >
             NEXT STEP
           </button>
         )}
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FAF5EC] flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-[#B68A3A]" />
+        </div>
+      }
+    >
+      <CheckoutContent />
+    </React.Suspense>
   );
 }

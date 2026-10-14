@@ -10,14 +10,14 @@ import { KolamDivider } from '@/components/storefront/kolam-divider';
 
 export default function HeritagePage() {
   return (
-    <div className="min-h-screen bg-[var(--color-vault-black)] text-[var(--color-ivory)] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans">
       <Header />
 
       <main className="flex-1 space-y-24 pb-24">
         {/* Section 1: Hero Quote over Workshop Image */}
-        <section className="relative min-h-[70vh] bg-[var(--color-sanctum)] border-b border-[var(--color-temple-gold)]/20 flex items-center justify-center text-center p-8 overflow-hidden">
+        <section className="relative min-h-[60vh] bg-[#F2E7D7]/40 border-b border-[#E7D7C0] flex items-center justify-center text-center p-8 overflow-hidden">
           {/* Background Workshop Image Overlay */}
-          <div className="absolute inset-0 z-0 opacity-25">
+          <div className="absolute inset-0 z-0 opacity-15">
             <Image
               src="/images/craft/stage-2-nakashi.jpg"
               alt="Atelier Workshop"
@@ -25,18 +25,18 @@ export default function HeritagePage() {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-vault-black)] via-transparent to-[var(--color-vault-black)]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#FAF5EC] via-transparent to-[#FAF5EC]" />
           </div>
 
           <div className="relative z-10 max-w-4xl mx-auto space-y-6">
             <KolamDivider />
-            <div className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[var(--color-temple-gold)]">
+            <div className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[#B68A3A] font-semibold">
               OUR PROVENANCE
             </div>
-            <h1 className="font-serif text-[40px] sm:text-[64px] font-light italic leading-tight text-[var(--color-ivory)]">
+            <h1 className="font-serif text-[38px] sm:text-[56px] font-normal italic leading-tight text-[#5B1018]">
               “Before gold was personal adornment, it was sacred temple geometry created for royal sanctums in Tamil Nadu.”
             </h1>
-            <div className="font-marcellus text-[12px] uppercase tracking-[0.25em] text-[var(--color-gold-light)]">
+            <div className="font-marcellus text-[12px] uppercase tracking-[0.25em] text-[#B68A3A] font-semibold">
               — THE HOUSE OF ADI PARVA
             </div>
           </div>
@@ -46,13 +46,13 @@ export default function HeritagePage() {
         <section className="max-w-[1440px] mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-6 space-y-6">
-              <div className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[var(--color-temple-gold)]">
+              <div className="font-marcellus text-[11px] uppercase tracking-[0.35em] text-[#B68A3A] font-semibold">
                 SACRED ORIGINS
               </div>
-              <h2 className="font-serif text-[36px] sm:text-[48px] font-light text-[var(--color-ivory)]">
-                Born in the Sthapati <em className="italic text-gold-gradient font-normal">Guilds</em>
+              <h2 className="font-serif text-[36px] sm:text-[48px] font-normal text-[#5B1018]">
+                Born in the Sthapati <em className="italic font-normal text-[#B68A3A]">Guilds</em>
               </h2>
-              <div className="space-y-4 font-jost text-[15px] sm:text-[16px] text-[var(--color-sandal)]/90 leading-relaxed font-light">
+              <div className="space-y-4 font-jost text-[15px] sm:text-[16px] text-[#765E55] leading-relaxed">
                 <p>
                   For centuries, hereditary sthapati artisans dedicated their bench craft to temple treasuries. Every kasu coin, peacock motif, and lotus petal was hand-engraved with mathematical precision using repoussé techniques passed down through secret family deeds.
                 </p>
@@ -69,7 +69,7 @@ export default function HeritagePage() {
                   alt="Sthapati Guild Heritage"
                   aspect="portrait"
                   sizes="450px"
-                  className="shadow-2xl border border-[var(--color-temple-gold)]/30"
+                  className="shadow-sm border border-[#E7D7C0]"
                 />
               </div>
             </div>
@@ -77,11 +77,11 @@ export default function HeritagePage() {
         </section>
 
         {/* Section 3: Gold Hairline Timeline */}
-        <section className="bg-[var(--color-sanctum)] py-20 border-y border-[var(--color-temple-gold)]/20">
+        <section className="bg-white py-20 border-y border-[#E7D7C0]">
           <div className="max-w-[1200px] mx-auto px-6 sm:px-8 space-y-12 text-center">
             <KolamDivider />
-            <h2 className="font-serif text-[36px] sm:text-[44px] font-light text-[var(--color-ivory)]">
-              Timeline of the <em className="italic text-gold-gradient font-normal">House</em>
+            <h2 className="font-serif text-[36px] sm:text-[44px] font-normal text-[#5B1018]">
+              Timeline of the <em className="italic font-normal text-[#B68A3A]">House</em>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pt-6 relative">
@@ -91,10 +91,10 @@ export default function HeritagePage() {
                 { year: '1982 AD', title: 'The Parva Deed', desc: 'The house archives sacred mold drawings and establishes custodial guidelines.' },
                 { year: '2026 AD', title: 'Living Vitrine Archive', desc: 'Adi Parva launches direct-to-patron living archives across India.' },
               ].map((t, idx) => (
-                <div key={idx} className="space-y-3 relative p-6 bg-[var(--color-vault-black)] border border-[var(--color-temple-gold)]/20 rounded-[4px]">
-                  <div className="font-serif text-[32px] text-[var(--color-temple-gold)] font-light">{t.year}</div>
-                  <h3 className="font-marcellus text-[12px] uppercase tracking-[0.2em] text-[var(--color-ivory)]">{t.title}</h3>
-                  <p className="font-jost text-xs text-[var(--color-sandal)]/70 font-light">{t.desc}</p>
+                <div key={idx} className="space-y-3 relative p-6 bg-[#FAF5EC] border border-[#E7D7C0] rounded-[4px] shadow-xs">
+                  <div className="font-serif text-[32px] text-[#5B1018] font-normal">{t.year}</div>
+                  <h3 className="font-marcellus text-[12px] uppercase tracking-[0.2em] text-[#5B1018] font-semibold">{t.title}</h3>
+                  <p className="font-jost text-xs text-[#765E55]">{t.desc}</p>
                 </div>
               ))}
             </div>

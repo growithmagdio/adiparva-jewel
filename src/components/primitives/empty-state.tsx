@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import Link from 'next/link';
 import { MicroLabel } from './micro-label';
 import { Button } from './button';
 
@@ -51,11 +52,11 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
         {actionLabel && (
           <div>
             {actionHref ? (
-              <a href={actionHref}>
+              <Link href={actionHref}>
                 <Button variant="secondary" size="md">
                   {actionLabel}
                 </Button>
-              </a>
+              </Link>
             ) : (
               <Button variant="secondary" size="md" onClick={onAction}>
                 {actionLabel}

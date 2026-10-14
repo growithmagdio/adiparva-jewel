@@ -41,6 +41,8 @@ export interface StoreData {
   stockMovements: StockMovement[];
 }
 
+let memoryCache: StoreData | null = null;
+
 export function getInitialSeedData(): StoreData {
   return {
     categories: [...seedCategories],
@@ -58,6 +60,10 @@ export function getInitialSeedData(): StoreData {
 }
 
 export function getStoreData(): StoreData {
+  if (memoryCache) {
+    return memoryCache;
+  }
+
   if (typeof window === 'undefined') {
     return getInitialSeedData();
   }
@@ -66,18 +72,23 @@ export function getStoreData(): StoreData {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       const initial = getInitialSeedData();
+      memoryCache = initial;
       saveStoreData(initial);
       return initial;
     }
     const parsed = JSON.parse(raw);
+    memoryCache = parsed;
     return parsed;
   } catch (err) {
     console.error('Failed to read localStorage store, fallback to seed:', err);
-    return getInitialSeedData();
+    const initial = getInitialSeedData();
+    memoryCache = initial;
+    return initial;
   }
 }
 
 export function saveStoreData(data: StoreData): void {
+  memoryCache = data;
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -88,6 +99,7 @@ export function saveStoreData(data: StoreData): void {
 
 export function resetStore(): StoreData {
   const fresh = getInitialSeedData();
+  memoryCache = fresh;
   saveStoreData(fresh);
   return fresh;
 }
