@@ -71,11 +71,31 @@ export function Header() {
   const navLinks = [
     { label: 'Home', href: '/' },
     { label: 'Shop', href: '/collections' },
-    { label: 'Collections', href: '/collections', hasMega: true },
-    { label: 'Bridal', href: '/collections/bridal-sets' },
     { label: 'Our Story', href: '/heritage' },
     { label: 'Contact', href: '/contact' },
+    { label: 'Wishlist', href: '/wishlist' },
+    { label: 'Account', href: '/account' },
   ];
+
+  const collectionStrip = [
+    { label: 'Temple Necklaces', href: '/collections/temple-jewellery' },
+    { label: 'Jhumkas & Earrings', href: '/collections/jhumkas' },
+    { label: 'Bangles & Kada', href: '/collections/bangles-kada' },
+    { label: 'Vaddanams (Hip Belts)', href: '/collections/oddiyanam' },
+    { label: 'Bridal Parures', href: '/collections/bridal-sets' },
+    { label: 'Maang Tikka & Accessories', href: '/collections/maang-tikka-nath' },
+  ];
+
+  const isCollectionActive = (href: string) => {
+    if (pathname === href) return true;
+    if (href === '/collections/temple-jewellery' && (pathname === '/collections/temple' || pathname === '/collections/necklaces')) return true;
+    if (href === '/collections/jhumkas' && pathname === '/collections/earrings') return true;
+    if (href === '/collections/bangles-kada' && pathname === '/collections/bangles') return true;
+    if (href === '/collections/oddiyanam' && pathname === '/collections/vaddanams') return true;
+    if (href === '/collections/bridal-sets' && pathname === '/collections/bridal') return true;
+    if (href === '/collections/maang-tikka-nath' && pathname === '/collections/accessories') return true;
+    return false;
+  };
 
   return (
     <>
@@ -152,28 +172,22 @@ export function Header() {
           {/* Left: Transparent Adiparva Logo Lockup */}
           <LogoLockup size="md" />
 
-          {/* Centre: Desktop Navigation Links (Maroon #5B1018 + Gold Hover) */}
-          <nav className="hidden xl:flex items-center space-x-9" aria-label="Main Navigation">
+          {/* Centre: Desktop Navigation Links */}
+          <nav className="hidden xl:flex items-center space-x-7 lg:space-x-8" aria-label="Main Navigation">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
-                <div
-                  key={link.label}
-                  className="relative group py-5"
-                  onMouseEnter={() => link.hasMega && setIsMegaMenuOpen(true)}
-                  onMouseLeave={() => link.hasMega && setIsMegaMenuOpen(false)}
-                >
+                <div key={link.label} className="relative py-4">
                   <Link
                     href={link.href}
                     prefetch={true}
-                    className={`font-sans text-[13px] font-medium tracking-[0.12em] uppercase transition-colors duration-200 relative flex items-center gap-1.5 ${
+                    className={`font-sans text-[12.5px] font-medium tracking-[0.14em] uppercase transition-colors duration-200 relative flex items-center ${
                       isActive
-                        ? 'text-[#5B1018] font-semibold'
-                        : 'text-[#5B1018]/85 hover:text-[#B68A3A]'
+                        ? 'text-[#5B1018] font-bold'
+                        : 'text-[#5B1018]/90 hover:text-[#B68A3A]'
                     }`}
                   >
                     <span>{link.label}</span>
-                    {link.hasMega && <ChevronDown className="w-3.5 h-3.5 text-[#B68A3A] group-hover:rotate-180 transition-transform duration-200" />}
                     
                     {/* Gold Underline Indicator */}
                     <span
@@ -182,67 +196,12 @@ export function Header() {
                       }`}
                     />
                   </Link>
-
-                  {/* Mega Menu Dropdown */}
-                  {link.hasMega && isMegaMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.25 }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 w-[860px] bg-[#FAF5EC] border border-[#E7D7C0] p-6 shadow-xl z-50 text-[#5B1018] rounded-[3px]"
-                    >
-                      <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#E7D7C0]">
-                        <span className="font-serif text-lg text-[#5B1018] font-medium">Explore The Heritage Collection</span>
-                        <Link
-                          href="/collections"
-                          prefetch={true}
-                          onClick={() => setIsMegaMenuOpen(false)}
-                          className="text-[11px] font-sans font-semibold text-[#B68A3A] hover:text-[#5B1018] uppercase tracking-[0.16em] transition-colors"
-                        >
-                          View All Pieces →
-                        </Link>
-                      </div>
-                      <div className="grid grid-cols-4 gap-5">
-                        {categories.slice(0, 4).map((cat) => {
-                          const displayImg = cat.image || cat.heroImage || `/images/categories/${cat.slug}.jpg`;
-                          return (
-                            <Link
-                              key={cat.id}
-                              href={`/collections/${cat.slug}`}
-                              prefetch={true}
-                              onClick={() => setIsMegaMenuOpen(false)}
-                              className="group/item flex flex-col space-y-2.5 p-2 rounded-[2px] hover:bg-[#F2E7D7]/60 transition-colors"
-                            >
-                              <div className="aspect-[4/5] relative overflow-hidden rounded-[2px] border border-[#E7D7C0]">
-                                <Image
-                                  src={displayImg}
-                                  alt={cat.name}
-                                  fill
-                                  className="object-cover transition-transform duration-500 group-hover/item:scale-105"
-                                  sizes="200px"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80 group-hover/item:opacity-60 transition-opacity" />
-                                <span className="absolute bottom-2 left-2 right-2 text-white font-serif text-sm font-medium drop-shadow-sm">
-                                  {cat.name}
-                                </span>
-                              </div>
-                              <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-[#765E55]">{cat.pieceCount} Pieces</span>
-                                <span className="text-[#B68A3A] group-hover/item:translate-x-0.5 transition-transform font-medium">→</span>
-                              </div>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </motion.div>
-                  )}
                 </div>
               );
             })}
           </nav>
 
-          {/* Right: Functional Action Icons (Deep Maroon/Brown #3B090D, hover Antique Gold #B68A3A) */}
+          {/* Right: Functional Action Icons */}
           <div className="flex items-center space-x-5 sm:space-x-6 text-[#3B090D]">
             {/* Search */}
             <button
@@ -252,29 +211,6 @@ export function Header() {
             >
               <Search className="w-5 h-5 stroke-[1.8]" />
             </button>
-
-            {/* Wishlist */}
-            <Link
-              href="/wishlist"
-              prefetch={true}
-              className="p-1.5 hover:text-[#B68A3A] transition-colors relative"
-              aria-label="View saved wishlist"
-            >
-              <Heart className="w-5 h-5 stroke-[1.8]" />
-              {wishlistProductIds.length > 0 && (
-                <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-[#5B1018] border-2 border-[#FAF5EC]" />
-              )}
-            </Link>
-
-            {/* Account */}
-            <Link
-              href="/account"
-              prefetch={true}
-              className="p-1.5 hover:text-[#B68A3A] transition-colors hidden sm:block"
-              aria-label="Customer Account"
-            >
-              <User className="w-5 h-5 stroke-[1.8]" />
-            </Link>
 
             {/* Shopping Bag Button with Badge */}
             <button
@@ -290,6 +226,38 @@ export function Header() {
           </div>
         </div>
 
+        {/* 3. Horizontal Category Strip (Always Visible Under Main Nav & Sticky on Scrolling) */}
+        <div className="bg-[#FAF5EC] border-t border-[#E7D7C0]/80 py-2.5 px-4 overflow-x-auto scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden select-none">
+          <div className="max-w-[1440px] mx-auto flex items-center justify-start lg:justify-center gap-6 sm:gap-8 text-[11px] sm:text-[12px] uppercase tracking-[0.16em] font-sans font-medium whitespace-nowrap">
+            {collectionStrip.map((item, index) => {
+              const active = isCollectionActive(item.href);
+              return (
+                <React.Fragment key={item.href}>
+                  {index > 0 && (
+                    <span className="text-[#B68A3A]/40 text-[9px] shrink-0 pointer-events-none select-none">
+                      ❖
+                    </span>
+                  )}
+                  <Link
+                    href={item.href}
+                    prefetch={true}
+                    className={`transition-all duration-200 py-1 relative shrink-0 ${
+                      active
+                        ? 'text-[#5B1018] font-bold'
+                        : 'text-[#5B1018]/80 hover:text-[#B68A3A]'
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    {active && (
+                      <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[#B68A3A] rounded-full" />
+                    )}
+                  </Link>
+                </React.Fragment>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Mobile Full-Screen Navigation Drawer */}
         <AnimatePresence>
           {isMobileMenuOpen && (
@@ -300,43 +268,56 @@ export function Header() {
               transition={{ duration: 0.35, ease: 'easeInOut' }}
               className="xl:hidden fixed inset-x-0 top-[120px] bg-[#FAF5EC] z-50 p-6 sm:p-8 flex flex-col justify-between border-t border-[#E7D7C0] overflow-y-auto"
             >
-              <nav className="flex flex-col space-y-4 pt-2">
-                {navLinks.map((link, idx) => (
-                  <motion.div
-                    key={link.label}
-                    initial={{ opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                  >
-                    <Link
-                      href={link.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="font-serif text-[26px] font-normal text-[#5B1018] hover:text-[#B68A3A] transition-colors block border-b border-[#E7D7C0] pb-3"
+              <div className="space-y-6">
+                <nav className="flex flex-col space-y-2 pt-2">
+                  <div className="text-[10.5px] uppercase tracking-[0.24em] text-[#B68A3A] font-semibold pb-1 border-b border-[#E7D7C0]">
+                    MENU
+                  </div>
+                  {navLinks.map((link, idx) => (
+                    <motion.div
+                      key={link.label}
+                      initial={{ opacity: 0, x: -16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.04 }}
                     >
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                ))}
-              </nav>
+                      <Link
+                        href={link.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`font-serif text-[22px] font-normal transition-colors block border-b border-[#E7D7C0]/60 pb-2 ${
+                          pathname === link.href ? 'text-[#B68A3A] font-medium' : 'text-[#5B1018] hover:text-[#B68A3A]'
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </nav>
 
-              <div className="space-y-4 pt-8 pb-10 border-t border-[#E7D7C0]">
-                <div className="grid grid-cols-2 gap-3">
-                  <Link
-                    href="/account"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="h-10 px-4 bg-[#F2E7D7] border border-[#E7D7C0] rounded-[2px] font-sans text-xs uppercase tracking-wider text-[#5B1018] font-semibold flex items-center justify-center"
-                  >
-                    My Account
-                  </Link>
-                  <Link
-                    href="/wishlist"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="h-10 px-4 bg-[#F2E7D7] border border-[#E7D7C0] rounded-[2px] font-sans text-xs uppercase tracking-wider text-[#5B1018] font-semibold flex items-center justify-center"
-                  >
-                    Saved Pieces
-                  </Link>
+                <div className="space-y-3 pt-2">
+                  <div className="text-[10.5px] uppercase tracking-[0.24em] text-[#B68A3A] font-semibold pb-1 border-b border-[#E7D7C0]">
+                    COLLECTIONS
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-sans">
+                    {collectionStrip.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`py-2 px-3 rounded-[2px] border transition-colors ${
+                          isCollectionActive(item.href)
+                            ? 'bg-[#F2E7D7] border-[#B68A3A] text-[#5B1018] font-bold'
+                            : 'bg-[#FAF5EC] border-[#E7D7C0] text-[#5B1018] hover:border-[#B68A3A]'
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-                <div className="text-center font-sans text-[11px] uppercase tracking-[0.2em] text-[#765E55]">
+              </div>
+
+              <div className="space-y-4 pt-6 pb-8 border-t border-[#E7D7C0]">
+                <div className="text-center font-sans text-[11px] uppercase tracking-[0.2em] text-[#5B1018]/70">
                   ADI PARVA · THE TEMPLE OF TRADITION
                 </div>
               </div>

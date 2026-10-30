@@ -104,7 +104,7 @@ function CollectionsContent() {
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#5B1018] flex flex-col font-sans">
       <Header />
 
       <main className="flex-1">
@@ -114,14 +114,14 @@ function CollectionsContent() {
             {/* Breadcrumbs */}
             <div className="font-sans text-[11px] uppercase tracking-[0.22em] text-[#B68A3A] font-semibold">
               <Link href="/" className="hover:text-[#5B1018] transition-colors">HOME</Link>
-              <span className="mx-2 text-[#765E55]/50">/</span>
+              <span className="mx-2 text-[#5B1018]/50">/</span>
               <span>SHOP COLLECTION</span>
             </div>
 
             <h1 className="font-serif text-[38px] sm:text-[52px] font-normal text-[#5B1018]">
               The <span className="italic text-[#B68A3A] font-light">Heritage Collection</span>
             </h1>
-            <p className="text-[15px] sm:text-[16px] text-[#765E55] max-w-[60ch] leading-relaxed">
+            <p className="text-[15px] sm:text-[16px] text-[#5B1018]/90 max-w-[60ch] leading-relaxed font-medium">
               Explore handcrafted temple gold, Kundan, Polki diamonds, and antique bridal heirlooms sculpted by master artisans.
             </p>
           </div>
@@ -150,11 +150,11 @@ function CollectionsContent() {
                 <h4 className="font-sans text-[11px] uppercase tracking-[0.2em] text-[#5B1018] font-semibold">
                   CATEGORIES
                 </h4>
-                <div className="space-y-2 font-sans text-sm text-[#765E55]">
+                <div className="space-y-2 font-sans text-sm text-[#5B1018]">
                   <button
                     onClick={() => updateParam('category', 'all')}
                     className={`block w-full text-left transition-colors cursor-pointer ${
-                      selectedCategory === 'all' ? 'text-[#5B1018] font-bold' : 'hover:text-[#5B1018]'
+                      selectedCategory === 'all' ? 'text-[#5B1018] font-bold' : 'hover:text-[#B68A3A]'
                     }`}
                   >
                     All Categories ({products.length})
@@ -166,7 +166,7 @@ function CollectionsContent() {
                         key={cat.id}
                         onClick={() => updateParam('category', cat.id)}
                         className={`block w-full text-left transition-colors cursor-pointer ${
-                          selectedCategory === cat.id ? 'text-[#5B1018] font-bold' : 'hover:text-[#5B1018]'
+                          selectedCategory === cat.id ? 'text-[#5B1018] font-bold' : 'hover:text-[#B68A3A]'
                         }`}
                       >
                         {cat.name} ({count})
@@ -181,7 +181,7 @@ function CollectionsContent() {
                 <h4 className="font-sans text-[11px] uppercase tracking-[0.2em] text-[#5B1018] font-semibold">
                   PRICE RANGE
                 </h4>
-                <div className="space-y-2 font-sans text-sm text-[#765E55]">
+                <div className="space-y-2 font-sans text-sm text-[#5B1018]">
                   {[
                     { label: 'All Prices', val: 'all' },
                     { label: 'Below ₹2,000', val: 'under-2k' },
@@ -189,7 +189,7 @@ function CollectionsContent() {
                     { label: '₹5,000 – ₹10,000', val: '5k-10k' },
                     { label: 'Above ₹10,000', val: 'above-10k' },
                   ].map((pr) => (
-                    <label key={pr.val} className="flex items-center gap-3 cursor-pointer hover:text-[#5B1018]">
+                    <label key={pr.val} className="flex items-center gap-3 cursor-pointer hover:text-[#B68A3A] font-medium">
                       <input
                         type="radio"
                         name="priceRange"
@@ -208,14 +208,14 @@ function CollectionsContent() {
                 <h4 className="font-sans text-[11px] uppercase tracking-[0.2em] text-[#5B1018] font-semibold">
                   MATERIAL & FINISH
                 </h4>
-                <div className="space-y-2 font-sans text-sm text-[#765E55]">
+                <div className="space-y-2 font-sans text-sm text-[#5B1018]">
                   {[
                     { label: 'All Finishes', val: 'all' },
                     { label: '22K Antique Gold', val: '22k gold' },
                     { label: 'Gold-plated Silver', val: 'silver' },
                     { label: 'Antique Gold Finish', val: 'antique' },
                   ].map((m) => (
-                    <label key={m.val} className="flex items-center gap-3 cursor-pointer hover:text-[#5B1018]">
+                    <label key={m.val} className="flex items-center gap-3 cursor-pointer hover:text-[#B68A3A] font-medium">
                       <input
                         type="radio"
                         name="metalFinish"
@@ -234,7 +234,7 @@ function CollectionsContent() {
             <div className="flex-1 space-y-6">
               {/* Header Controls Bar */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#F2E7D7] p-4 border border-[#E7D7C0] rounded-[4px]">
-                <div className="font-sans text-[11px] uppercase tracking-[0.2em] text-[#765E55] font-medium">
+                <div className="font-sans text-[11px] uppercase tracking-[0.2em] text-[#5B1018] font-bold">
                   SHOWING {displayedProducts.length} OF {sortedProducts.length} PIECES
                 </div>
 
@@ -250,7 +250,7 @@ function CollectionsContent() {
 
                   {/* Sort Dropdown */}
                   <div className="flex items-center gap-2">
-                    <span className="font-sans text-[11px] uppercase tracking-[0.16em] text-[#765E55] hidden sm:inline font-medium">
+                    <span className="font-sans text-[11px] uppercase tracking-[0.16em] text-[#5B1018] hidden sm:inline font-semibold">
                       SORT BY:
                     </span>
                     <select
@@ -278,7 +278,7 @@ function CollectionsContent() {
                 <div className="text-center py-20 space-y-4 bg-[#F2E7D7] border border-[#E7D7C0] rounded-[4px]">
                   <KolamDivider />
                   <p className="font-serif text-2xl text-[#5B1018]">No pieces match your selected filters.</p>
-                  <p className="font-sans text-sm text-[#765E55]">Adjust your price range or category filter.</p>
+                  <p className="font-sans text-sm text-[#5B1018]/80 font-medium">Adjust your price range or category filter.</p>
                   <button
                     onClick={clearAllFilters}
                     className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] font-sans text-[11px] uppercase tracking-[0.2em] font-semibold rounded-[2px] hover:bg-[#3B090D] cursor-pointer"

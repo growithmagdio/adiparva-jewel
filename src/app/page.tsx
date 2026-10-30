@@ -129,7 +129,7 @@ export default function HomePage() {
   }, [products, activeTab]);
 
   return (
-    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans selection:bg-[#5B1018] selection:text-[#FAF5EC]">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#5B1018] flex flex-col font-sans selection:bg-[#5B1018] selection:text-[#FAF5EC]">
       <Header />
 
       <main className="flex-1">
@@ -307,7 +307,7 @@ export default function HomePage() {
                 <h2 className="font-serif text-[34px] sm:text-[44px] font-normal text-[#5B1018]">
                   CURATED FOR YOU
                 </h2>
-                <p className="text-[15px] text-[#765E55]">
+                <p className="text-[15px] text-[#5B1018]/90 font-medium">
                   Discover timeless pieces for every celebration.
                 </p>
               </div>
@@ -365,7 +365,7 @@ export default function HomePage() {
               <h2 className="font-serif text-[34px] sm:text-[44px] font-normal text-[#5B1018]">
                 Why Choose Adiparva?
               </h2>
-              <p className="text-[15px] text-[#765E55] max-w-[48ch] mx-auto font-sans">
+              <p className="text-[15px] text-[#5B1018]/90 max-w-[48ch] mx-auto font-sans font-medium">
                 Every piece is an authentic temple artifact, created with uncompromised integrity.
               </p>
             </div>
@@ -411,7 +411,7 @@ export default function HomePage() {
                     <h3 className="font-serif text-[17px] text-[#5B1018] font-medium leading-snug">
                       {item.title}
                     </h3>
-                    <p className="text-[13px] text-[#765E55] leading-relaxed">
+                    <p className="text-[13px] text-[#5B1018]/85 leading-relaxed font-medium">
                       {item.desc}
                     </p>
                   </div>
@@ -486,7 +486,7 @@ export default function HomePage() {
               <h2 className="font-serif text-[36px] sm:text-[48px] font-normal leading-tight text-[#5B1018]">
                 Crafted from Culture. Designed for <span className="italic text-[#B68A3A]">Queens</span>.
               </h2>
-              <div className="space-y-4 text-[15px] sm:text-[16px] text-[#765E55] leading-relaxed max-w-[58ch] font-sans">
+              <div className="space-y-4 text-[15px] sm:text-[16px] text-[#5B1018]/90 leading-relaxed max-w-[58ch] font-sans font-medium">
                 <p>
                   Named after the first book of the Mahabharata, Adi Parva is born from the sacred temple towns of South India. We partner directly with hereditary sthapati artisan guilds who have preserved hand-repoussé (nakashi) techniques for centuries.
                 </p>
@@ -559,7 +559,7 @@ export default function HomePage() {
                     <div className="font-sans text-[13px] uppercase tracking-[0.16em] text-[#5B1018] font-bold">
                       {t.name}
                     </div>
-                    <div className="text-[12px] text-[#765E55]">
+                    <div className="text-[12px] text-[#5B1018]/80 font-medium">
                       {t.city}
                     </div>
                   </div>
@@ -576,7 +576,7 @@ export default function HomePage() {
             <h2 className="font-serif text-[34px] sm:text-[42px] font-normal text-[#5B1018]">
               Join the Royal Register
             </h2>
-            <p className="text-[15px] text-[#765E55] leading-relaxed">
+            <p className="text-[15px] text-[#5B1018]/90 leading-relaxed font-medium">
               Receive private invitations to new archive collections, bridal previews, and confidential seasonal dispatches.
             </p>
 
@@ -591,7 +591,7 @@ export default function HomePage() {
                   placeholder="Enter your email address"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
-                  className="w-full bg-[#FAF5EC] border-b border-[#B68A3A] focus:border-[#5B1018] text-[15px] text-[#5B1018] placeholder-[#765E55]/60 py-3 outline-none transition-colors font-sans"
+                  className="w-full bg-[#FAF5EC] border-b border-[#B68A3A] focus:border-[#5B1018] text-[15px] text-[#5B1018] placeholder-[#5B1018]/50 py-3 outline-none transition-colors font-sans"
                   required
                 />
                 <button

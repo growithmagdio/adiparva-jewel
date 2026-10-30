@@ -80,7 +80,7 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${cormorant.variable} ${playfair.variable} ${poppins.variable} ${marcellus.variable} ${jost.variable} ${notoTamil.variable}`}
     >
-      <body className="min-h-screen bg-[#FAF5EC] text-[#765E55] antialiased font-sans selection:bg-[#5B1018] selection:text-[#FAF5EC]">
+      <body className="min-h-screen bg-[#FAF5EC] text-[#5B1018] antialiased font-sans selection:bg-[#5B1018] selection:text-[#FAF5EC]">
         {children}
       </body>
     </html>

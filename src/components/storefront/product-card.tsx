@@ -145,7 +145,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {isSoldOut ? (
               <button
                 disabled
-                className="w-full h-8 border border-[#E7D7C0] bg-[#F2E7D7] text-[#765E55] font-sans text-[10px] uppercase tracking-[0.2em] flex items-center justify-center cursor-not-allowed opacity-80"
+                className="w-full h-8 border border-[#E7D7C0] bg-[#F2E7D7] text-[#5B1018]/60 font-sans text-[10px] uppercase tracking-[0.2em] flex items-center justify-center cursor-not-allowed opacity-80"
               >
                 SOLD OUT
               </button>
@@ -194,7 +194,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 ₹{product.price.toLocaleString('en-IN')}
               </span>
               {product.compareAtPrice && (
-                <span className="font-sans text-[12px] text-[#765E55]/80 line-through tabular-nums">
+                <span className="font-sans text-[12px] text-[#5B1018]/60 line-through tabular-nums">
                   ₹{product.compareAtPrice.toLocaleString('en-IN')}
                 </span>
               )}
@@ -207,7 +207,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
             <div className="flex items-center gap-1.5 text-[10px] text-[#B68A3A] pt-0.5">
               <span className="tracking-widest">★★★★★</span>
-              <span className="text-[#765E55] text-[10px]">({product.reviewCount || 42})</span>
+              <span className="text-[#5B1018]/80 font-medium text-[10px]">({product.reviewCount || 42})</span>
             </div>
           </div>
 
@@ -216,7 +216,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {isSoldOut ? (
               <button
                 disabled
-                className="w-full h-8 bg-[#F2E7D7] text-[#765E55] font-sans text-[10px] uppercase tracking-[0.2em] flex items-center justify-center cursor-not-allowed opacity-80"
+                className="w-full h-8 bg-[#F2E7D7] text-[#5B1018]/60 font-sans text-[10px] uppercase tracking-[0.2em] flex items-center justify-center cursor-not-allowed opacity-80"
               >
                 SOLD OUT
               </button>

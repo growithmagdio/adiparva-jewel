@@ -16,6 +16,7 @@ export default function CategoryPage() {
   const rawSlug = (params?.slug as string) || 'all';
 
   const slugMap: Record<string, string> = {
+    necklaces: 'temple-jewellery',
     temple: 'temple-jewellery',
     'temple-jewellery': 'temple-jewellery',
     kundan: 'kundan',
@@ -81,12 +82,12 @@ export default function CategoryPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#5B1018] flex flex-col font-sans select-none">
       <Header />
 
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-12 space-y-10">
         {/* Breadcrumb */}
-        <div className="font-sans text-[11px] uppercase tracking-[0.22em] text-[#765E55]/70 flex items-center gap-2">
+        <div className="font-sans text-[11px] uppercase tracking-[0.22em] text-[#5B1018]/70 flex items-center gap-2">
           <Link href="/" className="hover:text-[#5B1018] transition-colors">Home</Link>
           <span className="text-[#B68A3A]/40">/</span>
           <Link href="/collections" className="hover:text-[#5B1018] transition-colors">Collections</Link>
@@ -102,14 +103,14 @@ export default function CategoryPage() {
           <h1 className="font-serif text-[36px] sm:text-[50px] font-normal text-[#5B1018]">
             {category?.name || 'Collection'}
           </h1>
-          <p className="font-sans text-[15px] sm:text-[16px] text-[#765E55] max-w-[68ch] leading-relaxed">
+          <p className="font-sans text-[15px] sm:text-[16px] text-[#5B1018]/90 max-w-[68ch] leading-relaxed font-medium">
             {category?.description || 'Browse our complete collection of handcrafted South Indian temple gold and antique heirlooms.'}
           </p>
         </div>
 
         {/* Controls Bar */}
         <div className="flex items-center justify-between font-sans text-sm border-b border-[#E7D7C0] pb-4">
-          <span className="text-[#765E55] font-medium">Showing {sortedProducts.length} pieces</span>
+          <span className="text-[#5B1018] font-semibold">Showing {sortedProducts.length} pieces</span>
 
           <div className="flex items-center gap-3">
             <span className="font-sans text-xs uppercase tracking-[0.18em] text-[#5B1018] font-semibold">Sort:</span>
@@ -139,7 +140,7 @@ export default function CategoryPage() {
         ) : sortedProducts.length === 0 ? (
           <div className="text-center py-20 bg-[#F2E7D7] border border-[#E7D7C0] p-8 rounded-[4px] space-y-4">
             <h3 className="font-serif text-2xl text-[#5B1018]">No pieces found in this collection</h3>
-            <p className="font-sans text-sm text-[#765E55]">Check back soon for new additions to this collection.</p>
+            <p className="font-sans text-sm text-[#5B1018]/80 font-medium">Check back soon for new additions to this collection.</p>
             <Link
               href="/collections"
               className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] font-sans text-[11px] uppercase tracking-[0.2em] inline-flex items-center justify-center rounded-[2px] font-semibold hover:bg-[#3B090D] transition-colors"

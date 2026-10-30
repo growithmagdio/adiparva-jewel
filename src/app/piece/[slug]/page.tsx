@@ -102,7 +102,7 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans">
+      <div className="min-h-screen bg-[#FAF5EC] text-[#5B1018] flex flex-col font-sans">
         <Header />
         <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-8 py-16">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -122,12 +122,12 @@ export default function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans">
+      <div className="min-h-screen bg-[#FAF5EC] text-[#5B1018] flex flex-col font-sans">
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center p-16 text-center space-y-4">
           <KolamDivider />
           <h2 className="font-serif text-3xl text-[#5B1018]">Piece Not Found</h2>
-          <p className="text-sm text-[#765E55]">The requested heritage piece is no longer in the active collection.</p>
+          <p className="text-sm text-[#5B1018]/85">The requested heritage piece is no longer in the active collection.</p>
           <Link
             href="/collections"
             className="h-11 px-7 bg-[#5B1018] text-[#FAF5EC] font-sans text-xs uppercase tracking-[0.2em] inline-flex items-center justify-center rounded-[2px] font-semibold hover:bg-[#3B090D] transition-colors"
@@ -195,7 +195,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col font-sans selection:bg-[#5B1018] selection:text-[#FAF5EC]">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#5B1018] flex flex-col font-sans selection:bg-[#5B1018] selection:text-[#FAF5EC]">
       <Header />
 
       <main className="flex-1 pb-24 lg:pb-0">
@@ -258,7 +258,7 @@ export default function ProductDetailPage() {
 
                 <div className="flex items-center gap-2 text-xs text-[#B68A3A]">
                   <span className="tracking-widest">★★★★★</span>
-                  <span className="text-[12px] text-[#765E55]">
+                  <span className="text-[12px] text-[#5B1018]/85 font-medium">
                     4.9 ({product.reviewCount || 42} Customer Reviews)
                   </span>
                 </div>
@@ -270,7 +270,7 @@ export default function ProductDetailPage() {
                   ₹{(product.price + (selectedVariant?.priceDelta || 0)).toLocaleString('en-IN')}
                 </span>
                 {product.compareAtPrice && (
-                  <span className="font-sans text-[16px] text-[#765E55]/70 line-through tabular-nums">
+                  <span className="font-sans text-[16px] text-[#5B1018]/60 line-through tabular-nums">
                     ₹{product.compareAtPrice.toLocaleString('en-IN')}
                   </span>
                 )}
@@ -298,7 +298,7 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Short Description */}
-              <p className="text-[14.5px] text-[#765E55] leading-relaxed">
+              <p className="text-[14.5px] text-[#5B1018] leading-relaxed">
                 {product.shortDescription}
               </p>
 
@@ -440,22 +440,22 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-2 gap-3.5 border-t border-[#E7D7C0] pt-6 text-xs text-[#765E55]">
+              <div className="grid grid-cols-2 gap-3.5 border-t border-[#E7D7C0] pt-6 text-xs text-[#5B1018]">
                 <div className="flex items-center gap-2.5 p-2.5 bg-[#F2E7D7]/40 rounded border border-[#E7D7C0]">
                   <Award className="w-4 h-4 text-[#B68A3A] shrink-0" />
-                  <span>BIS Hallmarked Gold</span>
+                  <span className="font-medium">BIS Hallmarked Gold</span>
                 </div>
                 <div className="flex items-center gap-2.5 p-2.5 bg-[#F2E7D7]/40 rounded border border-[#E7D7C0]">
                   <Truck className="w-4 h-4 text-[#B68A3A] shrink-0" />
-                  <span>Insured Express Delivery</span>
+                  <span className="font-medium">Insured Express Delivery</span>
                 </div>
                 <div className="flex items-center gap-2.5 p-2.5 bg-[#F2E7D7]/40 rounded border border-[#E7D7C0]">
                   <RotateCcw className="w-4 h-4 text-[#B68A3A] shrink-0" />
-                  <span>7-Day Return Policy</span>
+                  <span className="font-medium">7-Day Return Policy</span>
                 </div>
                 <div className="flex items-center gap-2.5 p-2.5 bg-[#F2E7D7]/40 rounded border border-[#E7D7C0]">
                   <ShieldCheck className="w-4 h-4 text-[#B68A3A] shrink-0" />
-                  <span>Lifetime Maintenance</span>
+                  <span className="font-medium">Lifetime Maintenance</span>
                 </div>
               </div>
             </div>
@@ -476,7 +476,7 @@ export default function ProductDetailPage() {
                   className={`font-sans text-[11.5px] uppercase tracking-[0.2em] pb-2 relative transition-colors cursor-pointer font-semibold ${
                     activeTab === tab.id
                       ? 'text-[#5B1018]'
-                      : 'text-[#765E55]/70 hover:text-[#5B1018]'
+                      : 'text-[#5B1018]/70 hover:text-[#5B1018]'
                   }`}
                 >
                   <span>{tab.label}</span>
@@ -487,11 +487,11 @@ export default function ProductDetailPage() {
               ))}
             </div>
 
-            <div className="max-w-[860px] mx-auto text-[15px] text-[#765E55] leading-relaxed">
+            <div className="max-w-[860px] mx-auto text-[15px] text-[#5B1018] leading-relaxed">
               {activeTab === 'description' && (
                 <div className="space-y-4">
                   <h3 className="font-serif text-2xl text-[#5B1018]">Heritage & Provenance</h3>
-                  <p className="whitespace-pre-line">{product.story}</p>
+                  <p className="whitespace-pre-line text-[#5B1018]/90 font-medium">{product.story}</p>
                 </div>
               )}
 
@@ -532,7 +532,7 @@ export default function ProductDetailPage() {
                     <p className="italic text-[#5B1018]">
                       “Exceptional craftsmanship. The antique gold patination and stone settings are authentic to royal temple treasury artifacts.”
                     </p>
-                    <div className="text-xs text-[#765E55] font-semibold uppercase tracking-wider">
+                    <div className="text-xs text-[#5B1018]/80 font-semibold uppercase tracking-wider">
                       Verified Patron Purchase — Chennai Atelier
                     </div>
                   </div>
@@ -542,7 +542,7 @@ export default function ProductDetailPage() {
               {activeTab === 'shipping' && (
                 <div className="space-y-4">
                   <h3 className="font-serif text-2xl text-[#5B1018]">Transit & Guarantee</h3>
-                  <p>
+                  <p className="text-[#5B1018]/90 font-medium">
                     All orders are dispatched via tamper-evident insured express courier across India. Delivery arrives in 3–5 business days in a custom velvet-lined presentation casket with BIS hallmarking certificate.
                   </p>
                 </div>
@@ -576,7 +576,7 @@ export default function ProductDetailPage() {
           {isSoldOut ? (
             <button
               disabled
-              className="w-full h-11 bg-[#E7D7C0] text-[#765E55] text-[10px] uppercase tracking-[0.2em] font-semibold flex items-center justify-center rounded-[2px] cursor-not-allowed"
+              className="w-full h-11 bg-[#E7D7C0] text-[#5B1018]/70 text-[10px] uppercase tracking-[0.2em] font-semibold flex items-center justify-center rounded-[2px] cursor-not-allowed"
             >
               OUT OF STOCK
             </button>

@@ -11,7 +11,7 @@ export function Footer() {
   const siteConfig = getSiteConfig();
 
   return (
-    <footer className="bg-[#F2E7D7] text-[#765E55] select-none border-t border-[#E7D7C0] pt-6">
+    <footer className="bg-[#F2E7D7] text-[#5B1018] select-none border-t border-[#E7D7C0] pt-6">
       {/* Kolam Divider at Top */}
       <KolamDivider />
 
@@ -20,7 +20,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 pb-8 border-b border-[#E7D7C0]">
           <div className="space-y-3 text-center md:text-left max-w-lg">
             <LogoLockup size="lg" />
-            <p className="text-[14px] text-[#765E55] leading-relaxed font-sans pt-2">
+            <p className="text-[14px] text-[#5B1018]/90 leading-relaxed font-sans pt-2 font-medium">
               Living archive of handcrafted South Indian temple jewellery, pure gold repoussé nakashi, and heirloom bridal parures for timeless celebrations.
             </p>
           </div>
@@ -39,37 +39,37 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 text-[14px]">
           {/* Column 1: Shop */}
           <div className="space-y-4 font-sans">
-            <h4 className="text-[12px] uppercase tracking-[0.25em] text-[#5B1018] font-semibold">
+            <h4 className="text-[12px] uppercase tracking-[0.25em] text-[#5B1018] font-bold">
               COLLECTIONS
             </h4>
-            <ul className="space-y-2.5 text-[#765E55]">
+            <ul className="space-y-2.5 text-[#5B1018]/85 font-medium">
               <li>
-                <Link href="/collections/temple-jewellery" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/collections/temple-jewellery" className="hover:text-[#B68A3A] transition-colors">
                   Temple Necklaces
                 </Link>
               </li>
               <li>
-                <Link href="/collections/jhumkas" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/collections/jhumkas" className="hover:text-[#B68A3A] transition-colors">
                   Jhumkas & Earrings
                 </Link>
               </li>
               <li>
-                <Link href="/collections/bangles-kada" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/collections/bangles-kada" className="hover:text-[#B68A3A] transition-colors">
                   Bangles & Kada
                 </Link>
               </li>
               <li>
-                <Link href="/collections/oddiyanam" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/collections/oddiyanam" className="hover:text-[#B68A3A] transition-colors">
                   Vaddanams (Hip Belts)
                 </Link>
               </li>
               <li>
-                <Link href="/collections/bridal-sets" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/collections/bridal-sets" className="hover:text-[#B68A3A] transition-colors">
                   Bridal Parures
                 </Link>
               </li>
               <li>
-                <Link href="/collections/maang-tikka-nath" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/collections/maang-tikka-nath" className="hover:text-[#B68A3A] transition-colors">
                   Maang Tikka & Accessories
                 </Link>
               </li>
@@ -78,27 +78,27 @@ export function Footer() {
 
           {/* Column 2: The House */}
           <div className="space-y-4 font-sans">
-            <h4 className="text-[12px] uppercase tracking-[0.25em] text-[#5B1018] font-semibold">
+            <h4 className="text-[12px] uppercase tracking-[0.25em] text-[#5B1018] font-bold">
               THE HOUSE
             </h4>
-            <ul className="space-y-2.5 text-[#765E55]">
+            <ul className="space-y-2.5 text-[#5B1018]/85 font-medium">
               <li>
-                <Link href="/heritage" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/heritage" className="hover:text-[#B68A3A] transition-colors">
                   Our Story & Heritage
                 </Link>
               </li>
               <li>
-                <Link href="/craft" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/craft" className="hover:text-[#B68A3A] transition-colors">
                   The Making Process
                 </Link>
               </li>
               <li>
-                <Link href="/care" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/care" className="hover:text-[#B68A3A] transition-colors">
                   Jewellery Care & Certification
                 </Link>
               </li>
               <li>
-                <Link href="/journal" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/journal" className="hover:text-[#B68A3A] transition-colors">
                   Journal & Editorial
                 </Link>
               </li>
@@ -107,32 +107,32 @@ export function Footer() {
 
           {/* Column 3: Customer Care */}
           <div className="space-y-4 font-sans">
-            <h4 className="text-[12px] uppercase tracking-[0.25em] text-[#5B1018] font-semibold">
+            <h4 className="text-[12px] uppercase tracking-[0.25em] text-[#5B1018] font-bold">
               CUSTOMER CARE
             </h4>
-            <ul className="space-y-2.5 text-[#765E55]">
+            <ul className="space-y-2.5 text-[#5B1018]/85 font-medium">
               <li>
-                <Link href="/contact" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/contact" className="hover:text-[#B68A3A] transition-colors">
                   Contact & Concierge
                 </Link>
               </li>
               <li>
-                <Link href="/care" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/care" className="hover:text-[#B68A3A] transition-colors">
                   Shipping & Insurance Policy
                 </Link>
               </li>
               <li>
-                <Link href="/care" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/care" className="hover:text-[#B68A3A] transition-colors">
                   7-Day Inspection & Returns
                 </Link>
               </li>
               <li>
-                <Link href="/account/orders" className="hover:text-[#5B1018] transition-colors">
+                <Link href="/account/orders" className="hover:text-[#B68A3A] transition-colors">
                   Track Your Order
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="hover:text-[#5B1018] transition-colors text-[#B68A3A] font-semibold">
+                <Link href="/admin" className="hover:text-[#B68A3A] transition-colors text-[#5B1018] font-semibold">
                   Curator Console
                 </Link>
               </li>
@@ -140,11 +140,11 @@ export function Footer() {
           </div>
 
           {/* Column 4: Contact & Concierge */}
-          <div className="space-y-4 font-sans text-[#765E55]">
-            <h4 className="text-[12px] uppercase tracking-[0.25em] text-[#5B1018] font-semibold">
+          <div className="space-y-4 font-sans text-[#5B1018]">
+            <h4 className="text-[12px] uppercase tracking-[0.25em] text-[#5B1018] font-bold">
               ATELIER CONCIERGE
             </h4>
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 font-medium">
               {siteConfig.displayPhone && (
                 <div className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 text-[#B68A3A] shrink-0" />
@@ -175,7 +175,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar: Payment Marks + Social Icons + Copyright */}
-        <div className="pt-8 border-t border-[#E7D7C0] flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#765E55] font-sans">
+        <div className="pt-8 border-t border-[#E7D7C0] flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#5B1018] font-sans">
           {/* Payment Marks (Quiet Outlined Badges) */}
           <div className="flex items-center flex-wrap gap-2">
             {['UPI', 'VISA', 'MASTERCARD', 'NET BANKING', 'RUPAY', 'COD'].map((method) => (
@@ -202,7 +202,7 @@ export function Footer() {
           </div>
 
           {/* Copyright Notice */}
-          <div className="text-center md:text-right font-sans text-[11px] uppercase tracking-[0.15em] text-[#765E55]">
+          <div className="text-center md:text-right font-sans text-[11px] uppercase tracking-[0.15em] text-[#5B1018]/80 font-medium">
             © 2026 ADI PARVA — THE TEMPLE OF TRADITION. ALL RIGHTS RESERVED.
           </div>
         </div>

@@ -16,6 +16,8 @@ import { getStoreData } from '@/lib/data/store';
 import { auth, db } from '@/lib/firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { Header } from '@/components/storefront/header';
+import { Footer } from '@/components/storefront/footer';
 import { KolamDivider } from '@/components/storefront/kolam-divider';
 import {
   Lock,
@@ -521,15 +523,15 @@ function CheckoutContent() {
   // Invalid item error state
   if (!loadingSummary && summary && !summary.valid) {
     return (
-      <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] flex flex-col justify-center items-center p-6 text-center space-y-4 font-sans select-none">
+      <div className="min-h-screen bg-[#2E070B] text-[#FAF5EC] flex flex-col justify-center items-center p-6 text-center space-y-4 font-sans select-none">
         <KolamDivider />
-        <h2 className="font-serif text-3xl text-[#5B1018]">This item is not available</h2>
-        <p className="text-sm text-[#765E55] max-w-md">
+        <h2 className="font-serif text-3xl text-[#FAF5EC]">This item is not available</h2>
+        <p className="text-sm text-[#FAF5EC]/85 max-w-md">
           {summary.message || 'The selected piece or option is no longer available.'}
         </p>
         <Link
           href="/collections"
-          className="h-11 px-7 bg-[#5B1018] text-[#FAF5EC] font-sans text-xs uppercase tracking-[0.2em] font-semibold inline-flex items-center justify-center rounded-[2px] hover:bg-[#3B090D] transition-colors"
+          className="h-11 px-7 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-[0.2em] font-semibold inline-flex items-center justify-center rounded-[2px] transition-all"
         >
           RETURN TO COLLECTION
         </Link>
@@ -540,30 +542,29 @@ function CheckoutContent() {
   const activeAddr = savedAddresses.find((a) => a.id === selectedAddrId);
 
   return (
-    <div className="min-h-screen bg-[#FAF5EC] text-[#765E55] select-none font-sans pb-28 lg:pb-12 selection:bg-[#5B1018] selection:text-[#FAF5EC]">
-      {/* Top Header */}
-      <header className="border-b border-[#E7D7C0] py-4 px-6 sm:px-8 bg-[#FAF5EC]/95 backdrop-blur-md sticky top-0 z-30 shadow-xs">
+    <div className="min-h-screen bg-[#2E070B] text-[#FAF5EC] select-none font-sans pb-28 lg:pb-16 selection:bg-[#5B1018] selection:text-[#FAF5EC]">
+      {/* Universal Storefront Header with Category Strip */}
+      <Header />
+
+      {/* Return to piece/cart & Secure checkout sub-bar */}
+      <div className="border-b border-[#B68A3A]/25 bg-[#3B090D] py-3 px-4 sm:px-8">
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
           <button
             type="button"
             onClick={handleReturn}
-            className="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#B68A3A] hover:text-[#5B1018] transition-colors cursor-pointer"
+            className="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#D7B56D] hover:text-[#FAF5EC] transition-colors cursor-pointer"
             aria-label={isBuyNow ? 'Return to piece' : 'Return to cart'}
           >
             <ArrowLeft className="w-4 h-4" />
             <span>{isBuyNow ? 'RETURN TO PIECE' : 'RETURN TO CART'}</span>
           </button>
 
-          <Link href="/" className="font-serif text-xl tracking-[0.15em] font-normal text-[#5B1018]">
-            ADI PARVA
-          </Link>
-
-          <div className="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#B68A3A]">
+          <div className="flex items-center gap-2 font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#D7B56D]">
             <Lock className="w-3.5 h-3.5 text-[#B68A3A]" />
             <span className="hidden sm:inline">SECURE CHECKOUT</span>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main 2-Column Responsive Layout */}
       <main className="max-w-[1440px] mx-auto px-4 sm:px-8 py-8 sm:py-12">
@@ -574,20 +575,20 @@ function CheckoutContent() {
             {/* ==================================================== */}
             {/* STEP 1: AUTH / CONTACT DETAILS                       */}
             {/* ==================================================== */}
-            <div className="bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-4 shadow-sm transition-all">
-              <div className="flex items-center justify-between border-b border-[#E7D7C0] pb-3">
+            <div className="bg-[#3B090D] border border-[#B68A3A]/30 rounded-[4px] p-6 space-y-4 shadow-md transition-all text-[#FAF5EC]">
+              <div className="flex items-center justify-between border-b border-[#B68A3A]/20 pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-[#5B1018] border border-[#B68A3A]/50 text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
                     1
                   </span>
-                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#5B1018]">
+                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#FAF5EC]">
                     CONTACT DETAILS
                   </h3>
                 </div>
                 {(currentUser || guestModeConfirmed) && activeStep > 1 && (
                   <button
                     onClick={() => setActiveStep(1)}
-                    className="text-xs font-semibold text-[#B68A3A] flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-[#D7B56D] flex items-center gap-1 hover:text-[#FAF5EC] hover:underline cursor-pointer transition-colors"
                   >
                     <Edit2 className="w-3 h-3" />
                     <span>Change</span>
@@ -596,23 +597,23 @@ function CheckoutContent() {
               </div>
 
               {isAuthLoading ? (
-                <div className="h-12 bg-[#F2E7D7] animate-pulse rounded-[2px]" />
+                <div className="h-12 bg-[#2E070B] animate-pulse rounded-[2px]" />
               ) : currentUser || guestModeConfirmed ? (
-                <div className="flex items-center justify-between bg-[#F2E7D7]/40 p-4 rounded-[4px] border border-[#E7D7C0] text-sm">
+                <div className="flex items-center justify-between bg-[#2E070B] p-4 rounded-[4px] border border-[#B68A3A]/30 text-sm">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-full bg-[#5B1018] border border-[#B68A3A]/50 text-[#FAF5EC] font-sans text-xs flex items-center justify-center font-bold">
                       {(currentUser?.displayName || authName || 'P').charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <div className="font-semibold text-[#5B1018]">
+                      <div className="font-semibold text-[#FAF5EC]">
                         {currentUser?.displayName || authName || 'Customer'} {currentUser?.phoneNumber || authPhone ? `(${currentUser?.phoneNumber || authPhone})` : ''}
                       </div>
-                      <div className="text-xs text-[#765E55]">
+                      <div className="text-xs text-[#FAF5EC]/75">
                         {currentUser?.email || authEmail || 'Contact details provided'}
                       </div>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-emerald-800 flex items-center gap-1 bg-emerald-50 border border-emerald-500/30 px-2.5 py-1 rounded">
+                  <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1 bg-emerald-950/60 border border-emerald-500/30 px-2.5 py-1 rounded">
                     <Check className="w-3 h-3" /> VERIFIED
                   </span>
                 </div>
@@ -621,38 +622,38 @@ function CheckoutContent() {
                   {!otpSent ? (
                     <form onSubmit={handleSendOtp} className="space-y-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase tracking-[0.18em] text-[#B68A3A] font-semibold">
+                        <label className="text-[10px] uppercase tracking-[0.18em] text-[#D7B56D] font-semibold">
                           MOBILE PHONE NUMBER
                         </label>
                         <div className="relative">
-                          <Phone className="w-4 h-4 text-[#B68A3A] absolute left-3.5 top-3" />
+                          <Phone className="w-4 h-4 text-[#D7B56D] absolute left-3.5 top-3" />
                           <input
                             type="tel"
                             value={authPhone}
                             onChange={(e) => setAuthPhone(e.target.value)}
                             placeholder="Enter 10-digit mobile number"
-                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] pl-10 pr-3.5 py-2.5 text-[#5B1018] font-medium text-sm outline-none focus:border-[#B68A3A] transition-all"
+                            className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] pl-10 pr-3.5 py-2.5 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium text-sm outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A] transition-all"
                           />
                         </div>
                       </div>
 
-                      {authError && <p className="text-xs text-[#B3261E] font-medium">{authError}</p>}
+                      {authError && <p className="text-xs text-[#FF6B6B] font-medium">{authError}</p>}
 
                       <button
                         type="submit"
-                        className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] cursor-pointer transition-colors shadow-xs"
+                        className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] cursor-pointer transition-all shadow-md"
                       >
                         SEND OTP CODE
                       </button>
                     </form>
                   ) : (
                     <form onSubmit={handleVerifyOtp} className="space-y-4">
-                      <div className="p-3 bg-[#F2E7D7]/50 border border-[#E7D7C0] rounded-[2px] text-xs text-[#765E55]">
-                        Verification code sent to <strong className="text-[#5B1018]">{authPhone}</strong>.
+                      <div className="p-3 bg-[#2E070B] border border-[#B68A3A]/30 rounded-[2px] text-xs text-[#FAF5EC]/90">
+                        Verification code sent to <strong className="text-[#D7B56D]">{authPhone}</strong>.
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase tracking-[0.18em] text-[#B68A3A] font-semibold">
+                        <label className="text-[10px] uppercase tracking-[0.18em] text-[#D7B56D] font-semibold">
                           ENTER 6-DIGIT OTP
                         </label>
                         <input
@@ -661,23 +662,23 @@ function CheckoutContent() {
                           value={otpCode}
                           onChange={(e) => setOtpCode(e.target.value)}
                           placeholder="123456"
-                          className="w-32 tracking-[0.4em] text-center font-mono text-base bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] py-2 text-[#5B1018] font-bold outline-none focus:border-[#B68A3A]"
+                          className="w-32 tracking-[0.4em] text-center font-mono text-base bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] py-2 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-bold outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                         />
                       </div>
 
-                      {authError && <p className="text-xs text-[#B3261E] font-medium">{authError}</p>}
+                      {authError && <p className="text-xs text-[#FF6B6B] font-medium">{authError}</p>}
 
                       <div className="flex gap-3">
                         <button
                           type="submit"
-                          className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] cursor-pointer shadow-xs transition-colors"
+                          className="h-10 px-6 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-[0.16em] font-semibold rounded-[2px] cursor-pointer shadow-md transition-all"
                         >
                           VERIFY & CONTINUE
                         </button>
                         <button
                           type="button"
                           onClick={() => setOtpSent(false)}
-                          className="h-10 px-4 border border-[#B68A3A] text-[#5B1018] bg-[#FFFFFF] hover:bg-[#F2E7D7] font-sans text-xs uppercase tracking-wider rounded-[2px] cursor-pointer"
+                          className="h-10 px-4 border border-[#B68A3A] text-[#FAF5EC] bg-[#3B090D]/60 hover:bg-[#5B1018] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-wider rounded-[2px] cursor-pointer transition-all"
                         >
                           BACK
                         </button>
@@ -686,8 +687,8 @@ function CheckoutContent() {
                   )}
 
                   {/* Or Guest Mode */}
-                  <div className="border-t border-[#E7D7C0] pt-4 space-y-3">
-                    <span className="text-[10px] uppercase tracking-[0.18em] text-[#B68A3A] font-semibold">
+                  <div className="border-t border-[#B68A3A]/20 pt-4 space-y-3">
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-[#D7B56D] font-semibold">
                       OR CONTINUE AS GUEST
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -696,20 +697,20 @@ function CheckoutContent() {
                         value={authName}
                         onChange={(e) => setAuthName(e.target.value)}
                         placeholder="Full Name"
-                        className="bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-sm text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                        className="bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-sm text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                       />
                       <input
                         type="email"
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
                         placeholder="Email Address"
-                        className="bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-sm text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                        className="bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-sm text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={handleContinueAsGuest}
-                      className="h-9 px-6 bg-[#FAF5EC] border border-[#B68A3A] text-[#5B1018] hover:bg-[#5B1018] hover:text-[#FAF5EC] font-sans text-[11px] uppercase tracking-[0.18em] font-semibold rounded-[2px] transition-colors cursor-pointer"
+                      className="h-9 px-6 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-[11px] uppercase tracking-[0.18em] font-semibold rounded-[2px] transition-all cursor-pointer shadow-md"
                     >
                       CONTINUE TO ADDRESS
                     </button>
@@ -721,20 +722,20 @@ function CheckoutContent() {
             {/* ==================================================== */}
             {/* STEP 2: DELIVERY ADDRESS                              */}
             {/* ==================================================== */}
-            <div className="bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-4 shadow-sm transition-all">
-              <div className="flex items-center justify-between border-b border-[#E7D7C0] pb-3">
+            <div className="bg-[#3B090D] border border-[#B68A3A]/30 rounded-[4px] p-6 space-y-4 shadow-md transition-all text-[#FAF5EC]">
+              <div className="flex items-center justify-between border-b border-[#B68A3A]/20 pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-[#5B1018] border border-[#B68A3A]/50 text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
                     2
                   </span>
-                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#5B1018]">
+                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#FAF5EC]">
                     DELIVERY ADDRESS
                   </h3>
                 </div>
                 {activeStep > 2 && (
                   <button
                     onClick={() => setActiveStep(2)}
-                    className="text-xs font-marcellus text-[var(--color-gold-light)] flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-[#D7B56D] flex items-center gap-1 hover:text-[#FAF5EC] hover:underline cursor-pointer transition-colors"
                   >
                     <Edit2 className="w-3 h-3" />
                     <span>Change</span>
@@ -743,24 +744,24 @@ function CheckoutContent() {
               </div>
 
               {activeStep > 2 ? (
-                <div className="bg-[#FAF0E4] p-4 rounded-[4px] border-2 border-[#2C1810] font-jost text-sm text-[#1F1613]">
-                  <div className="font-medium flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#96601A]" />
+                <div className="bg-[#2E070B] p-4 rounded-[4px] border border-[#B68A3A]/30 font-sans text-sm text-[#FAF5EC]">
+                  <div className="font-semibold flex items-center gap-2 text-[#FAF5EC]">
+                    <MapPin className="w-4 h-4 text-[#D7B56D]" />
                     <span>{activeAddr ? activeAddr.fullName : fullName}</span>
-                    <span className="text-xs text-[#4A3B33]">({activeAddr ? activeAddr.phone : phone})</span>
+                    <span className="text-xs text-[#FAF5EC]/75 font-normal">({activeAddr ? activeAddr.phone : phone})</span>
                   </div>
-                  <div className="text-xs text-[#4A3B33] pl-6 pt-1">
+                  <div className="text-xs text-[#FAF5EC]/85 pl-6 pt-1 font-medium">
                     {activeAddr
                       ? `${activeAddr.addressLine}${activeAddr.area ? `, ${activeAddr.area}` : ''}, ${activeAddr.city}, ${activeAddr.state} - ${activeAddr.pincode}`
                       : `${addressLine}${area ? `, ${area}` : ''}, ${city}, ${stateName} - ${pincode}`}
                   </div>
                 </div>
               ) : activeStep === 2 ? (
-                <div className="space-y-6 pt-2 font-jost text-sm">
-                  {/* Saved Address Cards (Tokens only: Ivory card, dark text, 2px maroon border when selected) */}
+                <div className="space-y-6 pt-2 font-sans text-sm">
+                  {/* Saved Address Cards */}
                   {savedAddresses.length > 0 && !isAddingNewAddress && (
                     <div className="space-y-3">
-                      <div className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
+                      <div className="font-sans text-[10.5px] uppercase tracking-[0.2em] text-[#D7B56D] font-bold">
                         SAVED ADDRESSES
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -770,27 +771,27 @@ function CheckoutContent() {
                             <div
                               key={addr.id}
                               onClick={() => setSelectedAddrId(addr.id)}
-                              className={`p-4 rounded-[4px] transition-all cursor-pointer flex flex-col justify-between space-y-3 bg-[#FAF0E4] ${
+                              className={`p-4 rounded-[4px] transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
                                 isSel
-                                  ? 'border-2 border-[#2C1810] text-[#1F1613] shadow-md'
-                                  : 'border border-[#E6D5BF] text-[#1F1613] hover:border-[#96601A]'
+                                  ? 'bg-[#2E070B] border-2 border-[#D7B56D] text-[#FAF5EC] shadow-md'
+                                  : 'bg-[#2E070B]/80 border border-[#B68A3A]/30 text-[#FAF5EC] hover:border-[#B68A3A]'
                               }`}
                             >
                               <div className="space-y-1">
                                 <div className="flex items-center justify-between">
-                                  <span className="font-marcellus text-xs uppercase tracking-wider font-semibold text-[#1F1613]">
+                                  <span className="font-sans text-xs uppercase tracking-wider font-bold text-[#FAF5EC]">
                                     {addr.fullName}
                                   </span>
                                   {isSel && (
-                                    <span className="font-marcellus text-[9px] uppercase tracking-wider text-[#96601A] font-bold flex items-center gap-1 bg-[#F6EDE1] px-1.5 py-0.5 rounded-[2px]">
-                                      <Check className="w-3 h-3 text-[#96601A]" /> Selected
+                                    <span className="font-sans text-[9px] uppercase tracking-wider text-[#D7B56D] font-bold flex items-center gap-1 bg-[#3B090D] border border-[#B68A3A]/40 px-1.5 py-0.5 rounded-[2px]">
+                                      <Check className="w-3 h-3 text-[#D7B56D]" /> Selected
                                     </span>
                                   )}
                                 </div>
-                                <div className="text-xs text-[#4A3B33] leading-relaxed">
+                                <div className="text-xs text-[#FAF5EC]/85 leading-relaxed font-medium">
                                   {addr.addressLine}{addr.area ? `, ${addr.area}` : ''}, {addr.city}, {addr.state} - {addr.pincode}
                                 </div>
-                                <div className="text-xs text-[#96601A] font-medium">Ph: {addr.phone}</div>
+                                <div className="text-xs text-[#D7B56D] font-semibold">Ph: {addr.phone}</div>
                               </div>
 
                               <button
@@ -800,7 +801,7 @@ function CheckoutContent() {
                                   setSelectedAddrId(addr.id);
                                   handleConfirmAddress();
                                 }}
-                                className="w-full h-8 bg-[#2C1810] text-[#FDF7EF] hover:bg-[#1C0F07] font-marcellus text-[10px] uppercase tracking-[0.2em] font-semibold rounded-[2px] transition-colors cursor-pointer"
+                                className="w-full h-8 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-[10px] uppercase tracking-[0.2em] font-semibold rounded-[2px] transition-all cursor-pointer shadow-md"
                               >
                                 DELIVER HERE
                               </button>
@@ -812,7 +813,7 @@ function CheckoutContent() {
                       <button
                         type="button"
                         onClick={() => setIsAddingNewAddress(true)}
-                        className="text-xs font-marcellus text-[var(--color-gold-light)] hover:underline pt-2 flex items-center gap-1 cursor-pointer"
+                        className="text-xs font-semibold text-[#D7B56D] hover:text-[#FAF5EC] hover:underline pt-2 flex items-center gap-1 cursor-pointer transition-colors"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add a new delivery address</span>
@@ -820,18 +821,18 @@ function CheckoutContent() {
                     </div>
                   )}
 
-                  {/* Manual Address Form (Shown when adding new address or for new user with no saved addresses) */}
+                  {/* Manual Address Form */}
                   {(isAddingNewAddress || savedAddresses.length === 0) && (
-                    <div className="space-y-4 border-t border-[var(--color-temple-gold)]/10 pt-4">
+                    <div className="space-y-4 border-t border-[#B68A3A]/20 pt-4">
                       <div className="flex items-center justify-between">
-                        <span className="font-marcellus text-[10px] uppercase tracking-[0.2em] text-[var(--color-temple-gold)]">
+                        <span className="font-sans text-[10.5px] uppercase tracking-[0.2em] text-[#D7B56D] font-bold">
                           DELIVERY DESTINATION FORM
                         </span>
                         {savedAddresses.length > 0 && (
                           <button
                             type="button"
                             onClick={() => setIsAddingNewAddress(false)}
-                            className="text-xs text-[var(--color-sandal)] hover:text-[var(--color-ivory)]"
+                            className="text-xs text-[#FAF5EC]/80 hover:text-[#D7B56D] font-medium"
                           >
                             Cancel
                           </button>
@@ -840,7 +841,7 @@ function CheckoutContent() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label className="font-marcellus text-[10px] uppercase tracking-[0.18em] text-[var(--color-temple-gold)]">
+                          <label className="font-sans text-[10px] uppercase tracking-[0.18em] text-[#D7B56D] font-semibold">
                             FULL NAME
                           </label>
                           <input
@@ -848,13 +849,13 @@ function CheckoutContent() {
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             placeholder="Recipient full name"
-                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                            className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                           />
-                          {addressErrors.fullName && <p className="text-xs text-[#B3261E]">{addressErrors.fullName}</p>}
+                          {addressErrors.fullName && <p className="text-xs text-[#FF6B6B]">{addressErrors.fullName}</p>}
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#D7B56D] font-semibold">
                             MOBILE PHONE
                           </label>
                           <input
@@ -863,13 +864,13 @@ function CheckoutContent() {
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="10-digit mobile number"
-                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                            className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                           />
-                          {addressErrors.phone && <p className="text-xs text-[#B3261E]">{addressErrors.phone}</p>}
+                          {addressErrors.phone && <p className="text-xs text-[#FF6B6B]">{addressErrors.phone}</p>}
                         </div>
 
                         <div className="sm:col-span-2 space-y-1">
-                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#D7B56D] font-semibold">
                             STREET ADDRESS & HOUSE NO.
                           </label>
                           <input
@@ -877,13 +878,13 @@ function CheckoutContent() {
                             value={addressLine}
                             onChange={(e) => setAddressLine(e.target.value)}
                             placeholder="Flat / House No. / Building / Street"
-                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                            className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                           />
-                          {addressErrors.addressLine && <p className="text-xs text-[#B3261E]">{addressErrors.addressLine}</p>}
+                          {addressErrors.addressLine && <p className="text-xs text-[#FF6B6B]">{addressErrors.addressLine}</p>}
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#D7B56D] font-semibold">
                             AREA / LOCALITY (OPTIONAL)
                           </label>
                           <input
@@ -891,12 +892,12 @@ function CheckoutContent() {
                             value={area}
                             onChange={(e) => setArea(e.target.value)}
                             placeholder="Area or Locality"
-                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                            className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                           />
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#D7B56D] font-semibold">
                             PINCODE
                           </label>
                           <input
@@ -905,13 +906,13 @@ function CheckoutContent() {
                             value={pincode}
                             onChange={handlePincodeChange}
                             placeholder="6-digit Pincode"
-                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                            className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                           />
-                          {addressErrors.pincode && <p className="text-xs text-[#B3261E]">{addressErrors.pincode}</p>}
+                          {addressErrors.pincode && <p className="text-xs text-[#FF6B6B]">{addressErrors.pincode}</p>}
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#D7B56D] font-semibold">
                             CITY
                           </label>
                           <input
@@ -919,13 +920,13 @@ function CheckoutContent() {
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
                             placeholder="City"
-                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                            className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                           />
-                          {addressErrors.city && <p className="text-xs text-[#B3261E]">{addressErrors.city}</p>}
+                          {addressErrors.city && <p className="text-xs text-[#FF6B6B]">{addressErrors.city}</p>}
                         </div>
 
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#B68A3A] font-semibold">
+                          <label className="text-[10px] uppercase tracking-[0.16em] text-[#D7B56D] font-semibold">
                             STATE
                           </label>
                           <input
@@ -933,16 +934,16 @@ function CheckoutContent() {
                             value={stateName}
                             onChange={(e) => setStateName(e.target.value)}
                             placeholder="State"
-                            className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3.5 py-2 text-[#5B1018] font-medium outline-none focus:border-[#B68A3A]"
+                            className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3.5 py-2 text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 font-medium outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                           />
-                          {addressErrors.stateName && <p className="text-xs text-[#B3261E]">{addressErrors.stateName}</p>}
+                          {addressErrors.stateName && <p className="text-xs text-[#FF6B6B]">{addressErrors.stateName}</p>}
                         </div>
                       </div>
 
                       <button
                         type="button"
                         onClick={handleConfirmAddress}
-                        className="h-10 px-8 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.18em] font-semibold rounded-[2px] cursor-pointer shadow-xs transition-colors"
+                        className="h-10 px-8 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-[0.18em] font-semibold rounded-[2px] cursor-pointer shadow-md transition-all"
                       >
                         DELIVER HERE
                       </button>
@@ -955,20 +956,20 @@ function CheckoutContent() {
             {/* ==================================================== */}
             {/* STEP 3: ORDER SUMMARY & ITEM CONFIRMATION             */}
             {/* ==================================================== */}
-            <div className="bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-4 shadow-sm transition-all">
-              <div className="flex items-center justify-between border-b border-[#E7D7C0] pb-3">
+            <div className="bg-[#3B090D] border border-[#B68A3A]/30 rounded-[4px] p-6 space-y-4 shadow-md transition-all text-[#FAF5EC]">
+              <div className="flex items-center justify-between border-b border-[#B68A3A]/20 pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
+                  <span className="w-6 h-6 rounded-full bg-[#5B1018] border border-[#B68A3A]/50 text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
                     3
                   </span>
-                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#5B1018]">
+                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#FAF5EC]">
                     ORDER SUMMARY ({summary?.items.length || 0} ITEMS)
                   </h3>
                 </div>
                 {activeStep > 3 && (
                   <button
                     onClick={() => setActiveStep(3)}
-                    className="text-xs font-semibold text-[#B68A3A] flex items-center gap-1 hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-[#D7B56D] flex items-center gap-1 hover:text-[#FAF5EC] hover:underline cursor-pointer transition-colors"
                   >
                     <Edit2 className="w-3 h-3" />
                     <span>Change</span>
@@ -977,13 +978,13 @@ function CheckoutContent() {
               </div>
 
               {activeStep > 3 ? (
-                <div className="bg-[#F2E7D7]/40 p-4 rounded-[4px] border border-[#E7D7C0] text-xs space-y-2">
+                <div className="bg-[#2E070B] p-4 rounded-[4px] border border-[#B68A3A]/30 text-xs space-y-2 text-[#FAF5EC]">
                   {summary?.items.map((it) => (
                     <div key={`${it.productId}-${it.variantId}`} className="flex justify-between items-center">
-                      <span className="text-[#5B1018] font-medium text-sm">
+                      <span className="text-[#FAF5EC] font-medium text-sm">
                         {it.name} ({it.variantLabel}) x {it.qty}
                       </span>
-                      <span className="text-[#5B1018] font-semibold text-sm">
+                      <span className="text-[#FAF5EC] font-semibold text-sm">
                         ₹{it.lineTotal.toLocaleString('en-IN')}
                       </span>
                     </div>
@@ -991,27 +992,27 @@ function CheckoutContent() {
                 </div>
               ) : activeStep === 3 ? (
                 <div className="space-y-6 pt-2">
-                  <div className="space-y-4 divide-y divide-[#E7D7C0]">
+                  <div className="space-y-4 divide-y divide-[#B68A3A]/20">
                     {summary?.items.map((item) => (
                       <div
                         key={`${item.productId}-${item.variantId}`}
                         className="pt-4 first:pt-0 flex gap-4 items-center justify-between"
                       >
                         <div className="flex gap-4 items-center">
-                          <div className="relative w-16 aspect-[3/4] bg-[#3B090D] rounded-[3px] overflow-hidden border border-[#B68A3A]/40 shrink-0">
+                          <div className="relative w-16 aspect-[3/4] bg-[#2E070B] rounded-[3px] overflow-hidden border border-[#B68A3A]/40 shrink-0">
                             <Image src={item.image} alt={item.name} fill className="object-cover" />
                           </div>
                           <div className="space-y-1">
-                            <div className="text-[10px] uppercase tracking-wider text-[#B68A3A] font-semibold">
+                            <div className="text-[10px] uppercase tracking-wider text-[#D7B56D] font-semibold">
                               CODE: {item.code}
                             </div>
-                            <h4 className="font-serif text-base text-[#5B1018] font-normal leading-snug">
+                            <h4 className="font-serif text-base text-[#FAF5EC] font-normal leading-snug">
                               {item.name}
                             </h4>
-                            <div className="text-xs text-[#765E55]">
+                            <div className="text-xs text-[#FAF5EC]/80 font-medium">
                               Option: {item.variantLabel}
                             </div>
-                            <div className="text-xs font-semibold text-[#5B1018]">
+                            <div className="text-xs font-semibold text-[#D7B56D]">
                               Unit: ₹{item.unitPrice.toLocaleString('en-IN')}
                             </div>
                           </div>
@@ -1019,22 +1020,22 @@ function CheckoutContent() {
 
                         {/* Quantity Stepper & Line Total */}
                         <div className="text-right space-y-2 shrink-0">
-                          <div className="font-sans text-base text-[#5B1018] font-semibold">
+                          <div className="font-sans text-base text-[#FAF5EC] font-semibold">
                             ₹{item.lineTotal.toLocaleString('en-IN')}
                           </div>
 
-                          <div className="inline-flex items-center border border-[#B68A3A] rounded-[2px] h-8 bg-[#FFFFFF]">
+                          <div className="inline-flex items-center border border-[#B68A3A]/50 rounded-[2px] h-8 bg-[#2E070B]">
                             <button
                               type="button"
                               onClick={() =>
                                 handleUpdateItemQty(item.productId, item.variantId, item.qty, item.maxStock, -1)
                               }
                               disabled={item.qty <= 1}
-                              className="w-7 h-full flex items-center justify-center text-xs text-[#5B1018] hover:bg-[#F2E7D7] disabled:opacity-30 cursor-pointer font-bold"
+                              className="w-7 h-full flex items-center justify-center text-xs text-[#FAF5EC] hover:bg-[#5B1018] disabled:opacity-30 cursor-pointer font-bold transition-colors"
                             >
                               -
                             </button>
-                            <span className="w-8 text-center text-xs font-semibold text-[#5B1018]">
+                            <span className="w-8 text-center text-xs font-semibold text-[#FAF5EC]">
                               {item.qty}
                             </span>
                             <button
@@ -1043,7 +1044,7 @@ function CheckoutContent() {
                                 handleUpdateItemQty(item.productId, item.variantId, item.qty, item.maxStock, 1)
                               }
                               disabled={item.qty >= item.maxStock}
-                              className="w-7 h-full flex items-center justify-center text-xs text-[#5B1018] hover:bg-[#F2E7D7] disabled:opacity-30 cursor-pointer font-bold"
+                              className="w-7 h-full flex items-center justify-center text-xs text-[#FAF5EC] hover:bg-[#5B1018] disabled:opacity-30 cursor-pointer font-bold transition-colors"
                             >
                               +
                             </button>
@@ -1056,7 +1057,7 @@ function CheckoutContent() {
                   <button
                     type="button"
                     onClick={() => setActiveStep(4)}
-                    className="h-10 px-8 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.18em] font-semibold rounded-[2px] cursor-pointer shadow-xs transition-colors"
+                    className="h-10 px-8 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-[0.18em] font-semibold rounded-[2px] cursor-pointer shadow-md transition-all"
                   >
                     CONTINUE TO PAYMENT
                   </button>
@@ -1067,12 +1068,12 @@ function CheckoutContent() {
             {/* ==================================================== */}
             {/* STEP 4: PAYMENT INSTRUMENT                            */}
             {/* ==================================================== */}
-            <div className="bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-5 shadow-sm">
-              <div className="flex items-center gap-3 border-b border-[#E7D7C0] pb-3">
-                <span className="w-6 h-6 rounded-full bg-[#5B1018] text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
+            <div className="bg-[#3B090D] border border-[#B68A3A]/30 rounded-[4px] p-6 space-y-5 shadow-md text-[#FAF5EC]">
+              <div className="flex items-center gap-3 border-b border-[#B68A3A]/20 pb-3">
+                <span className="w-6 h-6 rounded-full bg-[#5B1018] border border-[#B68A3A]/50 text-[#FAF5EC] font-sans text-xs font-bold flex items-center justify-center">
                   4
                 </span>
-                <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#5B1018]">
+                <h3 className="text-xs uppercase tracking-[0.2em] font-bold text-[#FAF5EC]">
                   PAYMENT METHOD
                 </h3>
               </div>
@@ -1081,9 +1082,9 @@ function CheckoutContent() {
                 <form onSubmit={handlePlaceOrder} className="space-y-6 pt-2 text-sm">
                   {/* Payment Failure Retry State Alert */}
                   {paymentError && (
-                    <div className="p-4 bg-[#FBE9E7] border border-[#B3261E]/40 rounded-[2px] text-[#B3261E] text-xs space-y-2 animate-in fade-in">
+                    <div className="p-4 bg-[#2E070B] border border-[#FF6B6B]/40 rounded-[2px] text-[#FF6B6B] text-xs space-y-2 animate-in fade-in">
                       <div className="flex items-center gap-2 font-semibold">
-                        <AlertCircle className="w-4 h-4 text-[#B3261E] shrink-0" />
+                        <AlertCircle className="w-4 h-4 text-[#FF6B6B] shrink-0" />
                         <span>{isSoldOutError ? 'Item Sold Out' : 'Payment Failed'}</span>
                       </div>
                       <p>{paymentError}</p>
@@ -1125,34 +1126,34 @@ function CheckoutContent() {
                           onClick={() => !pm.disabled && setPaymentMethod(pm.id as any)}
                           className={`p-4 rounded-[3px] border transition-all ${
                             pm.disabled
-                              ? 'border-[#E7D7C0] opacity-40 cursor-not-allowed bg-[#F2E7D7]'
+                              ? 'border-[#B68A3A]/20 opacity-40 cursor-not-allowed bg-[#2E070B]/50 text-[#FAF5EC]/60'
                               : isSel
-                              ? 'border-[#5B1018] bg-[#F2E7D7]/50 text-[#5B1018] ring-1 ring-[#5B1018] cursor-pointer shadow-xs'
-                              : 'border-[#E7D7C0] bg-[#FFFFFF] text-[#765E55] hover:border-[#B68A3A] cursor-pointer'
+                              ? 'border-[#D7B56D] bg-[#2E070B] text-[#FAF5EC] ring-1 ring-[#D7B56D] cursor-pointer shadow-md'
+                              : 'border-[#B68A3A]/30 bg-[#2E070B]/60 text-[#FAF5EC] hover:border-[#B68A3A] cursor-pointer'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div
                                 className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                  isSel ? 'border-[#5B1018] bg-[#5B1018]' : 'border-[#E7D7C0]'
+                                  isSel ? 'border-[#D7B56D] bg-[#5B1018]' : 'border-[#B68A3A]/40'
                                 }`}
                               >
                                 {isSel && <div className="w-1.5 h-1.5 rounded-full bg-[#FAF5EC]" />}
                               </div>
                               <div>
-                                <div className="text-xs uppercase tracking-wider text-[#5B1018] font-bold">
+                                <div className="text-xs uppercase tracking-wider text-[#FAF5EC] font-bold">
                                   {pm.label}
                                 </div>
-                                <div className="text-xs text-[#765E55]">{pm.desc}</div>
+                                <div className="text-xs text-[#FAF5EC]/85 font-medium">{pm.desc}</div>
                               </div>
                             </div>
                           </div>
 
                           {/* Extra VPA ID input for UPI */}
                           {isSel && pm.id === 'UPI' && (
-                            <div className="mt-3 pt-3 border-t border-[#E7D7C0] space-y-1">
-                              <label className="text-[10px] uppercase tracking-wider text-[#B68A3A] font-semibold">
+                            <div className="mt-3 pt-3 border-t border-[#B68A3A]/20 space-y-1">
+                              <label className="text-[10px] uppercase tracking-wider text-[#D7B56D] font-semibold">
                                 ENTER UPI ID (OPTIONAL)
                               </label>
                               <input
@@ -1160,7 +1161,7 @@ function CheckoutContent() {
                                 value={upiId}
                                 onChange={(e) => setUpiId(e.target.value)}
                                 placeholder="name@upi or mobile@paytm"
-                                className="w-full bg-[#FAF5EC] border border-[#E7D7C0] rounded-[2px] px-3 py-1.5 text-xs text-[#5B1018] outline-none focus:border-[#B68A3A]"
+                                className="w-full bg-[#2E070B] border border-[#B68A3A]/40 rounded-[2px] px-3 py-1.5 text-xs text-[#FAF5EC] placeholder:text-[#FAF5EC]/70 outline-none focus:border-[#B68A3A] focus:ring-1 focus:ring-[#B68A3A]"
                               />
                             </div>
                           )}
@@ -1173,7 +1174,7 @@ function CheckoutContent() {
                   <button
                     type="submit"
                     disabled={isProcessing || !summary?.valid}
-                    className="w-full h-[52px] bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 rounded-[2px] shadow-sm cursor-pointer disabled:opacity-50 transition-colors"
+                    className="w-full h-[52px] bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-[0.2em] font-bold flex items-center justify-center gap-2 rounded-[2px] shadow-lg cursor-pointer disabled:opacity-50 transition-all"
                   >
                     {isProcessing ? (
                       <>
@@ -1191,29 +1192,29 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Right Column: Price Details Box */}
-          <div className="lg:col-span-5 bg-[#FFFFFF] border border-[#E7D7C0] rounded-[6px] p-6 space-y-6 lg:sticky lg:top-24 shadow-sm">
-            <h3 className="text-[12px] uppercase tracking-[0.25em] text-[#B68A3A] font-bold border-b border-[#E7D7C0] pb-3">
+          {/* Right Column: Price Details Box (Product Card Matching Style) */}
+          <div className="lg:col-span-5 bg-[#3B090D] border border-[#B68A3A]/40 rounded-[4px] p-6 space-y-6 lg:sticky lg:top-24 shadow-md text-[#FAF5EC]">
+            <h3 className="text-[12px] uppercase tracking-[0.25em] text-[#D7B56D] font-bold border-b border-[#B68A3A]/30 pb-3 font-sans">
               PRICE DETAILS
             </h3>
 
             {/* Breakdown Table */}
-            <div className="space-y-3 text-sm text-[#765E55]">
-              <div className="flex justify-between">
-                <span>Items Subtotal</span>
-                <span className="text-[#5B1018] font-semibold text-base tabular-nums">
+            <div className="space-y-3 text-sm text-[#FAF5EC]">
+              <div className="flex justify-between font-medium">
+                <span className="text-[#FAF5EC]/85">Items Subtotal</span>
+                <span className="text-[#FAF5EC] font-bold text-base tabular-nums">
                   ₹{summary?.subtotal.toLocaleString('en-IN') || 0}
                 </span>
               </div>
 
-              <div className="flex justify-between items-center">
-                <span>Delivery Charge</span>
+              <div className="flex justify-between items-center font-medium">
+                <span className="text-[#FAF5EC]/85">Delivery Charge</span>
                 {summary?.shipping === 0 ? (
-                  <span className="text-emerald-700 text-xs uppercase tracking-wider font-semibold">
+                  <span className="text-emerald-400 text-xs uppercase tracking-wider font-semibold">
                     FREE (OVER ₹1999)
                   </span>
                 ) : (
-                  <span className="text-[#5B1018] font-semibold text-base tabular-nums">
+                  <span className="text-[#FAF5EC] font-bold text-base tabular-nums">
                     ₹{summary?.shipping}
                   </span>
                 )}
@@ -1221,30 +1222,30 @@ function CheckoutContent() {
 
               {/* GST Display */}
               {summary?.gstMode === 'exclusive' && summary.gst > 0 ? (
-                <div className="flex justify-between">
-                  <span>GST (3%)</span>
-                  <span className="text-[#5B1018] font-semibold text-base tabular-nums">
+                <div className="flex justify-between font-medium">
+                  <span className="text-[#FAF5EC]/85">GST (3%)</span>
+                  <span className="text-[#FAF5EC] font-bold text-base tabular-nums">
                     ₹{summary.gst.toLocaleString('en-IN')}
                   </span>
                 </div>
               ) : (
-                <div className="text-xs text-[#765E55]/80 uppercase tracking-wider pt-1">
+                <div className="text-xs text-[#FAF5EC]/70 uppercase tracking-wider pt-1 font-medium">
                   Inclusive of all taxes
                 </div>
               )}
 
               {summary && summary.totalSavings > 0 && (
-                <div className="p-3 bg-emerald-50 border border-emerald-500/30 rounded-[2px] flex items-center justify-between text-xs text-emerald-800 font-semibold">
+                <div className="p-3 bg-emerald-950/60 border border-emerald-500/30 rounded-[2px] flex items-center justify-between text-xs text-emerald-400 font-semibold">
                   <span>YOUR SAVINGS</span>
                   <span className="font-serif">₹{summary.totalSavings.toLocaleString('en-IN')}</span>
                 </div>
               )}
 
-              <div className="border-t border-[#E7D7C0] pt-4 flex justify-between items-baseline">
-                <span className="text-sm uppercase tracking-wider text-[#5B1018] font-bold">
+              <div className="border-t border-[#B68A3A]/30 pt-4 flex justify-between items-baseline">
+                <span className="text-sm uppercase tracking-wider text-[#FAF5EC] font-bold">
                   TOTAL AMOUNT
                 </span>
-                <span className="font-serif text-[28px] text-[#5B1018] font-medium tabular-nums">
+                <span className="font-serif text-[28px] font-bold tabular-nums text-transparent bg-clip-text bg-gradient-to-r from-[#F7DA96] via-[#E5B869] to-[#B68A3A]">
                   ₹{summary?.total.toLocaleString('en-IN') || 0}
                 </span>
               </div>
@@ -1254,12 +1255,12 @@ function CheckoutContent() {
       </main>
 
       {/* Mobile Sticky Bottom Action Bar (375px) */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#FAF5EC] border-t border-[#E7D7C0] p-3 z-40 flex items-center justify-between shadow-2xl">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#2E070B] border-t border-[#B68A3A]/40 p-3 z-40 flex items-center justify-between shadow-2xl text-[#FAF5EC]">
         <div>
-          <div className="font-sans text-[10px] uppercase tracking-wider text-[#765E55]">
+          <div className="font-sans text-[10px] uppercase tracking-wider text-[#FAF5EC]/75 font-semibold">
             TOTAL AMOUNT
           </div>
-          <div className="font-serif text-xl text-[#5B1018] font-semibold">
+          <div className="font-serif text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F7DA96] via-[#E5B869] to-[#B68A3A]">
             ₹{summary?.total.toLocaleString('en-IN') || 0}
           </div>
         </div>
@@ -1268,7 +1269,7 @@ function CheckoutContent() {
           <button
             onClick={handlePlaceOrder}
             disabled={isProcessing || !summary?.valid}
-            className="h-11 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.2em] font-bold rounded-[2px] shadow-sm disabled:opacity-50 cursor-pointer"
+            className="h-11 px-6 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-[0.2em] font-bold rounded-[2px] shadow-sm disabled:opacity-50 cursor-pointer transition-all"
           >
             {isProcessing ? (
               <span>PROCESSING...</span>
@@ -1281,12 +1282,14 @@ function CheckoutContent() {
         ) : (
           <button
             onClick={() => setActiveStep((s) => Math.min(4, s + 1))}
-            className="h-11 px-6 bg-[#5B1018] text-[#FAF5EC] hover:bg-[#3B090D] font-sans text-xs uppercase tracking-[0.2em] font-semibold rounded-[2px] cursor-pointer"
+            className="h-11 px-6 bg-[#5B1018] text-[#FAF5EC] border border-[#76252C] hover:bg-[#76252C] hover:border-[#D7B56D] font-sans text-xs uppercase tracking-[0.2em] font-semibold rounded-[2px] cursor-pointer transition-all"
           >
             NEXT STEP
           </button>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }
@@ -1295,7 +1298,7 @@ export default function CheckoutPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen bg-[#FAF5EC] flex items-center justify-center">
+        <div className="min-h-screen bg-[#2E070B] flex items-center justify-center">
           <Loader2 className="w-8 h-8 animate-spin text-[#B68A3A]" />
         </div>
       }
